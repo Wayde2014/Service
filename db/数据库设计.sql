@@ -16,10 +16,11 @@ CREATE TABLE `t_user_info` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_uid`),
   UNIQUE KEY `f_mobile` (`f_mobile`)
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='用户信息表';
+
 
 /*用户地址信息表*/
-CREATE TABLE `t_address_info` (
+CREATE TABLE `t_user_address_info` (
   `f_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int(11) NOT NULL COMMENT '用户uid',
   `f_province` varchar(100) NOT NULL COMMENT '省份名称',
@@ -31,7 +32,8 @@ CREATE TABLE `t_address_info` (
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户地址信息表';
+
 
 /*用户账户流水表*/
 CREATE TABLE `t_user_paylog` (
@@ -44,10 +46,11 @@ CREATE TABLE `t_user_paylog` (
   `f_tradenote` varchar(1000) default null comment '交易备注',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户账户流水表';
+
 
 /*用户充值订单表*/
-CREATE TABLE `t_charge_order` (
+CREATE TABLE `t_user_charge_order` (
   `f_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int(11) NOT NULL COMMENT '用户uid',
   `f_paymoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '充值金额',
@@ -59,10 +62,11 @@ CREATE TABLE `t_charge_order` (
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户充值订单表';
+
 
 /*用户提款订单表*/
-CREATE TABLE `t_draw_order` (
+CREATE TABLE `t_user_draw_order` (
   `f_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int(11) NOT NULL COMMENT '用户uid',
   `f_drawmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '提款金额',
@@ -74,4 +78,4 @@ CREATE TABLE `t_draw_order` (
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户提款订单表';
