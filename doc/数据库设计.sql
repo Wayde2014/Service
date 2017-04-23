@@ -81,6 +81,25 @@ CREATE TABLE `t_user_draw_order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-提款订单表';
 
 
+/*用户管理-登录信息表*/
+CREATE TABLE `t_user_login` (
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增长ID',
+  `f_uid` int NOT NULL COMMENT '用户ID',
+  `f_usercheck` varchar(100) NOT NULL COMMENT '登录时的ck',
+  `f_logname` varchar(100) DEFAULT NULL COMMENT '登录时的name',
+  `f_uuid` varchar(100) NOT NULL COMMENT 'uuid,设备号',
+  `f_platform` varchar(50) DEFAULT NULL COMMENT '平台：1 web主站,2 android, 3 IOS, 4 H5',
+  `f_ip` varchar(50) DEFAULT NULL COMMENT '登录ip',
+  `f_remark` varchar(500) DEFAULT NULL COMMENT '附属信息',
+  `f_status` int NOT NULL COMMENT '状态(1 成功 0 失败)',
+  `f_note` varchar(500) DEFAULT NULL COMMENT '备注',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`),
+  KEY `idx_uid` (`f_uid`),
+  KEY `idx_ip` (`f_ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 comment '用户管理-登录信息表';
+
+
 /*门店管理-门店信息表*/
 CREATE TABLE `t_store_info` (
   `f_sid` int NOT NULL AUTO_INCREMENT COMMENT '门店uid(自增)',
@@ -93,6 +112,8 @@ CREATE TABLE `t_store_info` (
   `f_closetime` time default null comment '营业结束时间',
   `f_contact` varchar(200) default null comment '联系方式',
   `f_picture` varchar(500) comment '门店图片(多张以英文逗号分隔)',
+  `f_maplat` varchar(50) DEFAULT NULL COMMENT '地图坐标-经度',
+  `f_maplng` varchar(50) DEFAULT NULL COMMENT '地图坐标-纬度',  
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_sid`)
@@ -164,6 +185,17 @@ CREATE TABLE `t_store_account` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='门店管理-资金信息表';
 
 
+/*门店管理-配送员信息表*/
+CREATE TABLE `t_store_distripersion` (
+  `f_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '配送人员ID',
+  `f_username` varchar(200) DEFAULT NULL COMMENT '配送人员名字',
+  `f_mobile` varchar(200) DEFAULT NULL COMMENT '配送员联系方式',
+  `f_state` int(10) NOT NULL COMMENT '配送人员状态（0初始，-1已禁止）',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='门店管理-配送员信息表';
+
+
 /*后台管理-用户信息表*/
 CREATE TABLE `t_admin_userinfo` (
   `f_uid` int NOT NULL AUTO_INCREMENT COMMENT '用户uid(自增)',
@@ -223,3 +255,67 @@ CREATE TABLE `t_admin_role_module` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='后台管理-角色模块关联信息表';
+
+/*菜肴管理-口味信息表*/
+CREATE TABLE `t_food_tastes` (
+  `f_tid` int NOT NULL AUTO_INCREMENT COMMENT '口味ID(自增)',
+  `f_tname` varchar(200) NOT NULL COMMENT '口味名称',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-口味信息表';
+
+
+/*菜肴管理-菜系信息表*/
+CREATE TABLE `t_food_cuisine` (
+  `f_cid` int NOT NULL AUTO_INCREMENT COMMENT '菜系ID(自增)',
+  `f_cname` varchar(200) NOT NULL COMMENT '菜系名称',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_cid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-菜系信息表';
+
+
+/*菜肴管理-菜品信息表*/
+CREATE TABLE `t_food_dishes` (
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '菜肴ID(自增)',
+  `f_name` varchar(200) NOT NULL COMMENT '菜品名称',
+  `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+  `f_state` smallint NOT NULL COMMENT '菜品状态（-1已停售， 0初始， 1预售，100已售完）',
+  `f_tastesid` int NOT NULL COMMENT '口味ID',
+  `f_cuisineid` int NOT NULL COMMENT '菜系ID',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-菜品信息表';
+
+
+/*菜肴管理-菜单信息表*/
+CREATE TABLE `t_food_menu` (
+  `f_id` int NOT NULL AUTO_INCREMENT comment '菜单ID(自增)',
+  `f_oid` int NOT NULL comment 'unknow',
+  `f_foodid` int NOT NULL COMMENT '菜单ID',
+  `f_foodname` varchar(200) DEFAULT NULL COMMENT '菜名',
+  `f_foodicon` varchar(200) DEFAULT NULL COMMENT '菜品图片',
+  `f_foodprice` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+  `f_foodnum` varchar(200) DEFAULT NULL COMMENT '菜品数量',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='菜肴管理-菜单信息表';
+
+
+/*订单管理-订单信息表*/
+CREATE TABLE `t_order_info` (
+  `f_oid` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '订单ID,唯一标识',
+  `f_shopid` smallint NOT NULL COMMENT '店铺ID',
+  `f_type` tinyint NOT NULL DEFAULT 1 COMMENT '订单类型（1,外卖订单  2,食堂订单）',
+  `f_status` smallint NOT NULL DEFAULT 0 COMMENT '订单状态（0,初始 1,未付款 2,已付款 3,配送中 4,配送完成 5,用餐中 100,已完成 -100逾期）',
+  `f_allmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '订单总金额',
+  `f_paymoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '已支付金额',
+  `f_paytype` varchar(200) DEFAULT NULL COMMENT '支付方式',
+  `f_mealsnum` tinyint DEFAULT 0 COMMENT '就餐人数',
+  `f_addressid` int DEFAULT NULL COMMENT '配送地址ID',
+  `f_deliveryid` int DEFAULT NULL COMMENT '配送员ID',
+  `f_startime` timestamp DEFAULT NULL COMMENT '用餐开始时间',
+  `f_endtime` timestamp DEFAULT NULL COMMENT '用餐结束时间',  
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_oid`)
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='订单管理-订单信息表';
