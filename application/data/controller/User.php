@@ -2,14 +2,15 @@
 namespace app\data\controller;
 
 use base\Base;
-use \app\data\model\User_info;
+use \app\data\model\UserModel;
 
 class User extends Base
 {
     /**
      * 发生短信验证码接口
      * @param $mobile
-     * @return string
+     * @param $deviceid
+     * @return \think\response\Json
      */
     public function sendSms($mobile, $deviceid){
         //检查手机号码格式
@@ -27,19 +28,37 @@ class User extends Base
             return json($this->res);
         }
 
+        $UserModel = new UserModel();
+
         //检查该手机号是否已注册，如无则注册
-        $User_info = new User_info();
-        if(!$User_info->checkMobile($mobile)){
-            if(!$User_info->addUser($mobile,$last_deviceid)){
+        $uid = $UserModel->checkMobile($mobile);
+        if($uid === false){
+            $uid =$UserModel->addUser($mobile,$last_deviceid);
+            if($uid === false){
                 $this->res['code'] = -1;
                 $this->res['msg'] = '注册用户失败';
                 return json($this->res);
             }
         }
 
-        //发送短信验证码
+        //检查记录短信发送日志
+        if(!$UserModel->checkSmslog($uid,$mobile)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '短信发送太频繁了';
+            return json($this->res);
+        }
+
+        //发送短信验证码，并更新短信发送日志
         $Sms = new \third\Sms();
-        return json($Sms->sendsms($mobile));
+        $ret = $Sms->sendsms($mobile);
+        if($ret['code'] > 0){
+            $UserModel->updateSmslog($uid,$mobile);
+            $this->res['code'] = -1;
+            $this->res['msg'] = '短信发送太频繁了';
+            return json($this->res);
+        }
+        return json($ret);
+
     }
 
     /**
@@ -48,13 +67,14 @@ class User extends Base
      * @param $vcode
      * @return string
      */
-    public function login($mobile, $vcode){
+    public function login($mobile, $vcode, $deviceid, $platform){
         //检查短信验证码是否正确
         $Sms = new \third\Sms();
         $ret = $Sms->checksms($mobile, $vcode);
-        if($ret['code'] > 0){
+        if($ret['code'] <= 0){
             return json($ret);
         }
+
         //写登录信息
 
 
