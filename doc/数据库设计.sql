@@ -90,7 +90,7 @@ CREATE TABLE `t_user_login` (
   `f_platform` tinyint DEFAULT 1 COMMENT '平台：1 web主站,2 android, 3 IOS, 4 H5',
   `f_ip` varchar(50) DEFAULT NULL COMMENT '登录ip',
   `f_remark` varchar(500) DEFAULT NULL COMMENT '附属信息',
-  `f_expiretime` timestamp not null comment '登录过期时间(默认30天后过期)',
+  `f_expiretime` timestamp not null default '0000-00-00 00:00:00' comment '登录过期时间(默认30天后过期)',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`),
   unique key (`f_usercheck`)

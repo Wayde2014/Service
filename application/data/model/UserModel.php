@@ -151,4 +151,22 @@ class UserModel extends Model
             );
         }
     }
+
+    /**
+     * 通过ck获取用户登录信息
+     * @param $ck
+     * @return bool
+     */
+    public function getLoginUserInfo($ck){
+        $table_name = 'user_login';
+        $userinfo = Db::name($table_name)
+            ->where('f_usercheck',$ck)
+            ->where('f_expiretime','GT',time())
+            ->field('f_uid as uid')
+            ->select();
+        if(empty($userinfo)){
+            return false;
+        }
+        return $userinfo[0];
+    }
 }
