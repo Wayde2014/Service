@@ -52,10 +52,11 @@ class User extends Base
         $Sms = new \third\Sms();
         $ret = $Sms->sendsms($mobile);
         if($ret['code'] > 0){
-            $UserModel->updateSmslog($uid,$mobile);
-            $this->res['code'] = -1;
-            $this->res['msg'] = '短信发送太频繁了';
-            return json($this->res);
+            if(!$UserModel->updateSmslog($uid,$mobile)){
+                $this->res['code'] = -1;
+                $this->res['msg'] = '更新短信发送日志失败';
+                return json($this->res);
+            }
         }
         return json($ret);
 
@@ -67,7 +68,7 @@ class User extends Base
      * @param $vcode
      * @return string
      */
-    public function login($mobile, $vcode, $deviceid, $platform){
+    public function login($mobile, $vcode, $deviceid, $platform, $ip, $remark=''){
         //检查短信验证码是否正确
         $Sms = new \third\Sms();
         $ret = $Sms->checksms($mobile, $vcode);
@@ -76,8 +77,24 @@ class User extends Base
         }
 
         //写登录信息
-
-
+        $UserModel = new UserModel();
+        $uid = $UserModel->checkMobile($mobile);
+        $ck = md5($uid+$mobile+time());
+        $platform = intval($platform);
+        $expiretime = date("Y-m-d H:i:s", time()+30*24*3600);
+        $ret_login = $UserModel->addUserLogin($ck,$uid,$deviceid,$platform,$ip,$remark,$expiretime);
+        if($ret_login === false){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '写登录信息失败';
+            return json($this->res);
+        }
+        $this->res['code'] = 1;
+        $this->res['msg'] = '登录成功';
+        $this->res['info'] = array(
+            'ck' => $ret_login['usercheck'],
+            'expiretime' => $ret_login['expiretime'],
+        );
+        return json($this->res);
     }
 
 }
