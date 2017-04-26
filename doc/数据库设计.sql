@@ -319,3 +319,14 @@ CREATE TABLE `t_order_info` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_oid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='订单管理-订单信息表';
+
+/*用户管理-短信发送记录表*/
+CREATE TABLE `t_user_smslog` (
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `f_uid` int NOT NULL COMMENT '用户uid',
+  `f_mobile` varchar(50) NOT NULL COMMENT '手机号码',
+  `f_count` int default 0 COMMENT '发送成功次数',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`),
+  UNIQUE KEY (`f_uid`,`f_mobile`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-短信发送记录表';
