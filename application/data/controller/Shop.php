@@ -57,7 +57,7 @@ class Shop extends Base
         if($shopid){
             $res = Db::query(
             'SELECT
-                a.f_sid sid,
+                a.f_sid sid, 
                 a.f_shopname shopname,
                 a.f_shopicon shopicon,
                 a.f_shophone shophone,
