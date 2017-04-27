@@ -84,19 +84,16 @@ CREATE TABLE `t_user_draw_order` (
 /*用户管理-登录信息表*/
 CREATE TABLE `t_user_login` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增长ID',
-  `f_uid` int NOT NULL COMMENT '用户ID',
-  `f_usercheck` varchar(100) NOT NULL COMMENT '登录时的ck',
-  `f_logname` varchar(100) DEFAULT NULL COMMENT '登录时的name',
-  `f_uuid` varchar(100) NOT NULL COMMENT 'uuid,设备号',
-  `f_platform` varchar(50) DEFAULT NULL COMMENT '平台：1 web主站,2 android, 3 IOS, 4 H5',
+  `f_usercheck` varchar(200) NOT NULL COMMENT '登录ck',
+  `f_uid` int NOT NULL COMMENT '登录用户ID',
+  `f_deviceid` varchar(200) DEFAULT NULL COMMENT '登录设备号',
+  `f_platform` tinyint DEFAULT 1 COMMENT '平台：1 web主站,2 android, 3 IOS, 4 H5',
   `f_ip` varchar(50) DEFAULT NULL COMMENT '登录ip',
   `f_remark` varchar(500) DEFAULT NULL COMMENT '附属信息',
-  `f_status` int NOT NULL COMMENT '状态(1 成功 0 失败)',
-  `f_note` varchar(500) DEFAULT NULL COMMENT '备注',
+  `f_expiretime` timestamp not null default '0000-00-00 00:00:00' comment '登录过期时间(默认30天后过期)',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`),
-  KEY `idx_uid` (`f_uid`),
-  KEY `idx_ip` (`f_ip`)
+  unique key (`f_usercheck`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 comment '用户管理-登录信息表';
 
 
@@ -319,3 +316,14 @@ CREATE TABLE `t_order_info` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_oid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='订单管理-订单信息表';
+
+/*用户管理-短信发送记录表*/
+CREATE TABLE `t_user_smslog` (
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `f_uid` int NOT NULL COMMENT '用户uid',
+  `f_mobile` varchar(50) NOT NULL COMMENT '手机号码',
+  `f_count` int default 0 COMMENT '发送成功次数',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`),
+  UNIQUE KEY (`f_uid`,`f_mobile`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-短信发送记录表';
