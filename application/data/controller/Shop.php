@@ -47,8 +47,55 @@ class Shop extends Base
         }
         return json($this->res);
     }
+    /**
+     * 获取店铺详情
+     */
+    public function getShopDetail(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        if($shopid){
+            $res = Db::query(
+            'SELECT
+                a.f_sid sid,
+                a.f_shopname shopname,
+                a.f_shopicon shopicon,
+                a.f_shophone shophone,
+                a.f_address address,
+                a.f_menulist menulist,
+                a.f_sales sales,
+                a.f_deliveryfee deliveryfee,
+                a.f_minprice minprice,
+                a.f_preconsume preconsume,
+                a.f_isbooking isbooking,
+                a.f_isaway isaway,
+                a.f_opentime opentime,
+                a.f_deliverytime deliverytime,
+                b.f_cname cuisinename
+            FROM
+                t_dineshop a left join t_food_cuisine b on a.f_cuisineid = b.f_cid
+            WHERE
+                f_sid = :shopid',['shopid'=>intval($shopid)]);
+            if($res){
+                $info = $res[0];
+                $menulist = $info['menulist'];
+                $list = Db::query(
+                "SELECT
+                    a.f_id id,
+                    a.f_icon icon,
+                    a.f_name dishesname,
+                    a.f_price price,
+                    a.f_tastesid tastesid,
+                    c.f_cname cuisinename
+                FROM
+                    t_food_dishes a left join t_food_cuisine c on a.f_cuisineid = c.f_cid
+                WHERE
+                    instr(concat(',','".$menulist."',','),concat(',',f_id,',')) > 0");
+            }
+        }
+        $this->res['code'] = 1;
+        $this->res['info'] = $info;
+        $this->res['list'] = $list;
+        return json($this->res);
+    }
 }
-
-#114.240668,22.703796
-#纬度lat 22.703796 经度lon 114.240668
-//SELECT *,ROUND(6378.138 *2*ASIN(SQRT(POW(SIN((22.703796*PI()/180-f_maplat*PI()/180)/2),2)+COS(22.703796*PI()/180)*COS(f_maplat*PI()/180)*POW(SIN((114.240668*PI()/180-f_maplon*PI()/180)/2),2)))*1000) AS distance FROM t_dineshop ORDER BY distance ASC
