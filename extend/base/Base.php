@@ -43,11 +43,14 @@ class Base
                 if($k == 'token'){
                     continue;
                 }
-                $sign_str .= $k."=".$v;
+                $sign_str .= $k."=".$v."&";
+            }
+            if(!empty($sign_str)){
+                $sign_str = substr($sign_str,0,-1);
             }
         }
         $token = strtoupper(md5($sign_str.$this->sign_key));
-        if($token_ori != $token){
+        if(strtoupper($token_ori) != $token){
             $this->res['code'] = -1;
             $this->res['msg'] = 'Token error';
             return false;
