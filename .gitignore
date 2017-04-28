@@ -3,6 +3,5 @@ Thumbs.db
 Desktop.ini
 
 # My configurations:
-runtime/
-application/database.php
-.idea/
+/application/database.php
+/runtime/
