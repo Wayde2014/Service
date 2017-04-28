@@ -19,7 +19,7 @@ return [
     // 用户名
     'username'        => 'shanwei',
     // 密码
-    'password'        => 'shanwei@500',
+    'password'        => 'shanwei@zouyi.com',
     // 端口
     'hostport'        => '3306',
     // 连接dsn
