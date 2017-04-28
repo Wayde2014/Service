@@ -99,6 +99,46 @@ class UserModel extends Model
         }
     }
 
+    /**
+     * 延长登录过期时间
+     * @param $usercheck
+     * @return bool
+     */
+    public function extendExpireTime($usercheck){
+        $table_name = 'user_login';
+        $data = array(
+            'f_expiretime' => date("Y-m-d H:i:s", time()+30*24*3600),
+        );
+        $retup = Db::name($table_name)
+            ->where('f_usercheck',$usercheck)
+            ->where('f_lasttime','LT',time()-3600)
+            ->update($data);
+        if($retup !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 设置CK过期
+     * @param $usercheck
+     * @return bool
+     */
+    public function setCkExpired($usercheck){
+        $table_name = 'user_login';
+        $data = array(
+            'f_expiretime' => date("Y-m-d H:i:s", time()-60),
+        );
+        $retup = Db::name($table_name)
+            ->where('f_usercheck',$usercheck)
+            ->update($data);
+        if($retup !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     /**
      * 记录登录信息
@@ -108,10 +148,9 @@ class UserModel extends Model
      * @param $platform
      * @param $ip
      * @param $remark
-     * @param $expiretime
      * @return array
      */
-    public function addUserLogin($ck, $uid, $deviceid, $platform, $ip, $remark, $expiretime){
+    public function addUserLogin($ck, $uid, $deviceid, $platform, $ip, $remark){
         $table_name = 'user_login';
         //判断用户当前登录态是否已失效
         $ret = Db::name($table_name)
@@ -121,17 +160,14 @@ class UserModel extends Model
             ->select();
 
         if(!empty($ret)){
-            //更新过期时间
             $usercheck = $ret[0]['usercheck'];
-            $data = array(
-                'f_expiretime' => $expiretime,
-            );
-            Db::name($table_name)->where('f_usercheck',$usercheck)->update($data);
+            self::extendExpireTime($usercheck);
             return array(
                 'usercheck' => $usercheck,
-                'expiretime' => $expiretime,
+                'uid' => $uid,
             );
         }else{
+            $expiretime = date("Y-m-d H:i:s", time()+30*24*3600);
             $data = array(
                 'f_usercheck' => $ck,
                 'f_uid' => $uid,
@@ -147,7 +183,7 @@ class UserModel extends Model
             }
             return array(
                 'usercheck' => $ck,
-                'expiretime' => $expiretime,
+                'uid' => $uid,
             );
         }
     }
