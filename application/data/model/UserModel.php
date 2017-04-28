@@ -111,7 +111,7 @@ class UserModel extends Model
         );
         $retup = Db::name($table_name)
             ->where('f_usercheck',$usercheck)
-            ->where('f_lasttime','LT',time()-3600)
+            ->where('f_lasttime','< time',time()-3600)
             ->update($data);
         if($retup !== false){
             return true;
