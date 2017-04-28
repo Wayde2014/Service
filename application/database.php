@@ -9,6 +9,7 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+
 return [
     // 数据库类型
     'type'            => 'mysql',
@@ -17,9 +18,9 @@ return [
     // 数据库名
     'database'        => 'shanwei',
     // 用户名
-    'username'        => 'root',
+    'username'        => 'shanwei',
     // 密码
-    'password'        => '123456',
+    'password'        => 'shanwei@zouyi.com',
     // 端口
     'hostport'        => '3306',
     // 连接dsn
