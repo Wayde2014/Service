@@ -50,7 +50,7 @@ class Base
             }
         }
         $token = strtoupper(md5($sign_str.$this->sign_key));
-        if($token_ori != $token){
+        if(strtoupper($token_ori) != $token){
             $this->res['code'] = -1;
             $this->res['msg'] = 'Token error';
             return false;
