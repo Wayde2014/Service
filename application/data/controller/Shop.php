@@ -6,10 +6,10 @@ use think\Db;
 class Shop extends Base
 {
     /**
-     * »ñÈ¡ÍÆ¼öÁĞ±í
+     * è·å–æ¨èåˆ—è¡¨
      */
     public function getRecomList(){
-        $num = input('num')?input('num'):4; //È¡ÍÆ¼öµêÆÌ¸öÊı
+        $num = input('num')?input('num'):4; //å–æ¨èåº—é“ºä¸ªæ•°
         $list = Db::query('select f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sort sort from t_dineshop_recom order by f_sort asc limit 0,:num',['num'=>intval($num)]);
         if($list && count($list) > 0){
             $this->res['code'] = 1;
@@ -18,13 +18,13 @@ class Shop extends Base
         return json($this->res);
     }
     /**
-     * »ñÈ¡ÍâÂôÁĞ±í
+     * è·å–å¤–å–åˆ—è¡¨
      */
     public function getTakeoutList(){
-        $page = input('page')?input('page'):1; //Ò³Âë
-        $pagesize = input('pagesize')?input('pagesize'):10; //Ã¿Ò³ÊıÁ¿
-        $lon = input('lon')?input('lon'):'114.240668'; //¾­¶È
-        $lat = input('lat')?input('lat'):'22.703796'; //Î³¶È
+        $page = input('page')?input('page'):1; //é¡µç 
+        $pagesize = input('pagesize')?input('pagesize'):10; //æ¯é¡µæ•°é‡
+        $lon = input('lon')?input('lon'):'114.240668'; //ç»åº¦
+        $lat = input('lat')?input('lat'):'22.703796'; //çº¬åº¦
         $list = Db::query('SELECT f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sales sales, f_deliveryfee deliveryfee, f_minprice minprice, f_preconsume preconsume, f_modtime modtime, distance distance FROM(SELECT *,ROUND(6378.138 *2*ASIN(SQRT(POW(SIN((:lat1*PI()/180-f_maplat*PI()/180)/2),2)+COS(:lat2*PI()/180)*COS(f_maplat*PI()/180)*POW(SIN((:lon*PI()/180-f_maplon*PI()/180)/2),2)))*1000) AS distance FROM t_dineshop where f_isaway=:isaway ORDER BY distance ASC) a LIMIT :page,:pagesize',['lon'=>floatval($lon), 'lat1'=>floatval($lat), 'lat2'=>floatval($lat), 'isaway'=>1, 'page'=>intval(($page-1)*$pagesize), 'pagesize'=>intval($pagesize)]);
         if($list && count($list) > 0){
             $this->res['code'] = 1;
@@ -33,13 +33,13 @@ class Shop extends Base
         return json($this->res);
     }
     /**
-     * »ñÈ¡Ê³ÌÃÁĞ±í
+     * è·å–é£Ÿå ‚åˆ—è¡¨
      */
     public function getCanteenList(){
-        $page = input('page')?input('page'):1; //Ò³Âë
-        $pagesize = input('pagesize')?input('pagesize'):10; //Ã¿Ò³ÊıÁ¿
-        $lon = input('lon')?input('lon'):'114.240668'; //¾­¶È
-        $lat = input('lat')?input('lat'):'22.703796'; //Î³¶È
+        $page = input('page')?input('page'):1; //é¡µç 
+        $pagesize = input('pagesize')?input('pagesize'):10; //æ¯é¡µæ•°é‡
+        $lon = input('lon')?input('lon'):'114.240668'; //ç»åº¦
+        $lat = input('lat')?input('lat'):'22.703796'; //çº¬åº¦
         $list = Db::query('SELECT f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sales sales, f_deliveryfee deliveryfee, f_minprice minprice, f_preconsume preconsume, f_modtime modtime, distance distance FROM(SELECT *,ROUND(6378.138 *2*ASIN(SQRT(POW(SIN((:lat1*PI()/180-f_maplat*PI()/180)/2),2)+COS(:lat2*PI()/180)*COS(f_maplat*PI()/180)*POW(SIN((:lon*PI()/180-f_maplon*PI()/180)/2),2)))*1000) AS distance FROM t_dineshop where f_isbooking=:isbooking ORDER BY distance ASC) a LIMIT :page,:pagesize',['lon'=>floatval($lon), 'lat1'=>floatval($lat), 'lat2'=>floatval($lat), 'isbooking'=>1, 'page'=>intval(($page-1)*$pagesize), 'pagesize'=>intval($pagesize)]);
         if($list && count($list) > 0){
             $this->res['code'] = 1;
@@ -48,12 +48,12 @@ class Shop extends Base
         return json($this->res);
     }
     /**
-     * »ñÈ¡µêÆÌÏêÇé
+     * è·å–åº—é“ºè¯¦æƒ…
      */
     public function getShopDetail(){
         $info = array();
         $list = array();
-        $shopid = input('shopid'); //µêÆÌID
+        $shopid = input('shopid'); //åº—é“ºID
         if($shopid){
             $res = Db::query(
             'SELECT
