@@ -107,7 +107,7 @@ class User extends Base
      */
     public function logout()
     {
-        $usercheck = input('usercheck');
+        $usercheck = input('ck');
         $UserModel = new UserModel();
         if ($UserModel->setCkExpired($usercheck)) {
             $this->res['code'] = 1;
