@@ -6,6 +6,11 @@ use \app\data\model\UserModel;
 
 class User extends Base
 {
+    private $paytype_list = array(100,200); //100-充值余额,200-充值押金
+    private $paychannel_list = array(1001,1002); //1001-支付宝充值,1002-微信充值
+    private $paysuc = 100;
+    private $payfail = -100;
+
     /**
      * 发生短信验证码接口
      * @return \think\response\Json
@@ -118,6 +123,66 @@ class User extends Base
             $this->res['msg'] = '退出登录失败';
             return json($this->res);
         }
+    }
+
+    /**
+     * 下用户充值订单接口
+     * @return \think\response\Json
+     */
+    public function recharge(){
+        //获取参数
+        $ck = input('ck');
+        $paytype = intval(input('paytype',0));
+        $paymoney = floatval(input('paymoney',0));
+        $paychannel = intval(input('channel',0));
+        $payaccount = input('account');
+        $paynote = input('paynote');
+
+        //校验参数
+        if(empty($ck)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = 'CK不能为空';
+            return json($this->res);
+        }
+        if(!in_array($paytype,$this->paytype_list)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '充值类型错误';
+            return json($this->res);
+        }
+        if(!in_array($paychannel,$this->paychannel_list)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '充值渠道错误';
+            return json($this->res);
+        }
+        if($paymoney <= 0){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '充值金额不能小于0';
+            return json($this->res);
+        }
+
+        //获取用户信息
+        $userinfo = self::getUserInfo($ck);
+        if(empty($userinfo)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '用户尚未登录';
+            return json($this->res);
+        }
+
+        $UserModel = new UserModel();
+        $uid = $userinfo['uid'];
+        $orderid = $UserModel->addChargeInfo($uid,$paymoney,$paytype,$paychannel,$payaccount,$paynote);
+        if($orderid === false){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '充值下单失败';
+            return json($this->res);
+        }
+
+        //暂时直接入账成功
+        $UserModel->updateChargeStatus($orderid,$this->paysuc);
+
+        $this->res['code'] = 1;
+        $this->res['msg'] = '充值下单成功';
+        return json($this->res);
     }
 
 }

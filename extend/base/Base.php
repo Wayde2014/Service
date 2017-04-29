@@ -1,6 +1,8 @@
 <?php
 namespace base;
 
+use \app\data\model\UserModel;
+
 class Base
 {
     // 配置参数
@@ -52,10 +54,28 @@ class Base
         $token = strtoupper(md5($sign_str.$this->sign_key));
         if(strtoupper($token_ori) != $token){
             $this->res['code'] = -1;
-            $this->res['msg'] = 'Token error';
+            $this->res['msg'] = 'Token error | '.$token;;
             return false;
         }
         return true;
+    }
+
+    /**
+     * 通过ck获取登录用户信息
+     * @param $ck
+     * @return array
+     */
+    public function getUserInfo($ck){
+        $UserModel = new UserModel();
+        $UserModel->extendExpireTime($ck);
+        $userinfo = $UserModel->getLoginUserInfo($ck);
+        if(empty($userinfo)){
+            return array();
+        }
+        $userid = $userinfo[0]['uid'];
+        return array(
+            'uid' => $userid,
+        );
     }
 }
 

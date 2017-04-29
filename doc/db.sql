@@ -1,329 +1,329 @@
-/*ÓÃ»§¹ÜÀí-ÓÃ»§ĞÅÏ¢±í*/
+/*ç”¨æˆ·ç®¡ç†-ç”¨æˆ·ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_user_info` (
-  `f_uid` int NOT NULL AUTO_INCREMENT COMMENT 'ÓÃ»§uid(×ÔÔö)',
-  `f_nickname` varchar(50) DEFAULT NULL COMMENT 'ÓÃ»§êÇ³Æ',
-  `f_mobile` varchar(50) NOT NULL COMMENT 'ÊÖ»úºÅÂë',
-  `f_realname` varchar(200) DEFAULT NULL COMMENT 'ÕæÊµĞÕÃû',
-  `f_sex` tinyint DEFAULT 0 COMMENT 'ĞÔ±ğ(0-Î´Öª,1-ÄĞ,2-Å®)',
-  `f_idcard` varchar(50) DEFAULT NULL COMMENT 'Éí·İÖ¤ºÅÂë',
-  `f_auth_status` smallint default 0 COMMENT 'ÊµÃûÈÏÖ¤×´Ì¬(0-Î´ÈÏÖ¤,100-ÒÑÈÏÖ¤,-100-ÈÏÖ¤Ê§°Ü)',
-  `f_usermoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'ÓÃ»§Óà¶î',
-  `f_freezemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '¶³½á½ğ¶î',
-  `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'Ñº½ğ½ğ¶î',
-  `f_user_status` smallint default 0 COMMENT 'ÓÃ»§×´Ì¬(0-Ä¬ÈÏ,100-ÒÑ³äÖµÑº½ğ,200-ÒÑÊµÃûÈÏÖ¤,-100-ºÚÃûµ¥)',
-  `f_lastdevice` varchar(200) DEFAULT NULL COMMENT 'ÓÃ»§×î½üÊ¹ÓÃµÄÉè±¸',
-  `f_regtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '×¢²áÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_uid` int NOT NULL AUTO_INCREMENT COMMENT 'ç”¨æˆ·uid(è‡ªå¢)',
+  `f_nickname` varchar(50) DEFAULT NULL COMMENT 'ç”¨æˆ·æ˜µç§°',
+  `f_mobile` varchar(50) NOT NULL COMMENT 'æ‰‹æœºå·ç ',
+  `f_realname` varchar(200) DEFAULT NULL COMMENT 'çœŸå®å§“å',
+  `f_sex` tinyint DEFAULT 0 COMMENT 'æ€§åˆ«(0-æœªçŸ¥,1-ç”·,2-å¥³)',
+  `f_idcard` varchar(50) DEFAULT NULL COMMENT 'èº«ä»½è¯å·ç ',
+  `f_auth_status` smallint default 0 COMMENT 'å®åè®¤è¯çŠ¶æ€(0-æœªè®¤è¯,100-å·²è®¤è¯,-100-è®¤è¯å¤±è´¥)',
+  `f_usermoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'ç”¨æˆ·ä½™é¢',
+  `f_freezemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'å†»ç»“é‡‘é¢',
+  `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'æŠ¼é‡‘é‡‘é¢',
+  `f_user_status` smallint default 0 COMMENT 'ç”¨æˆ·çŠ¶æ€(0-é»˜è®¤,100-å·²å……å€¼æŠ¼é‡‘,200-å·²å®åè®¤è¯,-100-é»‘åå•)',
+  `f_lastdevice` varchar(200) DEFAULT NULL COMMENT 'ç”¨æˆ·æœ€è¿‘ä½¿ç”¨çš„è®¾å¤‡',
+  `f_regtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ³¨å†Œæ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_uid`),
   UNIQUE KEY `f_mobile` (`f_mobile`)
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='ÓÃ»§¹ÜÀí-ÓÃ»§ĞÅÏ¢±í';
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='ç”¨æˆ·ç®¡ç†-ç”¨æˆ·ä¿¡æ¯è¡¨';
 
 
-/*ÓÃ»§¹ÜÀí-µØÖ·ĞÅÏ¢±í*/
+/*ç”¨æˆ·ç®¡ç†-åœ°å€ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_user_address_info` (
-  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_uid` int NOT NULL COMMENT 'ÓÃ»§uid',
-  `f_province` varchar(100) NOT NULL COMMENT 'Ê¡·İÃû³Æ',
-  `f_city` varchar(100) NOT NULL COMMENT '³ÇÊĞÃû³Æ',
-  `f_address` varchar(1000) NOT NULL COMMENT 'ÏêÏ¸µØÖ·',
-  `f_mobile` varchar(50) NOT NULL COMMENT 'ÁªÏµµç»°',
-  `f_isactive` tinyint default 0 COMMENT 'ÊÇ·ñÄ¬ÈÏµØÖ·(0-·ñ,1-ÊÇ)',
-  `f_status` tinyint default 0 COMMENT 'µØÖ·×´Ì¬(0-ÓĞĞ§,-1-ÎŞĞ§)',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_uid` int NOT NULL COMMENT 'ç”¨æˆ·uid',
+  `f_province` varchar(100) NOT NULL COMMENT 'çœä»½åç§°',
+  `f_city` varchar(100) NOT NULL COMMENT 'åŸå¸‚åç§°',
+  `f_address` varchar(1000) NOT NULL COMMENT 'è¯¦ç»†åœ°å€',
+  `f_mobile` varchar(50) NOT NULL COMMENT 'è”ç³»ç”µè¯',
+  `f_isactive` tinyint default 0 COMMENT 'æ˜¯å¦é»˜è®¤åœ°å€(0-å¦,1-æ˜¯)',
+  `f_status` tinyint default 0 COMMENT 'åœ°å€çŠ¶æ€(0-æœ‰æ•ˆ,-1-æ— æ•ˆ)',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÓÃ»§¹ÜÀí-µØÖ·ĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ç”¨æˆ·ç®¡ç†-åœ°å€ä¿¡æ¯è¡¨';
 
 
-/*ÓÃ»§¹ÜÀí-ÕË»§Á÷Ë®±í*/
+/*ç”¨æˆ·ç®¡ç†-è´¦æˆ·æµæ°´è¡¨*/
 CREATE TABLE `t_user_paylog` (
-  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_uid` int NOT NULL COMMENT 'ÓÃ»§uid',
-  `f_inout` tinyint not null comment '³öÈëÕËÀàĞÍ(1-ÈëÕË,2-³öÕË)',
-  `f_trademoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' comment '½»Ò×½ğ¶î',
-  `f_tradetype` varchar(200) NOT NULL COMMENT '½»Ò×ÀàĞÍ(1001-Óà¶î³äÖµ,1002-Ñº½ğ³äÖµ,1004-¶©µ¥½â¶³,1003-Ñº½ğÍË¿î½â¶³,2001-Ñº½ğÍË¿î,2002-Ñº½ğÍË¿î¶³½á,2003-¶©µ¥Ö§¸¶,2004-¶©µ¥¶³½á)',
-  `f_suborder` varchar(200) default null COMMENT '¶©µ¥ºÅ', 
-  `f_tradenote` varchar(1000) default null comment '½»Ò×±¸×¢',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_uid` int NOT NULL COMMENT 'ç”¨æˆ·uid',
+  `f_inout` tinyint not null comment 'å‡ºå…¥è´¦ç±»å‹(1-å…¥è´¦,2-å‡ºè´¦)',
+  `f_trademoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' comment 'äº¤æ˜“é‡‘é¢',
+  `f_tradetype` varchar(200) NOT NULL COMMENT 'äº¤æ˜“ç±»å‹(1001-ä½™é¢å……å€¼,1002-æŠ¼é‡‘å……å€¼,1004-è®¢å•è§£å†»,1003-æŠ¼é‡‘é€€æ¬¾è§£å†»,2001-æŠ¼é‡‘é€€æ¬¾,2002-æŠ¼é‡‘é€€æ¬¾å†»ç»“,2003-è®¢å•æ”¯ä»˜,2004-è®¢å•å†»ç»“)',
+  `f_suborder` varchar(200) default null COMMENT 'è®¢å•å·',
+  `f_tradenote` varchar(1000) default null comment 'äº¤æ˜“å¤‡æ³¨',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÓÃ»§¹ÜÀí-ÕË»§Á÷Ë®±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ç”¨æˆ·ç®¡ç†-è´¦æˆ·æµæ°´è¡¨';
 
 
-/*ÓÃ»§¹ÜÀí-³äÖµ¶©µ¥±í*/
+/*ç”¨æˆ·ç®¡ç†-å……å€¼è®¢å•è¡¨*/
 CREATE TABLE `t_user_charge_order` (
-  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_uid` int NOT NULL COMMENT 'ÓÃ»§uid',
-  `f_paymoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '³äÖµ½ğ¶î',
-  `f_paytype` smallint NOT NULL COMMENT '³äÖµÀàĞÍ(100-³äÖµÓà¶î,200-³äÖµÑº½ğ)',
-  `f_channel` varchar(50) not NULL COMMENT '³äÖµÇşµÀ',
-  `f_account` varchar(200) not NULL COMMENT '³äÖµÕËºÅ',
-  `f_status` smallint default 0 COMMENT '¶©µ¥×´Ì¬(0-Ä¬ÈÏ,100-³äÖµ³É¹¦,-100-³äÖµÊ§°Ü)',
-  `f_paynote` varchar(1000) default null comment '³äÖµ±¸×¢',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_uid` int NOT NULL COMMENT 'ç”¨æˆ·uid',
+  `f_paymoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'å……å€¼é‡‘é¢',
+  `f_paytype` smallint NOT NULL COMMENT 'å……å€¼ç±»å‹(100-å……å€¼ä½™é¢,200-å……å€¼æŠ¼é‡‘)',
+  `f_channel` smallint not NULL COMMENT 'å……å€¼æ¸ é“(1001-æ”¯ä»˜å®å……å€¼,1002-å¾®ä¿¡å……å€¼)',
+  `f_account` varchar(200) not NULL COMMENT 'å……å€¼è´¦å·',
+  `f_status` smallint default 0 COMMENT 'è®¢å•çŠ¶æ€(0-é»˜è®¤,100-å……å€¼æˆåŠŸ,-100-å……å€¼å¤±è´¥)',
+  `f_paynote` varchar(1000) default null comment 'å……å€¼å¤‡æ³¨',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÓÃ»§¹ÜÀí-³äÖµ¶©µ¥±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ç”¨æˆ·ç®¡ç†-å……å€¼è®¢å•è¡¨';
 
 
-/*ÓÃ»§¹ÜÀí-Ìá¿î¶©µ¥±í*/
+/*ç”¨æˆ·ç®¡ç†-ææ¬¾è®¢å•è¡¨*/
 CREATE TABLE `t_user_draw_order` (
-  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_uid` int NOT NULL COMMENT 'ÓÃ»§uid',
-  `f_drawmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'Ìá¿î½ğ¶î',
-  `f_drawtype` smallint NOT NULL default 200 COMMENT '³äÖµÀàĞÍ(100-Óà¶îÌá¿î,200-Ñº½ğÍË¿î)',
-  `f_channel` varchar(50) not NULL COMMENT 'Ìá¿îÇşµÀ',
-  `f_account` varchar(200) not NULL COMMENT 'Ìá¿îÕËºÅ',
-  `f_status` smallint default 0 COMMENT '¶©µ¥×´Ì¬(0-Ä¬ÈÏ,100-Ìá¿î³É¹¦,-100-Ìá¿îÊ§°Ü)',
-  `f_drawnote` varchar(1000) default null comment 'Ìá¿î±¸×¢',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_uid` int NOT NULL COMMENT 'ç”¨æˆ·uid',
+  `f_drawmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'ææ¬¾é‡‘é¢',
+  `f_drawtype` smallint NOT NULL default 200 COMMENT 'å……å€¼ç±»å‹(100-ä½™é¢ææ¬¾,200-æŠ¼é‡‘é€€æ¬¾)',
+  `f_channel` varchar(50) not NULL COMMENT 'ææ¬¾æ¸ é“',
+  `f_account` varchar(200) not NULL COMMENT 'ææ¬¾è´¦å·',
+  `f_status` smallint default 0 COMMENT 'è®¢å•çŠ¶æ€(0-é»˜è®¤,100-ææ¬¾æˆåŠŸ,-100-ææ¬¾å¤±è´¥)',
+  `f_drawnote` varchar(1000) default null comment 'ææ¬¾å¤‡æ³¨',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÓÃ»§¹ÜÀí-Ìá¿î¶©µ¥±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ç”¨æˆ·ç®¡ç†-ææ¬¾è®¢å•è¡¨';
 
 
-/*ÓÃ»§¹ÜÀí-µÇÂ¼ĞÅÏ¢±í*/
+/*ç”¨æˆ·ç®¡ç†-ç™»å½•ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_user_login` (
-  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '×ÔÔö³¤ID',
-  `f_usercheck` varchar(200) NOT NULL COMMENT 'µÇÂ¼ck',
-  `f_uid` int NOT NULL COMMENT 'µÇÂ¼ÓÃ»§ID',
-  `f_deviceid` varchar(200) DEFAULT NULL COMMENT 'µÇÂ¼Éè±¸ºÅ',
-  `f_platform` tinyint DEFAULT 1 COMMENT 'Æ½Ì¨£º1 webÖ÷Õ¾,2 android, 3 IOS, 4 H5',
-  `f_ip` varchar(50) DEFAULT NULL COMMENT 'µÇÂ¼ip',
-  `f_remark` varchar(500) DEFAULT NULL COMMENT '¸½ÊôĞÅÏ¢',
-  `f_expiretime` timestamp not null default '0000-00-00 00:00:00' comment 'µÇÂ¼¹ıÆÚÊ±¼ä(Ä¬ÈÏ30Ììºó¹ıÆÚ)',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢é•¿ID',
+  `f_usercheck` varchar(200) NOT NULL COMMENT 'ç™»å½•ck',
+  `f_uid` int NOT NULL COMMENT 'ç™»å½•ç”¨æˆ·ID',
+  `f_deviceid` varchar(200) DEFAULT NULL COMMENT 'ç™»å½•è®¾å¤‡å·',
+  `f_platform` tinyint DEFAULT 1 COMMENT 'å¹³å°ï¼š1 webä¸»ç«™,2 android, 3 IOS, 4 H5',
+  `f_ip` varchar(50) DEFAULT NULL COMMENT 'ç™»å½•ip',
+  `f_remark` varchar(500) DEFAULT NULL COMMENT 'é™„å±ä¿¡æ¯',
+  `f_expiretime` timestamp not null default '0000-00-00 00:00:00' comment 'ç™»å½•è¿‡æœŸæ—¶é—´(é»˜è®¤30å¤©åè¿‡æœŸ)',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`),
   unique key (`f_usercheck`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 comment 'ÓÃ»§¹ÜÀí-µÇÂ¼ĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 comment 'ç”¨æˆ·ç®¡ç†-ç™»å½•ä¿¡æ¯è¡¨';
 
 
-/*ÃÅµê¹ÜÀí-ÃÅµêĞÅÏ¢±í*/
+/*é—¨åº—ç®¡ç†-é—¨åº—ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_store_info` (
-  `f_sid` int NOT NULL AUTO_INCREMENT COMMENT 'ÃÅµêuid(×ÔÔö)',
-  `f_name` varchar(1000) not NULL COMMENT 'ÃÅµêÃû³Æ',
-  `f_icon` varchar(200) default null COMMENT 'ÃÅµêÍ¼±ê',
-  `f_describle` TEXT COMMENT 'ÃÅµêÃèÊö',
-  `f_address` varchar(2000) not null COMMENT 'ÃÅµêµØÖ·',
-  `f_takeout` tinyint not null DEFAULT 1 COMMENT 'ÊÇ·ñÖ§³ÖÍâÂô(0-²»Ö§³Ö,1-Ö§³Ö)',
-  `f_opentime` time default null comment 'ÓªÒµ¿ªÊ¼Ê±¼ä',
-  `f_closetime` time default null comment 'ÓªÒµ½áÊøÊ±¼ä',
-  `f_contact` varchar(200) default null comment 'ÁªÏµ·½Ê½',
-  `f_picture` varchar(500) comment 'ÃÅµêÍ¼Æ¬(¶àÕÅÒÔÓ¢ÎÄ¶ººÅ·Ö¸ô)',
-  `f_maplat` varchar(50) DEFAULT NULL COMMENT 'µØÍ¼×ø±ê-¾­¶È',
-  `f_maplng` varchar(50) DEFAULT NULL COMMENT 'µØÍ¼×ø±ê-Î³¶È',  
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_sid` int NOT NULL AUTO_INCREMENT COMMENT 'é—¨åº—uid(è‡ªå¢)',
+  `f_name` varchar(1000) not NULL COMMENT 'é—¨åº—åç§°',
+  `f_icon` varchar(200) default null COMMENT 'é—¨åº—å›¾æ ‡',
+  `f_describle` TEXT COMMENT 'é—¨åº—æè¿°',
+  `f_address` varchar(2000) not null COMMENT 'é—¨åº—åœ°å€',
+  `f_takeout` tinyint not null DEFAULT 1 COMMENT 'æ˜¯å¦æ”¯æŒå¤–å–(0-ä¸æ”¯æŒ,1-æ”¯æŒ)',
+  `f_opentime` time default null comment 'è¥ä¸šå¼€å§‹æ—¶é—´',
+  `f_closetime` time default null comment 'è¥ä¸šç»“æŸæ—¶é—´',
+  `f_contact` varchar(200) default null comment 'è”ç³»æ–¹å¼',
+  `f_picture` varchar(500) comment 'é—¨åº—å›¾ç‰‡(å¤šå¼ ä»¥è‹±æ–‡é€—å·åˆ†éš”)',
+  `f_maplat` varchar(50) DEFAULT NULL COMMENT 'åœ°å›¾åæ ‡-ç»åº¦',
+  `f_maplng` varchar(50) DEFAULT NULL COMMENT 'åœ°å›¾åæ ‡-çº¬åº¦',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_sid`)
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='ÃÅµê¹ÜÀí-ÃÅµêĞÅÏ¢±í';
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='é—¨åº—ç®¡ç†-é—¨åº—ä¿¡æ¯è¡¨';
 
 
-/*ÃÅµê¹ÜÀí-ÃÅµê×ÀĞÍĞÅÏ¢±í*/
+/*é—¨åº—ç®¡ç†-é—¨åº—æ¡Œå‹ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_store_tableinfo` (
-  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_sid` int NOT NULL COMMENT 'ÃÅµêid',
-  `f_name` varchar(1000) not NULL COMMENT '×ÀĞÍÃû³Æ',
-  `f_picture` varchar(500) comment '×ÀĞÍÍ¼Æ¬(¶àÕÅÒÔÓ¢ÎÄ¶ººÅ·Ö¸ô)',
-  `f_seatnum` tinyint not null default 1 comment '¿É×øÈËÊı',
-  `f_amount` tinyint not null default 1 comment '×À×ÓÊıÁ¿',
-  `f_tablenum` varchar(100) default null comment '×ÀºÅ(ÒÔÓ¢ÎÄ¶ººÅ·Ö¸ô)',
-  `f_status` tinyint not null default 1 comment '×´Ì¬(1-ÓĞĞ§,0-ÎŞĞ§/ÒÑÉ¾³ı)',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_sid` int NOT NULL COMMENT 'é—¨åº—id',
+  `f_name` varchar(1000) not NULL COMMENT 'æ¡Œå‹åç§°',
+  `f_picture` varchar(500) comment 'æ¡Œå‹å›¾ç‰‡(å¤šå¼ ä»¥è‹±æ–‡é€—å·åˆ†éš”)',
+  `f_seatnum` tinyint not null default 1 comment 'å¯åäººæ•°',
+  `f_amount` tinyint not null default 1 comment 'æ¡Œå­æ•°é‡',
+  `f_tablenum` varchar(100) default null comment 'æ¡Œå·(ä»¥è‹±æ–‡é€—å·åˆ†éš”)',
+  `f_status` tinyint not null default 1 comment 'çŠ¶æ€(1-æœ‰æ•ˆ,0-æ— æ•ˆ/å·²åˆ é™¤)',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÃÅµê¹ÜÀí-ÃÅµêĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='é—¨åº—ç®¡ç†-é—¨åº—ä¿¡æ¯è¡¨';
 
 
-/*ÃÅµê¹ÜÀí-·ÅºÅĞÅÏ¢±í*/
+/*é—¨åº—ç®¡ç†-æ”¾å·ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_store_sellinfo` (
-  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_sid` int NOT NULL COMMENT 'ÃÅµêid',
-  `f_startdate` date default null comment '·ÅºÅ¿ªÊ¼ÈÕÆÚ',
-  `f_enddate` date default null comment '·ÅºÅ½áÊøÈÕÆÚ',
-  `f_starttime` time default null comment '·ÅºÅ¿ªÊ¼Ê±¼ä',
-  `f_endtime` time default null comment '·ÅºÅ½áÊøÊ±¼ä',
-  `f_tabletype` varchar(100) default null comment '·ÅºÅ×ÀĞÍID(ÒÔÓ¢ÎÄ¶ººÅ·Ö¸ô)',
-  `f_sellnum` tinyint default 1 comment '·ÅºÅÊıÁ¿',
-  `f_tablenum` varchar(100) default null comment '·ÅºÅ×ÀºÅ(ÒÔÓ¢ÎÄ¶ººÅ·Ö¸ô)',
-  `f_status` tinyint not null default 1 comment '×´Ì¬(1-ÓĞĞ§,0-ÎŞĞ§/ÒÑÉ¾³ı)',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_sid` int NOT NULL COMMENT 'é—¨åº—id',
+  `f_startdate` date default null comment 'æ”¾å·å¼€å§‹æ—¥æœŸ',
+  `f_enddate` date default null comment 'æ”¾å·ç»“æŸæ—¥æœŸ',
+  `f_starttime` time default null comment 'æ”¾å·å¼€å§‹æ—¶é—´',
+  `f_endtime` time default null comment 'æ”¾å·ç»“æŸæ—¶é—´',
+  `f_tabletype` varchar(100) default null comment 'æ”¾å·æ¡Œå‹ID(ä»¥è‹±æ–‡é€—å·åˆ†éš”)',
+  `f_sellnum` tinyint default 1 comment 'æ”¾å·æ•°é‡',
+  `f_tablenum` varchar(100) default null comment 'æ”¾å·æ¡Œå·(ä»¥è‹±æ–‡é€—å·åˆ†éš”)',
+  `f_status` tinyint not null default 1 comment 'çŠ¶æ€(1-æœ‰æ•ˆ,0-æ— æ•ˆ/å·²åˆ é™¤)',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÃÅµê¹ÜÀí-·ÅºÅĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='é—¨åº—ç®¡ç†-æ”¾å·ä¿¡æ¯è¡¨';
 
 
-/*ÃÅµê¹ÜÀí-ÕÛ¿ÛĞÅÏ¢±í*/
+/*é—¨åº—ç®¡ç†-æŠ˜æ‰£ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_store_discount` (
-  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_sid` int NOT NULL COMMENT 'ÃÅµêid',
-  `f_did` int NOT NULL COMMENT '²ËëÈid',
-  `f_type` tinyint not null default 1 comment 'ÕÛ¿ÛÀàĞÍ(1-Ö±¼õ,2-´òÕÛ)', 
-  `f_disnum` smallint not null comment 'ÕÛ¿ÛÊıÁ¿',
-  `f_startdate` date default null comment 'ÕÛ¿Û¿ªÊ¼ÈÕÆÚ',
-  `f_enddate` date default null comment 'ÕÛ¿Û½áÊøÈÕÆÚ',
-  `f_starttime` time default null comment 'ÕÛ¿Û¿ªÊ¼Ê±¼ä',
-  `f_endtime` time default null comment 'ÕÛ¿Û½áÊøÊ±¼ä',
-  `f_status` tinyint not null default 1 comment '×´Ì¬(1-ÓĞĞ§,0-ÎŞĞ§/ÒÑÉ¾³ı)',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_sid` int NOT NULL COMMENT 'é—¨åº—id',
+  `f_did` int NOT NULL COMMENT 'èœè‚´id',
+  `f_type` tinyint not null default 1 comment 'æŠ˜æ‰£ç±»å‹(1-ç›´å‡,2-æ‰“æŠ˜)',
+  `f_disnum` smallint not null comment 'æŠ˜æ‰£æ•°é‡',
+  `f_startdate` date default null comment 'æŠ˜æ‰£å¼€å§‹æ—¥æœŸ',
+  `f_enddate` date default null comment 'æŠ˜æ‰£ç»“æŸæ—¥æœŸ',
+  `f_starttime` time default null comment 'æŠ˜æ‰£å¼€å§‹æ—¶é—´',
+  `f_endtime` time default null comment 'æŠ˜æ‰£ç»“æŸæ—¶é—´',
+  `f_status` tinyint not null default 1 comment 'çŠ¶æ€(1-æœ‰æ•ˆ,0-æ— æ•ˆ/å·²åˆ é™¤)',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÃÅµê¹ÜÀí-ÕÛ¿ÛĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='é—¨åº—ç®¡ç†-æŠ˜æ‰£ä¿¡æ¯è¡¨';
 
 
-/*ÃÅµê¹ÜÀí-×Ê½ğĞÅÏ¢±í*/
+/*é—¨åº—ç®¡ç†-èµ„é‡‘ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_store_account` (
-  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_sid` int NOT NULL COMMENT 'ÃÅµêid',
-  `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'Ñº½ğ½ğ¶î',
-  `f_storemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'ÕË»§Óà¶î',
-  `f_proceeds` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'ÊÕÒæ½ğÓà¶î',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_sid` int NOT NULL COMMENT 'é—¨åº—id',
+  `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'æŠ¼é‡‘é‡‘é¢',
+  `f_storemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'è´¦æˆ·ä½™é¢',
+  `f_proceeds` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'æ”¶ç›Šé‡‘ä½™é¢',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÃÅµê¹ÜÀí-×Ê½ğĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='é—¨åº—ç®¡ç†-èµ„é‡‘ä¿¡æ¯è¡¨';
 
 
-/*ÃÅµê¹ÜÀí-ÅäËÍÔ±ĞÅÏ¢±í*/
+/*é—¨åº—ç®¡ç†-é…é€å‘˜ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_store_distripersion` (
-  `f_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ÅäËÍÈËÔ±ID',
-  `f_username` varchar(200) DEFAULT NULL COMMENT 'ÅäËÍÈËÔ±Ãû×Ö',
-  `f_mobile` varchar(200) DEFAULT NULL COMMENT 'ÅäËÍÔ±ÁªÏµ·½Ê½',
-  `f_state` int(10) NOT NULL COMMENT 'ÅäËÍÈËÔ±×´Ì¬£¨0³õÊ¼£¬-1ÒÑ½ûÖ¹£©',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'é…é€äººå‘˜ID',
+  `f_username` varchar(200) DEFAULT NULL COMMENT 'é…é€äººå‘˜åå­—',
+  `f_mobile` varchar(200) DEFAULT NULL COMMENT 'é…é€å‘˜è”ç³»æ–¹å¼',
+  `f_state` int(10) NOT NULL COMMENT 'é…é€äººå‘˜çŠ¶æ€ï¼ˆ0åˆå§‹ï¼Œ-1å·²ç¦æ­¢ï¼‰',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÃÅµê¹ÜÀí-ÅäËÍÔ±ĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='é—¨åº—ç®¡ç†-é…é€å‘˜ä¿¡æ¯è¡¨';
 
 
-/*ºóÌ¨¹ÜÀí-ÓÃ»§ĞÅÏ¢±í*/
+/*åå°ç®¡ç†-ç”¨æˆ·ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_admin_userinfo` (
-  `f_uid` int NOT NULL AUTO_INCREMENT COMMENT 'ÓÃ»§uid(×ÔÔö)',
-  `f_username` varchar(50) NOT NULL COMMENT 'ÓÃ»§Ãû',
-  `f_realname` varchar(200) DEFAULT NULL COMMENT 'ÕæÊµĞÕÃû',
-  `f_password` varchar(32) NOT NULL COMMENT 'ÓÃ»§ÃÜÂë',
-  `f_status` smallint default 100 COMMENT 'ÓÃ»§×´Ì¬(Ä¬ÈÏ100-Õı³£ÓÃ»§,-100-½ûÓÃÓÃ»§)',
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_uid` int NOT NULL AUTO_INCREMENT COMMENT 'ç”¨æˆ·uid(è‡ªå¢)',
+  `f_username` varchar(50) NOT NULL COMMENT 'ç”¨æˆ·å',
+  `f_realname` varchar(200) DEFAULT NULL COMMENT 'çœŸå®å§“å',
+  `f_password` varchar(32) NOT NULL COMMENT 'ç”¨æˆ·å¯†ç ',
+  `f_status` smallint default 100 COMMENT 'ç”¨æˆ·çŠ¶æ€(é»˜è®¤100-æ­£å¸¸ç”¨æˆ·,-100-ç¦ç”¨ç”¨æˆ·)',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_uid`),
   UNIQUE KEY `f_username` (`f_username`)
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='ºóÌ¨¹ÜÀí-ÓÃ»§ĞÅÏ¢±í';
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='åå°ç®¡ç†-ç”¨æˆ·ä¿¡æ¯è¡¨';
 
 
-/*ºóÌ¨¹ÜÀí-½ÇÉ«ĞÅÏ¢±í*/
+/*åå°ç®¡ç†-è§’è‰²ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_admin_role` (
-  `f_rid` int NOT NULL AUTO_INCREMENT COMMENT '½ÇÉ«rid(×ÔÔö)',
-  `f_name` varchar(100) NOT NULL COMMENT '½ÇÉ«Ãû³Æ',
-  `f_describle` varchar(1000) default NULL COMMENT '½ÇÉ«ÃèÊö',
-  `f_status` tinyint not null default 1 comment '×´Ì¬(1-ÓĞĞ§,0-ÎŞĞ§/ÒÑÉ¾³ı)',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_rid` int NOT NULL AUTO_INCREMENT COMMENT 'è§’è‰²rid(è‡ªå¢)',
+  `f_name` varchar(100) NOT NULL COMMENT 'è§’è‰²åç§°',
+  `f_describle` varchar(1000) default NULL COMMENT 'è§’è‰²æè¿°',
+  `f_status` tinyint not null default 1 comment 'çŠ¶æ€(1-æœ‰æ•ˆ,0-æ— æ•ˆ/å·²åˆ é™¤)',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_rid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ºóÌ¨¹ÜÀí-½ÇÉ«ĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='åå°ç®¡ç†-è§’è‰²ä¿¡æ¯è¡¨';
 
 
-/*ºóÌ¨¹ÜÀí-Ä£¿éĞÅÏ¢±í*/
+/*åå°ç®¡ç†-æ¨¡å—ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_admin_module` (
-  `f_mid` int NOT NULL AUTO_INCREMENT COMMENT 'Ä£¿émid(×ÔÔö)',
-  `f_name` varchar(100) NOT NULL COMMENT 'Ä£¿éÃû³Æ',
-  `f_describle` varchar(1000) default NULL COMMENT 'Ä£¿éÃèÊö',
-  `f_url` varchar(1000) default NULL COMMENT 'Á´½ÓµØÖ·',
-  `f_parentid` smallint default 0 comment '¸¸Ä£¿éID',
-  `f_order` smallint default 1 comment 'ÏÔÊ¾Ë³Ğò',  
-  `f_status` tinyint not null default 1 comment '×´Ì¬(1-ÓĞĞ§,0-ÎŞĞ§/ÒÑÉ¾³ı)',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_mid` int NOT NULL AUTO_INCREMENT COMMENT 'æ¨¡å—mid(è‡ªå¢)',
+  `f_name` varchar(100) NOT NULL COMMENT 'æ¨¡å—åç§°',
+  `f_describle` varchar(1000) default NULL COMMENT 'æ¨¡å—æè¿°',
+  `f_url` varchar(1000) default NULL COMMENT 'é“¾æ¥åœ°å€',
+  `f_parentid` smallint default 0 comment 'çˆ¶æ¨¡å—ID',
+  `f_order` smallint default 1 comment 'æ˜¾ç¤ºé¡ºåº',
+  `f_status` tinyint not null default 1 comment 'çŠ¶æ€(1-æœ‰æ•ˆ,0-æ— æ•ˆ/å·²åˆ é™¤)',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_mid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ºóÌ¨¹ÜÀí-Ä£¿éĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='åå°ç®¡ç†-æ¨¡å—ä¿¡æ¯è¡¨';
 
 
-/*ºóÌ¨¹ÜÀí-ÓÃ»§½ÇÉ«¹ØÁªĞÅÏ¢±í*/
+/*åå°ç®¡ç†-ç”¨æˆ·è§’è‰²å…³è”ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_admin_user_role` (
-  `f_id` int not null AUTO_INCREMENT comment '×ÔÔöID',
-  `f_uid` int NOT NULL COMMENT 'ÓÃ»§ID',
-  `f_rid` int NOT NULL COMMENT '½ÇÉ«ID',
-  `f_describle` varchar(1000) default NULL COMMENT 'ËµÃ÷',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int not null AUTO_INCREMENT comment 'è‡ªå¢ID',
+  `f_uid` int NOT NULL COMMENT 'ç”¨æˆ·ID',
+  `f_rid` int NOT NULL COMMENT 'è§’è‰²ID',
+  `f_describle` varchar(1000) default NULL COMMENT 'è¯´æ˜',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ºóÌ¨¹ÜÀí-ÓÃ»§½ÇÉ«¹ØÁªĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='åå°ç®¡ç†-ç”¨æˆ·è§’è‰²å…³è”ä¿¡æ¯è¡¨';
 
 
-/*ºóÌ¨¹ÜÀí-½ÇÉ«Ä£¿é¹ØÁªĞÅÏ¢±í*/
+/*åå°ç®¡ç†-è§’è‰²æ¨¡å—å…³è”ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_admin_role_module` (
-  `f_id` int not null AUTO_INCREMENT comment '×ÔÔöID',
-  `f_rid` int NOT NULL COMMENT '½ÇÉ«ID',
-  `f_mid` int NOT NULL COMMENT 'Ä£¿éID',
-  `f_describle` varchar(1000) default NULL COMMENT 'ËµÃ÷',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int not null AUTO_INCREMENT comment 'è‡ªå¢ID',
+  `f_rid` int NOT NULL COMMENT 'è§’è‰²ID',
+  `f_mid` int NOT NULL COMMENT 'æ¨¡å—ID',
+  `f_describle` varchar(1000) default NULL COMMENT 'è¯´æ˜',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ºóÌ¨¹ÜÀí-½ÇÉ«Ä£¿é¹ØÁªĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='åå°ç®¡ç†-è§’è‰²æ¨¡å—å…³è”ä¿¡æ¯è¡¨';
 
-/*²ËëÈ¹ÜÀí-¿ÚÎ¶ĞÅÏ¢±í*/
+/*èœè‚´ç®¡ç†-å£å‘³ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_food_tastes` (
-  `f_tid` int NOT NULL AUTO_INCREMENT COMMENT '¿ÚÎ¶ID(×ÔÔö)',
-  `f_tname` varchar(200) NOT NULL COMMENT '¿ÚÎ¶Ãû³Æ',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_tid` int NOT NULL AUTO_INCREMENT COMMENT 'å£å‘³ID(è‡ªå¢)',
+  `f_tname` varchar(200) NOT NULL COMMENT 'å£å‘³åç§°',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_tid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='²ËëÈ¹ÜÀí-¿ÚÎ¶ĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='èœè‚´ç®¡ç†-å£å‘³ä¿¡æ¯è¡¨';
 
 
-/*²ËëÈ¹ÜÀí-²ËÏµĞÅÏ¢±í*/
+/*èœè‚´ç®¡ç†-èœç³»ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_food_cuisine` (
-  `f_cid` int NOT NULL AUTO_INCREMENT COMMENT '²ËÏµID(×ÔÔö)',
-  `f_cname` varchar(200) NOT NULL COMMENT '²ËÏµÃû³Æ',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_cid` int NOT NULL AUTO_INCREMENT COMMENT 'èœç³»ID(è‡ªå¢)',
+  `f_cname` varchar(200) NOT NULL COMMENT 'èœç³»åç§°',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_cid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='²ËëÈ¹ÜÀí-²ËÏµĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='èœè‚´ç®¡ç†-èœç³»ä¿¡æ¯è¡¨';
 
 
-/*²ËëÈ¹ÜÀí-²ËÆ·ĞÅÏ¢±í*/
+/*èœè‚´ç®¡ç†-èœå“ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_food_dishes` (
-  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '²ËëÈID(×ÔÔö)',
-  `f_name` varchar(200) NOT NULL COMMENT '²ËÆ·Ãû³Æ',
-  `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '²ËÆ·¼Û¸ñ',
-  `f_state` smallint NOT NULL COMMENT '²ËÆ·×´Ì¬£¨-1ÒÑÍ£ÊÛ£¬ 0³õÊ¼£¬ 1Ô¤ÊÛ£¬100ÒÑÊÛÍê£©',
-  `f_tastesid` int NOT NULL COMMENT '¿ÚÎ¶ID',
-  `f_cuisineid` int NOT NULL COMMENT '²ËÏµID',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT 'èœè‚´ID(è‡ªå¢)',
+  `f_name` varchar(200) NOT NULL COMMENT 'èœå“åç§°',
+  `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'èœå“ä»·æ ¼',
+  `f_state` smallint NOT NULL COMMENT 'èœå“çŠ¶æ€ï¼ˆ-1å·²åœå”®ï¼Œ 0åˆå§‹ï¼Œ 1é¢„å”®ï¼Œ100å·²å”®å®Œï¼‰',
+  `f_tastesid` int NOT NULL COMMENT 'å£å‘³ID',
+  `f_cuisineid` int NOT NULL COMMENT 'èœç³»ID',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='²ËëÈ¹ÜÀí-²ËÆ·ĞÅÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='èœè‚´ç®¡ç†-èœå“ä¿¡æ¯è¡¨';
 
 
-/*²ËëÈ¹ÜÀí-²Ëµ¥ĞÅÏ¢±í*/
+/*èœè‚´ç®¡ç†-èœå•ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_food_menu` (
-  `f_id` int NOT NULL AUTO_INCREMENT comment '²Ëµ¥ID(×ÔÔö)',
+  `f_id` int NOT NULL AUTO_INCREMENT comment 'èœå•ID(è‡ªå¢)',
   `f_oid` int NOT NULL comment 'unknow',
-  `f_foodid` int NOT NULL COMMENT '²Ëµ¥ID',
-  `f_foodname` varchar(200) DEFAULT NULL COMMENT '²ËÃû',
-  `f_foodicon` varchar(200) DEFAULT NULL COMMENT '²ËÆ·Í¼Æ¬',
-  `f_foodprice` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '²ËÆ·¼Û¸ñ',
-  `f_foodnum` varchar(200) DEFAULT NULL COMMENT '²ËÆ·ÊıÁ¿',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_foodid` int NOT NULL COMMENT 'èœå•ID',
+  `f_foodname` varchar(200) DEFAULT NULL COMMENT 'èœå',
+  `f_foodicon` varchar(200) DEFAULT NULL COMMENT 'èœå“å›¾ç‰‡',
+  `f_foodprice` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'èœå“ä»·æ ¼',
+  `f_foodnum` varchar(200) DEFAULT NULL COMMENT 'èœå“æ•°é‡',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='²ËëÈ¹ÜÀí-²Ëµ¥ĞÅÏ¢±í';
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='èœè‚´ç®¡ç†-èœå•ä¿¡æ¯è¡¨';
 
 
-/*¶©µ¥¹ÜÀí-¶©µ¥ĞÅÏ¢±í*/
+/*è®¢å•ç®¡ç†-è®¢å•ä¿¡æ¯è¡¨*/
 CREATE TABLE `t_order_info` (
-  `f_oid` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '¶©µ¥ID,Î¨Ò»±êÊ¶',
-  `f_shopid` smallint NOT NULL COMMENT 'µêÆÌID',
-  `f_type` tinyint NOT NULL DEFAULT 1 COMMENT '¶©µ¥ÀàĞÍ£¨1,ÍâÂô¶©µ¥  2,Ê³ÌÃ¶©µ¥£©',
-  `f_status` smallint NOT NULL DEFAULT 0 COMMENT '¶©µ¥×´Ì¬£¨0,³õÊ¼ 1,Î´¸¶¿î 2,ÒÑ¸¶¿î 3,ÅäËÍÖĞ 4,ÅäËÍÍê³É 5,ÓÃ²ÍÖĞ 100,ÒÑÍê³É -100ÓâÆÚ£©',
-  `f_allmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '¶©µ¥×Ü½ğ¶î',
-  `f_paymoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'ÒÑÖ§¸¶½ğ¶î',
-  `f_paytype` varchar(200) DEFAULT NULL COMMENT 'Ö§¸¶·½Ê½',
-  `f_mealsnum` tinyint DEFAULT 0 COMMENT '¾Í²ÍÈËÊı',
-  `f_addressid` int DEFAULT NULL COMMENT 'ÅäËÍµØÖ·ID',
-  `f_deliveryid` int DEFAULT NULL COMMENT 'ÅäËÍÔ±ID',
-  `f_startime` timestamp DEFAULT NULL COMMENT 'ÓÃ²Í¿ªÊ¼Ê±¼ä',
-  `f_endtime` timestamp DEFAULT NULL COMMENT 'ÓÃ²Í½áÊøÊ±¼ä',  
-  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Ìí¼ÓÊ±¼ä',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_oid` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'è®¢å•ID,å”¯ä¸€æ ‡è¯†',
+  `f_shopid` smallint NOT NULL COMMENT 'åº—é“ºID',
+  `f_type` tinyint NOT NULL DEFAULT 1 COMMENT 'è®¢å•ç±»å‹ï¼ˆ1,å¤–å–è®¢å•  2,é£Ÿå ‚è®¢å•ï¼‰',
+  `f_status` smallint NOT NULL DEFAULT 0 COMMENT 'è®¢å•çŠ¶æ€ï¼ˆ0,åˆå§‹ 1,æœªä»˜æ¬¾ 2,å·²ä»˜æ¬¾ 3,é…é€ä¸­ 4,é…é€å®Œæˆ 5,ç”¨é¤ä¸­ 100,å·²å®Œæˆ -100é€¾æœŸï¼‰',
+  `f_allmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'è®¢å•æ€»é‡‘é¢',
+  `f_paymoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT 'å·²æ”¯ä»˜é‡‘é¢',
+  `f_paytype` varchar(200) DEFAULT NULL COMMENT 'æ”¯ä»˜æ–¹å¼',
+  `f_mealsnum` tinyint DEFAULT 0 COMMENT 'å°±é¤äººæ•°',
+  `f_addressid` int DEFAULT NULL COMMENT 'é…é€åœ°å€ID',
+  `f_deliveryid` int DEFAULT NULL COMMENT 'é…é€å‘˜ID',
+  `f_startime` timestamp DEFAULT NULL COMMENT 'ç”¨é¤å¼€å§‹æ—¶é—´',
+  `f_endtime` timestamp DEFAULT NULL COMMENT 'ç”¨é¤ç»“æŸæ—¶é—´',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'æ·»åŠ æ—¶é—´',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_oid`)
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='¶©µ¥¹ÜÀí-¶©µ¥ĞÅÏ¢±í';
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='è®¢å•ç®¡ç†-è®¢å•ä¿¡æ¯è¡¨';
 
-/*ÓÃ»§¹ÜÀí-¶ÌĞÅ·¢ËÍ¼ÇÂ¼±í*/
+/*ç”¨æˆ·ç®¡ç†-çŸ­ä¿¡å‘é€è®°å½•è¡¨*/
 CREATE TABLE `t_user_smslog` (
-  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '×ÔÔöid',
-  `f_uid` int NOT NULL COMMENT 'ÓÃ»§uid',
-  `f_mobile` varchar(50) NOT NULL COMMENT 'ÊÖ»úºÅÂë',
-  `f_count` int default 0 COMMENT '·¢ËÍ³É¹¦´ÎÊı',
-  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT 'è‡ªå¢id',
+  `f_uid` int NOT NULL COMMENT 'ç”¨æˆ·uid',
+  `f_mobile` varchar(50) NOT NULL COMMENT 'æ‰‹æœºå·ç ',
+  `f_count` int default 0 COMMENT 'å‘é€æˆåŠŸæ¬¡æ•°',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`f_id`),
   UNIQUE KEY (`f_uid`,`f_mobile`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ÓÃ»§¹ÜÀí-¶ÌĞÅ·¢ËÍ¼ÇÂ¼±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='ç”¨æˆ·ç®¡ç†-çŸ­ä¿¡å‘é€è®°å½•è¡¨';

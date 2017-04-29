@@ -205,4 +205,48 @@ class UserModel extends Model
         }
         return $userinfo[0];
     }
+
+    /**
+     * 新增充值订单信息
+     * @param $uid
+     * @param $paymoney
+     * @param $paytype
+     * @param $channel
+     * @param $account
+     * @param $paynote
+     * @return bool|int
+     */
+    public function addChargeInfo($uid, $paymoney, $paytype, $channel, $account, $paynote){
+        $table_name = 'user_charge_order';
+        $data = array(
+            'f_uid' => $uid,
+            'f_paymoney' => $paymoney,
+            'f_paytype' => $paytype,
+            'f_channel' => $channel,
+            'f_account' => $account,
+            'f_paynote' => $paynote,
+            'f_addtime' => date("Y-m-d H:i:s"),
+        );
+        $orderid = intval(Db::name($table_name)->insertGetId($data));
+        if ($orderid <= 0) {
+            return false;
+        }
+        return $orderid;
+    }
+
+    public function updateChargeStatus($orderid, $paymoney, $status){
+        $table_name = 'user_charge_order';
+        $data = array(
+            'f_paymoney' => $paymoney,
+            'f_status' => $status,
+        );
+        $retup = Db::name($table_name)
+            ->where('f_id',$orderid)
+            ->update($data);
+        if($retup !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
