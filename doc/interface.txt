@@ -29,10 +29,9 @@
 
 账户模块
     1、发送短信验证码接口(兼注册功能)
-    http://119.23.73.39/data/User/sendSms?mobile=13933332222&deviceid=355439075682780
+    http://119.23.73.39/data/User/sendSms?mobile=13933332222
     入参：
         mobile      手机号码
-        deviceid    设备号
     结果说明：
         {"code":1,"msg":"successs","info":[],"list":[]}
         code > 0，即发送成功

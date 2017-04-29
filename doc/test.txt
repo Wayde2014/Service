@@ -1,0 +1,13 @@
+1、注册
+http://www.shanwei.com/index.php/data/User/sendSms?mobile=13510902030
+
+2、登录
+http://www.shanwei.com/index.php/data/User/login?mobile=13510902030&vcode=1234&deviceid=355439075682780&platform=2&ip=192.168.1.1&remark=test
+
+3、退出登录
+http://www.shanwei.com/index.php/data/User/logout?ck=ck_ODNLYJBKZTVJNTGYMJEZYJE3OWVJMGU0ZWEXZJUWMJY=
+
+4、充值
+http://www.shanwei.com/index.php/data/User/recharge?ck=ck_NDE5YMEZZTBMZDM4YTNJODHJZJK4NJUZZJQZZMVIZJQ=&paytype=1001&paymoney=100&channel=1001
+
+5、提款
