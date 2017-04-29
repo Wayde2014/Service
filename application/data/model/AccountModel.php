@@ -38,8 +38,8 @@ class AccountModel extends Model
      * @param $channel
      * @return bool|int
      */
-    public function addChargeInfo($uid, $paymoney, $paytype, $channel){
-        $table_name = 'user_charge_order';
+    public function addRechargeOrderInfo($uid, $paymoney, $paytype, $channel){
+        $table_name = 'user_recharge_order';
         $data = array(
             'f_uid' => $uid,
             'f_paymoney' => $paymoney,
@@ -60,13 +60,70 @@ class AccountModel extends Model
      * @param $status
      * @param $bankorderid
      * @param $bankmoney
+     * @param $account
+     * @param $paynote
      * @return bool
      */
-    public function updateRechargeStatus($orderid, $status, $bankorderid, $bankmoney){
-        $table_name = 'user_charge_order';
+    public function updateRechargeOrderStatus($orderid, $status, $bankorderid, $bankmoney, $account, $paynote){
+        $table_name = 'user_recharge_order';
         $data = array(
             'f_bankorderid' => $bankorderid,
             'f_bankmoney' => $bankmoney,
+            'f_account' => $account,
+            'f_paynote' => $paynote,
+            'f_status' => $status,
+        );
+        $retup = Db::name($table_name)
+            ->where('f_id',$orderid)
+            ->update($data);
+        if($retup !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 新增提款订单信息
+     * @param $uid
+     * @param $drawmoney
+     * @param $drawtype
+     * @param $channel
+     * @return bool|int
+     */
+    public function addDrawOrderInfo($uid, $drawmoney, $drawtype, $channel){
+        $table_name = 'user_draw_order';
+        $data = array(
+            'f_uid' => $uid,
+            'f_drawmoney' => $drawmoney,
+            'f_drawtype' => $drawtype,
+            'f_channel' => $channel,
+            'f_addtime' => date("Y-m-d H:i:s"),
+        );
+        $orderid = intval(Db::name($table_name)->insertGetId($data));
+        if ($orderid <= 0) {
+            return false;
+        }
+        return $orderid;
+    }
+
+    /**
+     * 更新提款订单状态
+     * @param $orderid
+     * @param $status
+     * @param $bankorderid
+     * @param $bankmoney
+     * @param $account
+     * @param $drawnote
+     * @return bool
+     */
+    public function updateDrawOrderStatus($orderid, $status, $bankorderid, $bankmoney, $account, $drawnote){
+        $table_name = 'user_draw_order';
+        $data = array(
+            'f_bankorderid' => $bankorderid,
+            'f_bankmoney' => $bankmoney,
+            'f_account' => $account,
+            'f_drawnote' => $drawnote,
             'f_status' => $status,
         );
         $retup = Db::name($table_name)
@@ -245,13 +302,15 @@ class AccountModel extends Model
      * @return array|false|\PDOStatement|string|Model
      */
     public function getRechargeOrderInfo($orderid){
-        $table_name = 'user_charge_order';
+        $table_name = 'user_recharge_order';
         $orderinfo = Db::name($table_name)
             ->where('f_id',$orderid)
             ->field('f_uid as uid')
             ->field('f_paymoney as paymoney')
             ->field('f_paytype as paytype')
             ->field('f_channel as channel')
+            ->field('f_bankmoney as bankmoney')
+            ->field('f_account as account')
             ->field('f_status as status')
             ->find();
         return $orderinfo;
@@ -285,7 +344,6 @@ class AccountModel extends Model
      * @return bool
      */
     public function rechargeSuc($orderid, $bankorderid, $bankmoney, $account, $paynote){
-        $table_name = 'user_charge_order';
         $orderinfo = self::getRechargeOrderInfo($orderid);
         if(empty($orderinfo)){
             return false;
@@ -297,21 +355,12 @@ class AccountModel extends Model
         if($paymoney != $bankmoney || $ori_status != 0){
             return false;
         }
-        $data = array(
-            'f_bankorderid' => $bankorderid,
-            'f_bankmoney' => $bankmoney,
-            'f_account' => $account,
-            'f_paynote' => $paynote,
-            'f_status' => $this->paysuc,
-        );
-        $retup = Db::name($table_name)
-            ->where('f_id',$orderid)
-            ->update($data);
-        if($retup === false){
-            return false;
+        $retup = self::updateRechargeOrderStatus($orderid,$this->paysuc,$bankorderid,$bankmoney,$account,$paynote);
+        if($retup){
+            //存款
+            return self::deposit($uid,$bankmoney,$paytype,$orderid);
         }
-        //存款
-        return self::deposit($uid,$bankmoney,$paytype,$orderid);
+        return false;
     }
 
     /**
@@ -322,28 +371,17 @@ class AccountModel extends Model
      * @return bool
      */
     public function rechargeFail($orderid, $account, $paynote){
-        $table_name = 'user_charge_order';
         $orderinfo = self::getRechargeOrderInfo($orderid);
         if(empty($orderinfo)){
             return false;
         }
         $ori_status = $orderinfo['status'];
+        $ori_bankorderid = $orderinfo['bankorderid'];
+        $ori_bankmoney = $orderinfo['bankmoney'];
         if($ori_status != 0){
             return false;
         }
-        $data = array(
-            'f_account' => $account,
-            'f_paynote' => $paynote,
-            'f_status' => $this->payfail,
-        );
-        $retup = Db::name($table_name)
-            ->where('f_id',$orderid)
-            ->update($data);
-        if($retup !== false){
-            return true;
-        }else{
-            return true;
-        }
+        return self::updateRechargeOrderStatus($orderid,$this->payfail,$ori_bankorderid,$ori_bankmoney,$account,$paynote);
     }
 
     /**
@@ -356,7 +394,6 @@ class AccountModel extends Model
      * @return bool
      */
     public function drawSuc($orderid, $bankorderid, $bankmoney, $account, $drawnote){
-        $table_name = 'user_draw_order';
         $orderinfo = self::getDrawOrderInfo($orderid);
         if(empty($orderinfo)){
             return false;
@@ -372,21 +409,12 @@ class AccountModel extends Model
         if($drawtype == 200){
             $tradetype = 2101;
         }
-        $data = array(
-            'f_bankorderid' => $bankorderid,
-            'f_bankmoney' => $bankmoney,
-            'f_account' => $account,
-            'f_drawnote' => $drawnote,
-            'f_status' => $this->drawsuc,
-        );
-        $retup = Db::name($table_name)
-            ->where('f_id',$orderid)
-            ->update($data);
-        if($retup === false){
-            return false;
+        $retup = self::updateDrawOrderStatus($orderid,$this->drawsuc,$bankorderid,$bankmoney,$account,$drawnote);
+        if($retup){
+            //存款
+            return self::deduct($uid,$bankmoney,$tradetype,$orderid);
         }
-        //扣款
-        return self::deduct($uid,$bankmoney,$tradetype,$orderid);
+        return false;
     }
 
     /**
@@ -397,28 +425,17 @@ class AccountModel extends Model
      * @return bool
      */
     public function drawFail($orderid, $account, $drawynote){
-        $table_name = 'user_draw_order';
         $orderinfo = self::getDrawOrderInfo($orderid);
         if(empty($orderinfo)){
             return false;
         }
         $ori_status = $orderinfo['status'];
+        $ori_bankorderid = $orderinfo['bankorderid'];
+        $ori_bankmoney = $orderinfo['bankmoney'];
         if($ori_status != 0){
             return false;
         }
-        $data = array(
-            'f_account' => $account,
-            'f_paynote' => $drawynote,
-            'f_status' => $this->drawfail,
-        );
-        $retup = Db::name($table_name)
-            ->where('f_id',$orderid)
-            ->update($data);
-        if($retup !== false){
-            return true;
-        }else{
-            return true;
-        }
+        return self::updateDrawOrderStatus($orderid,$this->drawfail,$ori_bankorderid,$ori_bankmoney,$account,$drawynote);
     }
 
 }

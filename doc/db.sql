@@ -49,7 +49,7 @@ CREATE TABLE `t_user_paylog` (
 
 
 /*用户管理-充值订单表*/
-CREATE TABLE `t_user_charge_order` (
+CREATE TABLE `t_user_recharge_order` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
   `f_paymoney` decimal(19,4) unsigned NOT NULL COMMENT '充值金额',
@@ -330,3 +330,15 @@ CREATE TABLE `t_user_smslog` (
   PRIMARY KEY (`f_id`),
   UNIQUE KEY (`f_uid`,`f_mobile`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-短信发送记录表';
+
+/*用户管理-冻结解冻表*/
+CREATE TABLE `t_user_freezelog` (
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `f_uid` int NOT NULL COMMENT '用户uid',
+  `f_inout` tinyint not null comment '冻结解冻类型(1-解冻,2-冻结)',
+  `f_trademoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' comment '交易金额',
+  `f_tradetype` smallint NOT NULL COMMENT '交易类型(1101-押金退款解冻,1102-订单支付解冻,2001-押金退款冻结,2002-订单支付冻结)',
+  `f_tradenote` varchar(1000) default null comment '交易备注',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-冻结解冻表';

@@ -177,7 +177,7 @@ class User extends Base
 
         $AccountModel = new AccountModel();
         $uid = $userinfo['uid'];
-        $orderid = $AccountModel->addChargeInfo($uid,$paymoney,$paytype,$paychannel);
+        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
         if($orderid === false){
             $this->res['code'] = -1;
             $this->res['msg'] = '充值下单失败';
@@ -248,7 +248,7 @@ class User extends Base
 
         $AccountModel = new AccountModel();
         $uid = $userinfo['uid'];
-        $orderid = $AccountModel->addChargeInfo($uid,$drawmoney,$drawtype,$drawchannel);
+        $orderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype,$drawchannel);
         if($orderid === false){
             $this->res['code'] = -1;
             $this->res['msg'] = '提款下单失败';
