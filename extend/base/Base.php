@@ -19,7 +19,7 @@ class Base
             }
         }
         if(!self::checkToken()){
-            die(json_encode($this->res));
+            //die(json_encode($this->res));
         }
     }
 
