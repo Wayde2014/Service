@@ -36,7 +36,7 @@ class Base
         if(empty($token_ori)){
             $this->res['code'] = -1;
             $this->res['msg'] = 'Token can not be empty';
-            return false;
+            //return false;
         }
         $params = input();
         if(!empty($params)){
@@ -55,7 +55,7 @@ class Base
         if(strtoupper($token_ori) != $token){
             $this->res['code'] = -1;
             $this->res['msg'] = 'Token error | '.$token;;
-            return false;
+            //return false;
         }
         return true;
     }
@@ -72,7 +72,7 @@ class Base
         if(empty($userinfo)){
             return array();
         }
-        $userid = $userinfo[0]['uid'];
+        $userid = $userinfo['uid'];
         return array(
             'uid' => $userid,
         );

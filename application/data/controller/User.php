@@ -3,10 +3,12 @@ namespace app\data\controller;
 
 use base\Base;
 use \app\data\model\UserModel;
+use \app\data\model\AccountModel;
+use third\Sms;
 
 class User extends Base
 {
-    private $paytype_list = array(100,200); //100-充值余额,200-充值押金
+    private $paytype_list = array(1001,1002); //1001-充值余额,1002-充值押金
     private $paychannel_list = array(1001,1002); //1001-支付宝充值,1002-微信充值
     private $paysuc = 100;
     private $payfail = -100;
@@ -55,7 +57,7 @@ class User extends Base
         }
 
         //发送短信验证码，并更新短信发送日志
-        $Sms = new \third\Sms();
+        $Sms = new Sms();
         $ret = $Sms->sendsms($mobile);
         if ($ret['code'] > 0) {
             if (!$UserModel->updateSmslog($uid, $mobile)) {
@@ -80,7 +82,7 @@ class User extends Base
         $ip = input('ip');
         $remark = input('remark');
         //检查短信验证码是否正确
-        $Sms = new \third\Sms();
+        $Sms = new Sms();
         $ret = $Sms->checksms($mobile, $vcode);
         if ($ret['code'] <= 0) {
             return json($ret);
@@ -168,9 +170,9 @@ class User extends Base
             return json($this->res);
         }
 
-        $UserModel = new UserModel();
+        $AccountModel = new AccountModel();
         $uid = $userinfo['uid'];
-        $orderid = $UserModel->addChargeInfo($uid,$paymoney,$paytype,$paychannel,$payaccount,$paynote);
+        $orderid = $AccountModel->addChargeInfo($uid,$paymoney,$paytype,$paychannel,$payaccount,$paynote);
         if($orderid === false){
             $this->res['code'] = -1;
             $this->res['msg'] = '充值下单失败';
@@ -178,7 +180,16 @@ class User extends Base
         }
 
         //暂时直接入账成功
-        $UserModel->updateChargeStatus($orderid,$this->paysuc);
+        $ret = $AccountModel->updateRechargeStatus($orderid,$this->paysuc,$bankorderid,$bankmoney);
+        if($ret){
+            $this->res['code'] = 1;
+            $this->res['msg'] = '充值入账成功';
+            return json($this->res);
+        }else{
+            $this->res['code'] = -1;
+            $this->res['msg'] = '充值入账失败';
+            return json($this->res);
+        }
 
         $this->res['code'] = 1;
         $this->res['msg'] = '充值下单成功';
