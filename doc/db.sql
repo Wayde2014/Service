@@ -42,7 +42,7 @@ CREATE TABLE `t_user_paylog` (
   `f_inout` tinyint not null comment '出入账类型(1-入账,2-出账)',
   `f_trademoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' comment '交易金额',
   `f_tradetype` varchar(200) NOT NULL COMMENT '交易类型(1001-余额充值,1002-押金充值,1004-订单解冻,1003-押金退款解冻,2001-押金退款,2002-押金退款冻结,2003-订单支付,2004-订单冻结)',
-  `f_suborder` varchar(200) default null COMMENT '订单号', 
+  `f_suborder` varchar(200) default null COMMENT '订单号',
   `f_tradenote` varchar(1000) default null comment '交易备注',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
@@ -55,7 +55,7 @@ CREATE TABLE `t_user_charge_order` (
   `f_uid` int NOT NULL COMMENT '用户uid',
   `f_paymoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '充值金额',
   `f_paytype` smallint NOT NULL COMMENT '充值类型(100-充值余额,200-充值押金)',
-  `f_channel` varchar(50) not NULL COMMENT '充值渠道',
+  `f_channel` smallint not NULL COMMENT '充值渠道(1001-支付宝充值,1002-微信充值)',
   `f_account` varchar(200) not NULL COMMENT '充值账号',
   `f_status` smallint default 0 COMMENT '订单状态(0-默认,100-充值成功,-100-充值失败)',
   `f_paynote` varchar(1000) default null comment '充值备注',
@@ -110,7 +110,7 @@ CREATE TABLE `t_store_info` (
   `f_contact` varchar(200) default null comment '联系方式',
   `f_picture` varchar(500) comment '门店图片(多张以英文逗号分隔)',
   `f_maplat` varchar(50) DEFAULT NULL COMMENT '地图坐标-经度',
-  `f_maplng` varchar(50) DEFAULT NULL COMMENT '地图坐标-纬度',  
+  `f_maplng` varchar(50) DEFAULT NULL COMMENT '地图坐标-纬度',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_sid`)
@@ -156,7 +156,7 @@ CREATE TABLE `t_store_discount` (
   `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_sid` int NOT NULL COMMENT '门店id',
   `f_did` int NOT NULL COMMENT '菜肴id',
-  `f_type` tinyint not null default 1 comment '折扣类型(1-直减,2-打折)', 
+  `f_type` tinyint not null default 1 comment '折扣类型(1-直减,2-打折)',
   `f_disnum` smallint not null comment '折扣数量',
   `f_startdate` date default null comment '折扣开始日期',
   `f_enddate` date default null comment '折扣结束日期',
@@ -225,7 +225,7 @@ CREATE TABLE `t_admin_module` (
   `f_describle` varchar(1000) default NULL COMMENT '模块描述',
   `f_url` varchar(1000) default NULL COMMENT '链接地址',
   `f_parentid` smallint default 0 comment '父模块ID',
-  `f_order` smallint default 1 comment '显示顺序',  
+  `f_order` smallint default 1 comment '显示顺序',
   `f_status` tinyint not null default 1 comment '状态(1-有效,0-无效/已删除)',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_mid`)
@@ -311,7 +311,7 @@ CREATE TABLE `t_order_info` (
   `f_addressid` int DEFAULT NULL COMMENT '配送地址ID',
   `f_deliveryid` int DEFAULT NULL COMMENT '配送员ID',
   `f_startime` timestamp DEFAULT NULL COMMENT '用餐开始时间',
-  `f_endtime` timestamp DEFAULT NULL COMMENT '用餐结束时间',  
+  `f_endtime` timestamp DEFAULT NULL COMMENT '用餐结束时间',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_oid`)
