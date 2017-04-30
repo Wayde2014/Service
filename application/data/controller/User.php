@@ -258,33 +258,23 @@ class User extends Base
 
         //校验参数
         if(empty($ck)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = 'CK不能为空';
-            return json($this->res);
+            return json(self::erres("CK不能为空"));
         }
         if(!in_array($paytype,$this->paytype_config)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '充值类型错误';
-            return json($this->res);
+            return json(self::erres("充值类型错误"));
         }
         if(!in_array($paychannel,$this->paychannel_config)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '充值渠道错误';
-            return json($this->res);
+            return json(self::erres("充值渠道错误"));
         }
         if($paymoney <= 0){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '充值金额不能小于0';
-            return json($this->res);
+            return json(self::erres("充值金额不能小于0"));
         }
 
         $AccountModel = new AccountModel();
         $uid = $ckinfo['uid'];
         $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
         if($orderid === false){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '充值下单失败';
-            return json($this->res);
+            return json(self::erres("充值下单失败"));
         }
 
         //测试--暂时直接入账成功
@@ -294,18 +284,12 @@ class User extends Base
         $paynote = 'test';
         $ret = $AccountModel->rechargeSuc($orderid, $bankorderid, $bankmoney, $account, $paynote);
         if($ret){
-            $this->res['code'] = 1;
-            $this->res['msg'] = '充值入账成功';
-            return json($this->res);
+            return json(self::sucres());
         }else{
-            $this->res['code'] = -1;
-            $this->res['msg'] = '充值入账失败';
-            return json($this->res);
+            return json(self::erres("充值入账失败"));
         }
 
-        $this->res['code'] = 1;
-        $this->res['msg'] = '充值下单成功';
-        return json($this->res);
+        return json(self::sucres());
     }
 
     /**
@@ -328,19 +312,13 @@ class User extends Base
 
         //校验参数
         if(empty($ck)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = 'CK不能为空';
-            return json($this->res);
+            return json(self::erres("CK不能为空"));
         }
         if(!in_array($drawtype,$this->drawtype_config)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '提款类型错误';
-            return json($this->res);
+            return json(self::erres("提款类型错误"));
         }
         if($drawmoney <= 0){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '提款金额不能小于0';
-            return json($this->res);
+            return json(self::erres("提款金额不能小于0"));
         }
 
         //获取用户信息
@@ -350,30 +328,22 @@ class User extends Base
         $usermoney = $userinfo['usermoney'];
         $depositmoney = $userinfo['depositmoney'];
         if($drawtype == 200 && $depositmoney < $drawmoney){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '押金余额不足';
-            return json($this->res);
+            return json(self::erres("押金余额不足"));
         }
         if($drawtype == 100 && $usermoney < $drawmoney){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '账户余额不足';
-            return json($this->res);
+            return json(self::erres("账户余额不足"));
         }
 
         //冻结
         $tradenote = '用户提款冻结';
         $freeze = $AccountModel->freeze($uid,$drawmoney,2001,$tradenote);
         if(!$freeze){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '用户提款冻结失败';
-            return json($this->res);
+            return json(self::erres("用户提款冻结失败"));
         }
 
         $orderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype);
         if($orderid === false){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '提款发起失败';
-            return json($this->res);
+            return json(self::erres("提款发起失败"));
         }
 
         //测试--暂时直接提款成功
@@ -384,18 +354,12 @@ class User extends Base
         $channel = $this->drawchannel_config[0];
         $ret = $AccountModel->drawSuc($orderid, $channel, $bankorderid, $bankmoney, $account, $drawnote);
         if($ret){
-            $this->res['code'] = 1;
-            $this->res['msg'] = '提款扣款成功';
-            return json($this->res);
+            return json(self::sucres());
         }else{
-            $this->res['code'] = -1;
-            $this->res['msg'] = '提款扣款失败';
-            return json($this->res);
+            return json(self::erres("提款扣款失败"));
         }
 
-        $this->res['code'] = 1;
-        $this->res['msg'] = '提款发起成功';
-        return json($this->res);
+        return json(self::sucres());
     }
 
     /**
@@ -418,15 +382,11 @@ class User extends Base
         $AccountModel = new AccountModel();
         $userinfo = $AccountModel->getUserInfoByUid($uid);
         if(empty($userinfo)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '用户信息不存在';
-            return json($this->res);
+            return json(self::erres("用户信息不存在"));
         }
 
-        $this->res['code'] = 1;
-        $this->res['msg'] = 'success';
-        $this->res['info'] = $userinfo;
-        return json($this->res);
+        $resinfo = $userinfo;
+        return json(self::sucres($resinfo));
     }
 
 }
