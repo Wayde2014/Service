@@ -22,9 +22,7 @@ class User extends Base
         $mobile = input('mobile');
         //检查手机号码格式
         if (!check_mobile($mobile)) {
-            $this->res['code'] = -1;
-            $this->res['msg'] = '手机号码格式错误';
-            return json($this->res);
+            return json(self::erres("手机号码格式错误"));
         }
 
         $UserModel = new UserModel();
@@ -34,17 +32,13 @@ class User extends Base
         if ($uid === false) {
             $uid = $UserModel->addUser($mobile);
             if ($uid === false) {
-                $this->res['code'] = -1;
-                $this->res['msg'] = '注册用户失败';
-                return json($this->res);
+                return json(self::erres("注册用户失败"));
             }
         }
 
         //检查记录短信发送日志
         if (!$UserModel->checkSmslog($uid, $mobile)) {
-            $this->res['code'] = -1;
-            $this->res['msg'] = '短信发送太频繁了';
-            return json($this->res);
+            return json(self::erres("短信发送太频繁了"));
         }
 
         //发送短信验证码，并更新短信发送日志
@@ -52,9 +46,7 @@ class User extends Base
         $ret = $Sms->sendsms($mobile);
         if ($ret['code'] > 0) {
             if (!$UserModel->updateSmslog($uid, $mobile)) {
-                $this->res['code'] = -1;
-                $this->res['msg'] = '更新短信发送日志失败';
-                return json($this->res);
+                return json(self::erres("更新短信发送日志失败"));
             }
         }
         return json($ret);
@@ -76,18 +68,14 @@ class User extends Base
         //设备号不能为空
         $last_deviceid = trim($deviceid);
         if (empty($last_deviceid)) {
-            $this->res['code'] = -1;
-            $this->res['msg'] = '设备号不能为空';
-            return json($this->res);
+            return json(self::erres("设备号不能为空"));
         }
 
         //检查手机号有无注册
         $UserModel = new UserModel();
         $uid = $UserModel->checkMobile($mobile);
         if($uid === false){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '用户不存在';
-            return json($this->res);
+            return json(self::erres("用户不存在"));
         }
 
         //检查短信验证码是否正确
@@ -102,17 +90,13 @@ class User extends Base
         $platform = intval($platform);
         $ret_login = $UserModel->addUserLogin($ck, $uid, $deviceid, $platform, $ip, $remark);
         if ($ret_login === false) {
-            $this->res['code'] = -1;
-            $this->res['msg'] = '写登录信息失败';
-            return json($this->res);
+            return json(self::erres("写登录信息失败"));
         }
-        $this->res['code'] = 1;
-        $this->res['msg'] = '登录成功';
-        $this->res['info'] = array(
+        $resinfo = array(
             'ck' => $ret_login['ck'],
             'uid' => $ret_login['uid'],
         );
-        return json($this->res);
+        return json(self::sucres($resinfo));
     }
 
     /**
@@ -124,13 +108,9 @@ class User extends Base
         $usercheck = input('ck');
         $UserModel = new UserModel();
         if ($UserModel->setCkExpired($usercheck)) {
-            $this->res['code'] = 1;
-            $this->res['msg'] = '退出登录成功';
-            return json($this->res);
+            return json(self::sucres());
         } else {
-            $this->res['code'] = -1;
-            $this->res['msg'] = '退出登录失败';
-            return json($this->res);
+            return json(self::erres("退出登录失败"));
         }
     }
 
