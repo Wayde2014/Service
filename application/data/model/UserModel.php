@@ -150,45 +150,36 @@ class UserModel extends Model
      */
     public function addUserLogin($ck, $uid, $deviceid, $platform, $ip, $remark){
         $table_name = 'user_login';
-        //判断用户当前登录态是否已失效
-        $userinfo = self::getLoginUserInfo($ck);
-        if(!empty($userinfo)){
-            $ck = $userinfo['ck'];
-            self::extendExpireTime($ck);
-            return array(
-                'ck' => $ck,
-                'uid' => $uid,
-            );
-        }else{
-            $expiretime = date("Y-m-d H:i:s", time()+30*24*3600);
-            $data = array(
-                'f_usercheck' => $ck,
-                'f_uid' => $uid,
-                'f_deviceid' => $deviceid,
-                'f_platform' => $platform,
-                'f_ip' => $ip,
-                'f_remark' => $remark,
-                'f_expiretime' => $expiretime,
-            );
-            Db::name($table_name)->insert($data);
-            if(Db::name($table_name)->getLastInsID() <= 0){
-                return false;
-            }
-            return array(
-                'ck' => $ck,
-                'uid' => $uid,
-            );
+        $expiretime = date("Y-m-d H:i:s", time()+30*24*3600);
+        $data = array(
+            'f_usercheck' => $ck,
+            'f_uid' => $uid,
+            'f_deviceid' => $deviceid,
+            'f_platform' => $platform,
+            'f_ip' => $ip,
+            'f_remark' => $remark,
+            'f_expiretime' => $expiretime,
+        );
+        Db::name($table_name)->insert($data);
+        if(Db::name($table_name)->getLastInsID() <= 0){
+            return false;
         }
+        return array(
+            'ck' => $ck,
+            'uid' => $uid,
+        );
     }
 
     /**
      * 通过ck获取用户登录信息
      * @param $ck
-     * @return bool
+     * @param $uid
+     * @return array|false|\PDOStatement|string|Model
      */
-    public function getLoginUserInfo($ck){
+    public function getLoginUserInfo($ck,$uid){
         $table_name = 'user_login';
         $userinfo = Db::name($table_name)
+            ->where('f_uid',$uid)
             ->where('f_usercheck',$ck)
             ->where('f_expiretime', '> time', time())
             ->field('f_uid as uid')

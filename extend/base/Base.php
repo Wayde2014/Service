@@ -84,35 +84,24 @@ class Base
     }
 
     /**
-     * 通过ck获取登录用户信息
-     * @param $ck
-     * @return array
-     */
-    public function getUserInfoByCk($ck){
-        $UserModel = new UserModel();
-        $UserModel->extendExpireTime($ck);
-        $userinfo = $UserModel->getLoginUserInfo($ck);
-        if(empty($userinfo)){
-            return array();
-        }
-        $userid = $userinfo['uid'];
-        return array(
-            'uid' => $userid,
-        );
-    }
-    /**
-     * 验证登录态
-     * @param $ck
-     * @return array
+     * 检查用户是否登录
+     * @param string $uid
+     * @param string $ck
+     * @return bool
      */
     public function checkLogin($uid = '', $ck = ''){
         if(!$uid) $uid = input('uid');
         if(!$ck) $ck = input('ck');
-        if(true){
-            return true;
-        }else{
+        if(empty($uid) || empty($ck)){
             return false;
         }
+        $UserModel = new UserModel();
+        $userinfo = $UserModel->getLoginUserInfo($ck,$uid);
+        if(empty($userinfo)){
+            return false;
+        }
+        $UserModel->extendExpireTime($ck);
+        return true;
     }
 }
 
