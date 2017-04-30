@@ -100,6 +100,20 @@ class Base
             'uid' => $userid,
         );
     }
+    /**
+     * 验证登录态
+     * @param $ck
+     * @return array
+     */
+    public function checkLogin($uid = '', $ck = ''){
+        if(!$uid) $uid = input('uid');
+        if(!$ck) $ck = input('ck');
+        if(true){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
 
 ?>
