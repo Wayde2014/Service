@@ -52,9 +52,49 @@
         uid 用户ID
 
     3、退出登录接口
-    http://119.23.73.39/data/User/logout?ck=ck_YJC0MTG5YZFLY2I2ODI5NJG3MJIZNTK4NJE5Y2VIYJK=
+    http://119.23.73.39/data/User/logout?ck=ck_xxx
     入参：
         ck  唯一标示用户登录态信息
     结果说明：
         {"code":1,"msg":"退出登录成功","info":[],"list":[]}
         code > 0，即退出登录成功
+
+    4、获取登录用户信息
+    http://119.23.73.39/data/User/getuserinfo?ck=ck_xxx
+    入参：
+        ck  唯一标示用户登录态信息
+    结果说明：
+        {"code":1,"msg":"success","info":{"uid":10001,"nickname":null,"mobile":"13510902030","realname":null,"sex":0,"idcard":null,"auth_status":0,"usermoney":"1202.0000","freezemoney":"0.0000","depositmoney":"0.0000","user_status":0,"regtime":"2017-04-30 13:26:37"},"list":[]}
+        uid 用户唯一ID
+        nickname 用户昵称(默认空)
+        mobile 用户注册手机号码
+        realname 用户真实姓名
+        sex 0-保密,1-男,2-女
+        idcard 用户身份证号码
+        auth_status 实名认证状态(0-未认证,100-已认证,-100-认证失败)
+        usermoney 用户余额
+        freezemoney 冻结金额
+        depositmoney 押金金额
+        user_status 用户状态(0-默认,100-已充值押金,200-已实名认证,-100-黑名单)
+        regtime 用户注册时间
+
+    5、发起充值
+    http://www.shanwei.com/index.php/data/User/recharge?ck=ck_xxx&paytype=1001&paymoney=100&channel=1001
+    入参：
+        ck          唯一标示用户登录态信息
+        paytype     充值类型(1001-充值余额,1002-充值押金)
+        paymoney    充值金额
+        channel     充值渠道(1001-支付宝提款,1002-微信提款)
+    结果说明：
+        {"code":1,"msg":"充值下单成功","info":[],"list":[]}
+        code > 0，即充值下单成功
+
+    6、发起提款
+    http://www.shanwei.com/index.php/data/User/draw?ck=ck_xxx&drawtype=200&drawmoney=99
+    入参：
+        ck          唯一标示用户登录态信息
+        drawtype    提款类型(200-押金退款)
+        drawmoney   提款金额
+    结果说明：
+        {"code":1,"msg":"提款发起成功","info":[],"list":[]}
+        code > 0，即提款发起成功
