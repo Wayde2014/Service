@@ -10,6 +10,7 @@
 namespace app\data\model;
 
 use think\Exception;
+use think\Log;
 use think\Model;
 use think\Db;
 
@@ -88,16 +89,14 @@ class AccountModel extends Model
      * @param $uid
      * @param $drawmoney
      * @param $drawtype
-     * @param $channel
      * @return bool|int
      */
-    public function addDrawOrderInfo($uid, $drawmoney, $drawtype, $channel){
+    public function addDrawOrderInfo($uid, $drawmoney, $drawtype){
         $table_name = 'user_draw_order';
         $data = array(
             'f_uid' => $uid,
             'f_drawmoney' => $drawmoney,
             'f_drawtype' => $drawtype,
-            'f_channel' => $channel,
             'f_addtime' => date("Y-m-d H:i:s"),
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
@@ -111,15 +110,17 @@ class AccountModel extends Model
      * 更新提款订单状态
      * @param $orderid
      * @param $status
+     * @param $channel
      * @param $bankorderid
      * @param $bankmoney
      * @param $account
      * @param $drawnote
      * @return bool
      */
-    public function updateDrawOrderStatus($orderid, $status, $bankorderid, $bankmoney, $account, $drawnote){
+    public function updateDrawOrderStatus($orderid, $status, $channel, $bankorderid, $bankmoney, $account, $drawnote){
         $table_name = 'user_draw_order';
         $data = array(
+            'f_channel' => $channel,
             'f_bankorderid' => $bankorderid,
             'f_bankmoney' => $bankmoney,
             'f_account' => $account,
@@ -141,13 +142,22 @@ class AccountModel extends Model
      * @param $uid
      * @return array|false|\PDOStatement|string|Model
      */
-    public function getUserInfo($uid){
+    public function getUserInfoByUid($uid){
         $table_name = 'user_info';
         $userinfo = Db::name($table_name)
             ->where('f_uid',$uid)
+            ->field('f_uid as uid')
+            ->field('f_nickname as nickname')
+            ->field('f_mobile as mobile')
+            ->field('f_realname as realname')
+            ->field('f_sex as sex')
+            ->field('f_idcard as idcard')
+            ->field('f_auth_status as auth_status')
             ->field('f_usermoney as usermoney')
             ->field('f_freezemoney as freezemoney')
             ->field('f_depositmoney as depositmoney')
+            ->field('f_user_status as user_status')
+            ->field('f_regtime as regtime')
             ->find();
         return $userinfo;
     }
@@ -158,16 +168,17 @@ class AccountModel extends Model
      * @param $money
      * @param $tradetype
      * @param $orderid
+     * @param $suborderid
      * @return bool
      */
-    public function deposit($uid, $money, $tradetype, $orderid){
+    public function deposit($uid, $money, $tradetype, $orderid, $suborderid=''){
         $table_userinfo = 'user_info';
         $talbe_paylog = 'user_paylog';
         $inout = 1;
         Db::startTrans();
         try{
             //获取用户当前账户信息
-            $userinfo = self::getUserInfo($uid);
+            $userinfo = self::getUserInfoByUid($uid);
             $ori_usermoney = $userinfo['usermoney'];
             $ori_freezemoney = $userinfo['freezemoney'];
             $ori_depositmoney = $userinfo['depositmoney'];
@@ -211,7 +222,8 @@ class AccountModel extends Model
                 'f_inout' => $inout,
                 'f_trademoney' => $money,
                 'f_tradetype' => $tradetype,
-                'f_suborder' => $orderid,
+                'f_orderid' => $orderid,
+                'f_suborderid' => $suborderid,
                 'f_tradenote' => $tradenote,
             );
             Db::name($talbe_paylog)
@@ -230,16 +242,17 @@ class AccountModel extends Model
      * @param $money
      * @param $tradetype
      * @param $orderid
+     * @param $suborderid
      * @return bool
      */
-    public function deduct($uid, $money, $tradetype, $orderid){
+    public function deduct($uid, $money, $tradetype, $orderid, $suborderid=''){
         $table_userinfo = 'user_info';
         $talbe_paylog = 'user_paylog';
         $inout = 2;
         Db::startTrans();
         try{
             //获取用户当前账户信息
-            $userinfo = self::getUserInfo($uid);
+            $userinfo = self::getUserInfoByUid($uid);
             $ori_usermoney = $userinfo['usermoney'];
             $ori_freezemoney = $userinfo['freezemoney'];
             $ori_depositmoney = $userinfo['depositmoney'];
@@ -283,7 +296,8 @@ class AccountModel extends Model
                 'f_inout' => $inout,
                 'f_trademoney' => $money,
                 'f_tradetype' => $tradetype,
-                'f_suborder' => $orderid,
+                'f_orderid' => $orderid,
+                'f_suborderid' => $suborderid,
                 'f_tradenote' => $tradenote,
             );
             Db::name($talbe_paylog)
@@ -291,6 +305,7 @@ class AccountModel extends Model
             Db::commit();
             return true;
         }catch (Exception $e){
+            Log::record($e);
             Db::rollback();
             return false;
         }
@@ -387,13 +402,14 @@ class AccountModel extends Model
     /**
      * 提款成功处理
      * @param $orderid
+     * @param $channel
      * @param $bankorderid
      * @param $bankmoney
      * @param $account
      * @param $drawnote
      * @return bool
      */
-    public function drawSuc($orderid, $bankorderid, $bankmoney, $account, $drawnote){
+    public function drawSuc($orderid, $channel, $bankorderid, $bankmoney, $account, $drawnote){
         $orderinfo = self::getDrawOrderInfo($orderid);
         if(empty($orderinfo)){
             return false;
@@ -409,10 +425,10 @@ class AccountModel extends Model
         if($drawtype == 200){
             $tradetype = 2101;
         }
-        $retup = self::updateDrawOrderStatus($orderid,$this->drawsuc,$bankorderid,$bankmoney,$account,$drawnote);
+        $retup = self::updateDrawOrderStatus($orderid,$this->drawsuc,$channel,$bankorderid,$bankmoney,$account,$drawnote);
         if($retup){
-            //存款
-            return self::deduct($uid,$bankmoney,$tradetype,$orderid);
+            //解冻扣款
+            return self::unfreeze($uid,$bankmoney,$tradetype,$drawnote,$orderid);
         }
         return false;
     }
@@ -436,6 +452,65 @@ class AccountModel extends Model
             return false;
         }
         return self::updateDrawOrderStatus($orderid,$this->drawfail,$ori_bankorderid,$ori_bankmoney,$account,$drawynote);
+    }
+
+    /**
+     * 冻结金额
+     * @param $uid
+     * @param $money
+     * @param $tradetype
+     * @param $tradenote
+     * @return bool
+     */
+    public function freeze($uid, $money, $tradetype, $tradenote){
+        $table_name = 'user_freezelog';
+        $data = array(
+            'f_uid' => $uid,
+            'f_inout' => 2,
+            'f_trademoney' => $money,
+            'f_tradetype' => $tradetype,
+            'f_tradenote' => $tradenote,
+        );
+        $orderid = intval(Db::name($table_name)->insertGetId($data));
+        if ($orderid <= 0) {
+            Log::record("新增冻结流水失败");
+            return false;
+        }
+        //冻结扣款)
+        return self::deduct($uid,$money,$tradetype,$orderid);
+    }
+
+    /**
+     * 解冻扣款
+     * @param $uid
+     * @param $money
+     * @param $tradetype
+     * @param $tradenote
+     * @return bool
+     */
+    public function unfreeze($uid, $money, $tradetype, $tradenote){
+        $table_name = 'user_freezelog';
+        $data = array(
+            'f_uid' => $uid,
+            'f_inout' => 1,
+            'f_trademoney' => $money,
+            'f_tradetype' => $tradetype,
+            'f_tradenote' => $tradenote,
+        );
+        $orderid = intval(Db::name($table_name)->insertGetId($data));
+        if ($orderid <= 0) {
+            return false;
+        }
+        //解冻
+        $new_tradetype = 1101;
+        $unfreeze = self::deposit($uid,$money,$new_tradetype,$orderid);
+        if(!$unfreeze){
+            //解冻失败
+            return false;
+        }
+        //扣款
+        return self::deduct($uid,$money,$tradetype,$orderid);
+
     }
 
 }

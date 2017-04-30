@@ -10,7 +10,7 @@ class User extends Base
 {
     private $paytype_config = array(1001,1002); //1001-充值余额,1002-充值押金
     private $paychannel_config = array(1001,1002); //1001-支付宝充值,1002-微信充值
-    private $drawtype_config = array(100,200); //100-余额提款,200-押金退款
+    private $drawtype_config = array(200); //100-余额提款,200-押金退款
     private $drawchannel_config = array(1001,1002); //1001-支付宝提款,1002-微信提款
 
     /**
@@ -145,6 +145,14 @@ class User extends Base
         $paymoney = floatval(input('paymoney',0));
         $paychannel = intval(input('channel',0));
 
+        //检查用户是否登录
+        $ckinfo = self::getUserInfoByCk($ck);
+        if(empty($ckinfo)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '用户尚未登录';
+            return json($this->res);
+        }
+
         //校验参数
         if(empty($ck)){
             $this->res['code'] = -1;
@@ -167,16 +175,8 @@ class User extends Base
             return json($this->res);
         }
 
-        //获取用户信息
-        $userinfo = self::getUserInfo($ck);
-        if(empty($userinfo)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '用户尚未登录';
-            return json($this->res);
-        }
-
         $AccountModel = new AccountModel();
-        $uid = $userinfo['uid'];
+        $uid = $ckinfo['uid'];
         $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
         if($orderid === false){
             $this->res['code'] = -1;
@@ -214,7 +214,14 @@ class User extends Base
         $ck = input('ck');
         $drawtype = intval(input('drawtype',200));
         $drawmoney = floatval(input('drawmoney',0));
-        $drawchannel = intval(input('channel',0));
+
+        //检查用户是否登录
+        $ckinfo = self::getUserInfoByCk($ck);
+        if(empty($ckinfo)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '用户尚未登录';
+            return json($this->res);
+        }
 
         //校验参数
         if(empty($ck)){
@@ -227,11 +234,6 @@ class User extends Base
             $this->res['msg'] = '提款类型错误';
             return json($this->res);
         }
-        if(!in_array($drawchannel,$this->drawchannel_config)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '提款渠道错误';
-            return json($this->res);
-        }
         if($drawmoney <= 0){
             $this->res['code'] = -1;
             $this->res['msg'] = '提款金额不能小于0';
@@ -239,19 +241,35 @@ class User extends Base
         }
 
         //获取用户信息
-        $userinfo = self::getUserInfo($ck);
-        if(empty($userinfo)){
+        $AccountModel = new AccountModel();
+        $uid = $ckinfo['uid'];
+        $userinfo = $AccountModel->getUserInfoByUid($uid);
+        $usermoney = $userinfo['usermoney'];
+        $depositmoney = $userinfo['depositmoney'];
+        if($drawtype == 200 && $depositmoney < $drawmoney){
             $this->res['code'] = -1;
-            $this->res['msg'] = '用户尚未登录';
+            $this->res['msg'] = '押金余额不足';
+            return json($this->res);
+        }
+        if($drawtype == 100 && $usermoney < $drawmoney){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '账户余额不足';
             return json($this->res);
         }
 
-        $AccountModel = new AccountModel();
-        $uid = $userinfo['uid'];
-        $orderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype,$drawchannel);
+        //冻结
+        $tradenote = '用户提款冻结';
+        $freeze = $AccountModel->freeze($uid,$drawmoney,2001,$tradenote);
+        if(!$freeze){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '用户提款冻结失败';
+            return json($this->res);
+        }
+
+        $orderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype);
         if($orderid === false){
             $this->res['code'] = -1;
-            $this->res['msg'] = '提款下单失败';
+            $this->res['msg'] = '提款发起失败';
             return json($this->res);
         }
 
@@ -260,19 +278,51 @@ class User extends Base
         $bankmoney = $drawmoney;
         $account = 'test';
         $drawnote = 'test';
-        $ret = $AccountModel->rechargeSuc($orderid, $bankorderid, $bankmoney, $account, $drawnote);
+        $channel = $this->drawchannel_config[0];
+        $ret = $AccountModel->drawSuc($orderid, $channel, $bankorderid, $bankmoney, $account, $drawnote);
         if($ret){
             $this->res['code'] = 1;
-            $this->res['msg'] = '提款入账成功';
+            $this->res['msg'] = '提款扣款成功';
             return json($this->res);
         }else{
             $this->res['code'] = -1;
-            $this->res['msg'] = '提款入账失败';
+            $this->res['msg'] = '提款扣款失败';
             return json($this->res);
         }
 
         $this->res['code'] = 1;
-        $this->res['msg'] = '提款下单成功';
+        $this->res['msg'] = '提款发起成功';
+        return json($this->res);
+    }
+
+    /**
+     * 获取登录用户信息
+     */
+    public function getUserInfo(){
+        //获取参数
+        $ck = input('ck');
+
+        //检查用户是否登录
+        $ckinfo = self::getUserInfoByCk($ck);
+        if(empty($ckinfo)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '用户尚未登录';
+            return json($this->res);
+        }
+
+        //获取用户信息
+        $uid = $ckinfo['uid'];
+        $AccountModel = new AccountModel();
+        $userinfo = $AccountModel->getUserInfoByUid($uid);
+        if(empty($userinfo)){
+            $this->res['code'] = -1;
+            $this->res['msg'] = '用户信息不存在';
+            return json($this->res);
+        }
+
+        $this->res['code'] = 1;
+        $this->res['msg'] = 'success';
+        $this->res['info'] = $userinfo;
         return json($this->res);
     }
 

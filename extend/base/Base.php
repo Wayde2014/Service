@@ -13,7 +13,7 @@ class Base
      * 构造函数
      * @param array $res
      */
-    function __construct($res = array())
+    public function __construct($res = array())
     {
         if ($res && count($res) > 0) {
             foreach ($res as $key => $val) {
@@ -65,7 +65,7 @@ class Base
      * @param $ck
      * @return array
      */
-    public function getUserInfo($ck){
+    public function getUserInfoByCk($ck){
         $UserModel = new UserModel();
         $UserModel->extendExpireTime($ck);
         $userinfo = $UserModel->getLoginUserInfo($ck);
