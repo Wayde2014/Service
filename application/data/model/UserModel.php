@@ -150,6 +150,21 @@ class UserModel extends Model
      */
     public function addUserLogin($ck, $uid, $deviceid, $platform, $ip, $remark){
         $table_name = 'user_login';
+        //判断用户是否重复登录
+        $userinfo = Db::name($table_name)
+            ->where('f_uid',$uid)
+            ->where('f_expiretime', '> time', time())
+            ->field('f_uid as uid')
+            ->field('f_usercheck as ck')
+            ->order('f_expiretime desc')
+            ->find();
+        if(!empty($userinfo)){
+            return array(
+                'ck' => $userinfo['ck'],
+                'uid' => $uid,
+            );
+        }
+
         $expiretime = date("Y-m-d H:i:s", time()+30*24*3600);
         $data = array(
             'f_usercheck' => $ck,

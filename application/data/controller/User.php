@@ -105,9 +105,13 @@ class User extends Base
      */
     public function logout()
     {
-        $usercheck = input('ck');
+        $ck = input('ck');
+        $uid = input('uid');
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
+        }
         $UserModel = new UserModel();
-        if ($UserModel->setCkExpired($usercheck)) {
+        if ($UserModel->setCkExpired($ck)) {
             return json(self::sucres());
         } else {
             return json(self::erres("退出登录失败"));
@@ -284,16 +288,14 @@ class User extends Base
     public function recharge(){
         //获取参数
         $ck = input('ck');
+        $uid = input('uid');
         $paytype = intval(input('paytype',0));
         $paymoney = floatval(input('paymoney',0));
         $paychannel = intval(input('channel',0));
 
         //检查用户是否登录
-        $ckinfo = self::getUserInfoByCk($ck);
-        if(empty($ckinfo)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '用户尚未登录';
-            return json($this->res);
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
         }
 
         //校验参数
@@ -311,7 +313,6 @@ class User extends Base
         }
 
         $AccountModel = new AccountModel();
-        $uid = $ckinfo['uid'];
         $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
         if($orderid === false){
             return json(self::erres("充值下单失败"));
@@ -339,15 +340,13 @@ class User extends Base
     public function draw(){
         //获取参数
         $ck = input('ck');
+        $uid = input('uid');
         $drawtype = intval(input('drawtype',200));
         $drawmoney = floatval(input('drawmoney',0));
 
         //检查用户是否登录
-        $ckinfo = self::getUserInfoByCk($ck);
-        if(empty($ckinfo)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '用户尚未登录';
-            return json($this->res);
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
         }
 
         //校验参数
@@ -363,7 +362,6 @@ class User extends Base
 
         //获取用户信息
         $AccountModel = new AccountModel();
-        $uid = $ckinfo['uid'];
         $userinfo = $AccountModel->getUserInfoByUid($uid);
         $usermoney = $userinfo['usermoney'];
         $depositmoney = $userinfo['depositmoney'];
@@ -408,17 +406,14 @@ class User extends Base
     public function getUserInfo(){
         //获取参数
         $ck = input('ck');
+        $uid = input('uid');
 
         //检查用户是否登录
-        $ckinfo = self::getUserInfoByCk($ck);
-        if(empty($ckinfo)){
-            $this->res['code'] = -1;
-            $this->res['msg'] = '用户尚未登录';
-            return json($this->res);
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
         }
 
         //获取用户信息
-        $uid = $ckinfo['uid'];
         $AccountModel = new AccountModel();
         $userinfo = $AccountModel->getUserInfoByUid($uid);
         if(empty($userinfo)){
