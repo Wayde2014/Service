@@ -440,7 +440,7 @@ class AccountModel extends Model
      * @param $drawynote
      * @return bool
      */
-    public function drawFail($orderid, $account, $drawynote){
+    public function drawFail($orderid, $channel, $account, $drawynote){
         $orderinfo = self::getDrawOrderInfo($orderid);
         if(empty($orderinfo)){
             return false;
@@ -451,7 +451,7 @@ class AccountModel extends Model
         if($ori_status != 0){
             return false;
         }
-        return self::updateDrawOrderStatus($orderid,$this->drawfail,$ori_bankorderid,$ori_bankmoney,$account,$drawynote);
+        return self::updateDrawOrderStatus($orderid,$this->drawfail,$channel,$ori_bankorderid,$ori_bankmoney,$account,$drawynote);
     }
 
     /**
