@@ -5,13 +5,14 @@ http://www.shanwei.com/index.php/data/User/sendSms?mobile=13510902030
 http://www.shanwei.com/index.php/data/User/login?mobile=13510902030&vcode=1234&deviceid=355439075682780&platform=2&ip=192.168.1.1&remark=test
 
 3、退出登录
-http://www.shanwei.com/index.php/data/User/logout?ck=ck_xxx
+http://www.shanwei.com/index.php/data/User/logout?ck=ck_xxx&uid=1
 
 4、充值
-http://www.shanwei.com/index.php/data/User/recharge?ck=ck_xxx&paytype=1001&paymoney=100&channel=1001
+http://www.shanwei.com/index.php/data/User/recharge?ck=ck_xxx&uid=xxx&paytype=1001&paymoney=100&channel=1001
+http://www.shanwei.com/index.php/data/User/recharge?ck=ck_xxx&uid=xxx&paytype=1002&paymoney=99&channel=1002
 
 5、提款
-http://www.shanwei.com/index.php/data/User/draw?ck=ck_xxx&drawtype=1001&drawmoney=5
+http://www.shanwei.com/index.php/data/User/draw?ck=ck_xxx&uid=xxx&drawtype=200&drawmoney=99
 
 6、获取登录用户信息
-http://www.shanwei.com/index.php/data/User/getuserinfo?ck=ck_xxx
+http://www.shanwei.com/index.php/data/User/getuserinfo?ck=ck_xxx&uid=1
