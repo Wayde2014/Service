@@ -71,6 +71,8 @@
 .radio_button {
   text-align:left;
 }
+.table_cell {
+}
 .flow_shape {
 }
 .image {
@@ -86,4 +88,6 @@
 }
 .image1 {
   color:#000000;
+}
+.button {
 }
