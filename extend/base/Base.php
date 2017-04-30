@@ -1,6 +1,8 @@
 <?php
 namespace base;
 
+use \app\data\model\UserModel;
+
 class Base
 {
     // 配置参数
@@ -11,7 +13,7 @@ class Base
      * 构造函数
      * @param array $res
      */
-    function __construct($res = array())
+    public function __construct($res = array())
     {
         if ($res && count($res) > 0) {
             foreach ($res as $key => $val) {
@@ -79,6 +81,24 @@ class Base
             return false;
         }
         return true;
+    }
+
+    /**
+     * 通过ck获取登录用户信息
+     * @param $ck
+     * @return array
+     */
+    public function getUserInfoByCk($ck){
+        $UserModel = new UserModel();
+        $UserModel->extendExpireTime($ck);
+        $userinfo = $UserModel->getLoginUserInfo($ck);
+        if(empty($userinfo)){
+            return array();
+        }
+        $userid = $userinfo['uid'];
+        return array(
+            'uid' => $userid,
+        );
     }
 }
 

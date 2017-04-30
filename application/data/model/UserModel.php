@@ -21,25 +21,23 @@ class UserModel extends Model
     public function checkMobile($mobile)
     {
         $table_name = 'user_info';
-        $ret = Db::name($table_name)->field('f_uid as uid')->where('f_mobile', $mobile)->select();
+        $ret = Db::name($table_name)->field('f_uid as uid')->where('f_mobile', $mobile)->find();
         if (empty($ret)) {
             return false;
         }
-        return $ret[0]['uid'];
+        return $ret['uid'];
     }
 
     /**
      * 新增用户
      * @param $mobile
-     * @param $lastdevice
      * @return bool|int
      */
-    public function addUser($mobile, $lastdevice)
+    public function addUser($mobile)
     {
         $table_name = 'user_info';
         $data = array(
             'f_mobile' => $mobile,
-            'f_lastdevice' => $lastdevice,
             'f_regtime' => date("Y-m-d H:i:s"),
         );
         $userId = intval(Db::name($table_name)->insertGetId($data));
@@ -62,7 +60,7 @@ class UserModel extends Model
             ->where('f_mobile', $mobile)
             ->field('f_lasttime as lasttime')
             ->field('now() as curtime')
-            ->select();
+            ->find();
         if (empty($ret)) {
             $data = array(
                 'f_uid' => $uid,
@@ -101,16 +99,16 @@ class UserModel extends Model
 
     /**
      * 延长登录过期时间
-     * @param $usercheck
+     * @param $ck
      * @return bool
      */
-    public function extendExpireTime($usercheck){
+    public function extendExpireTime($ck){
         $table_name = 'user_login';
         $data = array(
             'f_expiretime' => date("Y-m-d H:i:s", time()+30*24*3600),
         );
         $retup = Db::name($table_name)
-            ->where('f_usercheck',$usercheck)
+            ->where('f_usercheck',$ck)
             ->where('f_lasttime','< time',time()-3600)
             ->update($data);
         if($retup !== false){
@@ -122,16 +120,16 @@ class UserModel extends Model
 
     /**
      * 设置CK过期
-     * @param $usercheck
+     * @param $ck
      * @return bool
      */
-    public function setCkExpired($usercheck){
+    public function setCkExpired($ck){
         $table_name = 'user_login';
         $data = array(
             'f_expiretime' => date("Y-m-d H:i:s", time()-60),
         );
         $retup = Db::name($table_name)
-            ->where('f_usercheck',$usercheck)
+            ->where('f_usercheck',$ck)
             ->update($data);
         if($retup !== false){
             return true;
@@ -153,17 +151,12 @@ class UserModel extends Model
     public function addUserLogin($ck, $uid, $deviceid, $platform, $ip, $remark){
         $table_name = 'user_login';
         //判断用户当前登录态是否已失效
-        $ret = Db::name($table_name)
-            ->where('f_uid', $uid)
-            ->where('f_expiretime', '> time', time())
-            ->field('f_usercheck as usercheck')
-            ->select();
-
-        if(!empty($ret)){
-            $usercheck = $ret[0]['usercheck'];
-            self::extendExpireTime($usercheck);
+        $userinfo = self::getLoginUserInfo($ck);
+        if(!empty($userinfo)){
+            $ck = $userinfo['ck'];
+            self::extendExpireTime($ck);
             return array(
-                'usercheck' => $usercheck,
+                'ck' => $ck,
                 'uid' => $uid,
             );
         }else{
@@ -182,7 +175,7 @@ class UserModel extends Model
                 return false;
             }
             return array(
-                'usercheck' => $ck,
+                'ck' => $ck,
                 'uid' => $uid,
             );
         }
@@ -197,15 +190,13 @@ class UserModel extends Model
         $table_name = 'user_login';
         $userinfo = Db::name($table_name)
             ->where('f_usercheck',$ck)
-            ->where('f_expiretime','GT',time())
+            ->where('f_expiretime', '> time', time())
             ->field('f_uid as uid')
-            ->select();
-        if(empty($userinfo)){
-            return false;
-        }
-        return $userinfo[0];
+            ->field('f_usercheck as ck')
+            ->find();
+        return $userinfo;
     }
-    
+
     /**
      * 新增地址
      */
@@ -226,7 +217,7 @@ class UserModel extends Model
         }
         return $addressid;
     }
-    
+
     /**
      * 检测地址是否已经注册
      */
@@ -246,7 +237,7 @@ class UserModel extends Model
             return $checkaddress[0]["id"];
         }
     }
-    
+
     /**
      * 更新地址
      */
@@ -285,7 +276,7 @@ class UserModel extends Model
         }
         return $address[0];
     }
-    
+
     /**
      * 设置默认地址
      */
@@ -296,13 +287,13 @@ class UserModel extends Model
             ->update(array( 'f_isactive' => 0 ));
         if($ret !== false){
             $ret = Db::name($table_name)
-            ->where('f_id', $addressid)
-            ->update(array( 'f_isactive' => 1 ));
+                ->where('f_id', $addressid)
+                ->update(array( 'f_isactive' => 1 ));
             if($ret !== false){
                 return true;
             }else{
                 return false;
-            } 
+            }
         }else{
             return false;
         }
