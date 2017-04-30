@@ -21,8 +21,29 @@ class Base
             }
         }
         if(!self::checkToken()){
-            die(json_encode($this->res));
+            //die(json_encode($this->res));
         }
+    }
+    
+    /**
+     * 错误返回
+     * @param array $res
+     */
+    public function erres($msg){
+        $this->res['code'] = -1;
+        $this->res['msg'] = $msg;
+        return $this->res;
+    }
+    /**
+     * 成功返回
+     * @param array $res
+     */
+    public function sucres($info = array(), $list = array()){
+        $this->res['code'] = 1;
+        $this->res['msg'] = 'success';
+        $this->res['info'] = $info;
+        $this->res['list'] = $list;
+        return $this->res;
     }
 
     /**
@@ -35,14 +56,15 @@ class Base
         $token_ori = input('token','');
         if(empty($token_ori)){
             $this->res['code'] = -1;
-            $this->res['msg'] = 'Token can not be empty';
-            //return false;
+            $this->res['msg'] = 'Token签名串不能为空';
+            return false;
         }
         $params = input();
+        $pathinfo = '/'.request()->pathinfo();
         if(!empty($params)){
             ksort($params);
             foreach($params as $k=>$v){
-                if($k == 'token'){
+                if($k == 'token' || $k == $pathinfo){
                     continue;
                 }
                 $sign_str .= $k."=".$v."&";
@@ -51,11 +73,12 @@ class Base
                 $sign_str = substr($sign_str,0,-1);
             }
         }
+        
         $token = strtoupper(md5($sign_str.$this->sign_key));
         if(strtoupper($token_ori) != $token){
             $this->res['code'] = -1;
-            $this->res['msg'] = 'Token error | '.$token;;
-            //return false;
+            $this->res['msg'] = 'Token签名错误';
+            return false;
         }
         return true;
     }

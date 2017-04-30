@@ -134,6 +134,129 @@ class User extends Base
         }
     }
 
+
+    /**
+     * 获取地址列表
+     * @return \think\response\Json
+     */
+    public function getAddressList()
+    {
+        $userid = input('userid');
+        if(empty($userid)) return json($this->erres('参数错误'));
+
+        $UserModel = new UserModel();
+        //检查该手机号是否已注册，如无则注册
+        $res = $UserModel->getAddressList($userid);
+        if($res) {
+            return json($this->sucres(array("num"=>count($res)), $res));
+        }else{
+            return json($this->erres('获取用户地址列表失败'));
+        }
+    }
+
+    /**
+     * 获取地址信息
+     * @return \think\response\Json
+     */
+    public function getAddressInfo()
+    {
+        $addressid = input('addressid');
+        if(empty($addressid)) return json($this->erres('参数错误'));
+
+        $UserModel = new UserModel();
+        //检查该手机号是否已注册，如无则注册
+        $info = $UserModel->getAddressInfo($addressid);
+        if($info) {
+            return json($this->sucres($info));
+        }else{
+            return json($this->erres('获取用户地址信息失败'));
+        }
+    }
+
+    /**
+     * 设置默认地址
+     * @return \think\response\Json
+     */
+    public function setDefAddress()
+    {
+        $userid = input('userid');
+        $addressid = input('addressid');
+        if(empty($addressid)) return json($this->erres('参数错误'));
+
+        $UserModel = new UserModel();
+        //检查该手机号是否已注册，如无则注册
+        $info = $UserModel->setDefAddress($userid, $addressid);
+        if($info) {
+            return json($this->sucres());
+        }else{
+            return json($this->erres('设置默认地址失败'));
+        }
+    }
+
+    /**
+     * 新增地址
+     * @return \think\response\Json
+     */
+    public function addAddress()
+    {
+        $userid = input('userid');
+        if(empty($userid)) return json($this->erres('用户ID为空'));
+        $province = input('province');
+        if(empty($province)) return json($this->erres('请传入省份地址'));
+        $city = input('city');
+        if(empty($city)) return json($this->erres('请传入省份地址'));
+        $address = input('address');
+        if(empty($address)) return json($this->erres('请传入详细地址'));
+        $mobile = input('mobile');
+        if(empty($mobile)) return json($this->erres('请传入用户手机号'));
+
+        $UserModel = new UserModel();
+        //检查该手机号是否已注册，如无则注册
+        $addressid = $UserModel->checkAddress($userid, $province, $city, $address, $mobile);
+        if ($addressid === false) {
+            $addressid = $UserModel->addAddress($userid, $province, $city, $address, $mobile);
+            if ($addressid === false) {
+                return json($this->erres('新增地址失败'));
+            }else{
+                $UserModel->setDefAddress($userid, $addressid);
+                return json($this->sucres(array("addressid" => $addressid)));
+            }
+        }else{
+            return json($this->sucres(array("addressid" => $addressid)));
+        }
+    }
+
+    /**
+     * 修改地址
+     * @return \think\response\Json
+     */
+    public function modAddress()
+    {
+        $addressid = input('addressid');
+        if(empty($addressid)) return json($this->erres('参数错误'));
+        $province = input('province');
+        $city = input('city');
+        $address = input('address');
+        $mobile = input('mobile');
+        if(empty($province)&&empty($city)&&empty($address)&&empty($mobile)){
+            return json($this->erres('请传入要修改的值'));
+        }
+        $params = array(
+            "province" => $province,
+            "city" => $city,
+            "address" => $address,
+            "mobile" => $mobile,
+        );
+        $UserModel = new UserModel();
+        //检查该手机号是否已注册，如无则注册
+        $res = $UserModel->updateAddress($addressid, $params);
+        if($res) {
+            return json($this->sucres());
+        }else{
+            return json($this->erres('更新地址失败'));
+        }
+    }
+
     /**
      * 用户充值接口
      * @return \think\response\Json

@@ -197,4 +197,121 @@ class UserModel extends Model
         return $userinfo;
     }
 
+    /**
+     * 新增地址
+     */
+    public function addAddress($userid, $province, $city, $address, $mobile)
+    {
+        $table_name = 'user_address_info';
+        $data = array(
+            'f_uid' => $userid,
+            'f_province' => $province,
+            'f_city' => $city,
+            'f_address' => $address,
+            'f_mobile' => $mobile,
+            'f_addtime' => date("Y-m-d H:i:s"),
+        );
+        $addressid = intval(Db::name($table_name)->insertGetId($data));
+        if ($addressid <= 0) {
+            return false;
+        }
+        return $addressid;
+    }
+
+    /**
+     * 检测地址是否已经注册
+     */
+    public function checkAddress($userid, $province, $city, $address, $mobile)
+    {
+        $table_name = 'user_address_info';
+        $checkaddress = Db::name($table_name)
+            ->field('f_id id')
+            ->where('f_uid', $userid)
+            ->where('f_province', $province)
+            ->where('f_city', $city)
+            ->where('f_address', $address)
+            ->select();
+        if(empty($checkaddress)){
+            return false;
+        }else{
+            return $checkaddress[0]["id"];
+        }
+    }
+
+    /**
+     * 更新地址
+     */
+    public function updateAddress($addressid, $params)
+    {
+        $table_name = 'user_address_info';
+        $data = array(
+            'f_id' => $addressid,
+        );
+        if($params['province']) $data['f_province'] = $params['province'];
+        if($params['city']) $data['f_city'] = $params['city'];
+        if($params['address']) $data['f_address'] = $params['address'];
+        if($params['mobile']) $data['f_mobile'] = $params['mobile'];
+        $ret = Db::name($table_name)
+            ->where('f_id', $addressid)
+            ->update($data);
+        if($ret !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 获取某一条地址信息
+     */
+    public function getAddressInfo($addressid){
+        $table_name = 'user_address_info';
+        $address = Db::name($table_name)
+            ->where('f_id', $addressid)
+            ->field('f_id id,f_province province,f_city city,f_address address,f_mobile mobile,f_isactive isactive')
+            ->order('f_addtime', 'desc')
+            ->select();
+        if(empty($address)){
+            return false;
+        }
+        return $address[0];
+    }
+
+    /**
+     * 设置默认地址
+     */
+    public function setDefAddress($userid, $addressid){
+        $table_name = 'user_address_info';
+        $ret = Db::name($table_name)
+            ->where('f_uid', $userid)
+            ->update(array( 'f_isactive' => 0 ));
+        if($ret !== false){
+            $ret = Db::name($table_name)
+                ->where('f_id', $addressid)
+                ->update(array( 'f_isactive' => 1 ));
+            if($ret !== false){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 获取用户配送地址信息
+     */
+    public function getAddressList($userid){
+        $table_name = 'user_address_info';
+        $address = Db::name($table_name)
+            ->where('f_uid', $userid)
+            ->field('f_id id,f_province province,f_city city,f_address address,f_mobile mobile,f_isactive isactive')
+            ->order('f_addtime', 'desc')
+            ->select();
+        //var_dump(Db::name($table_name)->getLastSql());
+        if(empty($address)){
+            return false;
+        }
+        return $address;
+    }
 }
