@@ -19,8 +19,29 @@ class Base
             }
         }
         if(!self::checkToken()){
-            die(json_encode($this->res));
+            //die(json_encode($this->res));
         }
+    }
+    
+    /**
+     * 错误返回
+     * @param array $res
+     */
+    public function erres($msg){
+        $this->res['code'] = -1;
+        $this->res['msg'] = $msg;
+        return $this->res;
+    }
+    /**
+     * 成功返回
+     * @param array $res
+     */
+    public function sucres($info = array(), $list = array()){
+        $this->res['code'] = 1;
+        $this->res['msg'] = 'success';
+        $this->res['info'] = $info;
+        $this->res['list'] = $list;
+        return $this->res;
     }
 
     /**
