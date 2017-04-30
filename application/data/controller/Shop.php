@@ -79,6 +79,7 @@ class Shop extends Base
             if($res){
                 $info = $res[0];
                 $menulist = $info['menulist'];
+                $shopdishes = array();
                 $list = Db::query(
                 "SELECT
                     a.f_id id,
@@ -86,16 +87,25 @@ class Shop extends Base
                     a.f_name dishesname,
                     a.f_price price,
                     a.f_tastesid tastesid,
+                    b.f_cname classifyname,
                     c.f_cname cuisinename
                 FROM
-                    t_food_dishes a left join t_food_cuisine c on a.f_cuisineid = c.f_cid
+                    t_food_dishes a
+                LEFT JOIN t_food_classify b ON a.f_classid = b.f_cid
+                LEFT JOIN t_food_cuisine c ON a.f_cuisineid = c.f_cid
                 WHERE
-                    instr(concat(',','".$menulist."',','),concat(',',f_id,',')) > 0");
+                    instr(concat(',','".$menulist."',','),concat(',',f_id,',')) > 0
+                ORDER BY classifyname");
+                if($list){
+                    foreach($list as $key=>$val){
+                        $shopdishes[$val['classifyname']][] = $val;
+                    }
+                }
+                $info["shopdishes"] = $shopdishes;
             }
         }
         $this->res['code'] = 1;
         $this->res['info'] = $info;
-        $this->res['list'] = $list;
         return json($this->res);
     }
 }

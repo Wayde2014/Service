@@ -244,9 +244,7 @@ class UserModel extends Model
     public function updateAddress($addressid, $params)
     {
         $table_name = 'user_address_info';
-        $data = array(
-            'f_id' => $addressid,
-        );
+        $data = array();
         if($params['province']) $data['f_province'] = $params['province'];
         if($params['city']) $data['f_city'] = $params['city'];
         if($params['address']) $data['f_address'] = $params['address'];
@@ -276,7 +274,20 @@ class UserModel extends Model
         }
         return $address[0];
     }
-
+    /**
+     * 删除地址信息
+     */
+    public function delAddress($addressid){
+        $table_name = 'user_address_info';
+        $res = Db::name($table_name)
+            ->where('f_id', $addressid)
+            ->delete();
+        if($res !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
     /**
      * 设置默认地址
      */

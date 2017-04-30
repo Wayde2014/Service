@@ -114,19 +114,21 @@ class User extends Base
         }
     }
 
-
     /**
      * 获取地址列表
      * @return \think\response\Json
      */
     public function getAddressList()
     {
-        $userid = input('userid');
-        if(empty($userid)) return json($this->erres('参数错误'));
+        $uid = input('uid');
+        if(empty($uid)) return json($this->erres('参数错误'));
 
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
-        $res = $UserModel->getAddressList($userid);
+        $res = $UserModel->getAddressList($uid);
         if($res) {
             return json($this->sucres(array("num"=>count($res)), $res));
         }else{
@@ -143,6 +145,9 @@ class User extends Base
         $addressid = input('addressid');
         if(empty($addressid)) return json($this->erres('参数错误'));
 
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
         $info = $UserModel->getAddressInfo($addressid);
@@ -152,6 +157,28 @@ class User extends Base
             return json($this->erres('获取用户地址信息失败'));
         }
     }
+    
+    /**
+     * 删除地址
+     * @return \think\response\Json
+     */
+    public function delAddress()
+    {
+        $addressid = input('addressid');
+        if(empty($addressid)) return json($this->erres('参数错误'));
+
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        
+        $UserModel = new UserModel();
+        //检查该手机号是否已注册，如无则注册
+        $info = $UserModel->delAddress($addressid);
+        if($info) {
+            return json($this->sucres());
+        }else{
+            return json($this->erres('删除地址失败'));
+        }
+    }
 
     /**
      * 设置默认地址
@@ -159,13 +186,17 @@ class User extends Base
      */
     public function setDefAddress()
     {
-        $userid = input('userid');
+        $uid = input('uid');
+        if(empty($uid)) return json($this->erres('用户id为空'));
         $addressid = input('addressid');
         if(empty($addressid)) return json($this->erres('参数错误'));
 
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
-        $info = $UserModel->setDefAddress($userid, $addressid);
+        $info = $UserModel->setDefAddress($uid, $addressid);
         if($info) {
             return json($this->sucres());
         }else{
@@ -179,8 +210,8 @@ class User extends Base
      */
     public function addAddress()
     {
-        $userid = input('userid');
-        if(empty($userid)) return json($this->erres('用户ID为空'));
+        $uid = input('uid');
+        if(empty($uid)) return json($this->erres('用户id为空'));
         $province = input('province');
         if(empty($province)) return json($this->erres('请传入省份地址'));
         $city = input('city');
@@ -189,16 +220,19 @@ class User extends Base
         if(empty($address)) return json($this->erres('请传入详细地址'));
         $mobile = input('mobile');
         if(empty($mobile)) return json($this->erres('请传入用户手机号'));
-
+    
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
-        $addressid = $UserModel->checkAddress($userid, $province, $city, $address, $mobile);
+        $addressid = $UserModel->checkAddress($uid, $province, $city, $address, $mobile);
         if ($addressid === false) {
-            $addressid = $UserModel->addAddress($userid, $province, $city, $address, $mobile);
+            $addressid = $UserModel->addAddress($uid, $province, $city, $address, $mobile);
             if ($addressid === false) {
                 return json($this->erres('新增地址失败'));
             }else{
-                $UserModel->setDefAddress($userid, $addressid);
+                $UserModel->setDefAddress($uid, $addressid);
                 return json($this->sucres(array("addressid" => $addressid)));
             }
         }else{
@@ -212,6 +246,8 @@ class User extends Base
      */
     public function modAddress()
     {
+        $uid = input('uid');
+        if(empty($uid)) return json($this->erres('用户id为空'));
         $addressid = input('addressid');
         if(empty($addressid)) return json($this->erres('参数错误'));
         $province = input('province');
@@ -221,6 +257,10 @@ class User extends Base
         if(empty($province)&&empty($city)&&empty($address)&&empty($mobile)){
             return json($this->erres('请传入要修改的值'));
         }
+        
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        
         $params = array(
             "province" => $province,
             "city" => $city,

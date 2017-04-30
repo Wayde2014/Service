@@ -37,3 +37,21 @@ function check_idcode($idcode)
         return false;
     }
 }
+
+/**
+ * 检测时间格式
+ * @param $datetime
+ * @return bool
+ */
+function check_datetime($datetime, $formate = 'yyyy-mm-dd hh:ii:ss')
+{
+    $matchstr = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/s';
+    if($formate == 'mm-dd hh:ii'){
+        $matchstr = '/^\d{2}-\d{2} \d{2}:\d{2}$/s';
+    }
+    if (preg_match($matchstr, $datetime)) {
+        return true;
+    } else {
+        return false;
+    }
+}

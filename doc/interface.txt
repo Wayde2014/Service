@@ -7,7 +7,7 @@
 
     2、API接口地址
         http://119.23.73.39/
-
+    3、用户相关接口需验证登录 传入uid=1002&ck=
 首页
     1，获取首页推荐店铺
     http://119.23.73.39/data/shop/getRecomList?num=4  
@@ -59,16 +59,18 @@
         {"code":1,"msg":"退出登录成功","info":[],"list":[]}
         code > 0，即退出登录成功
 
-    4，设置收货地址（默认设置最新地址为默认地址）
-    http://119.23.73.39/data/user/addAddress?userid=10002&province=广东省&city=深圳市&address=龙岗区龙岗中心城&mobile=18018738562
-    5，修改收货地址
+    4，设置收货地址（默认设置最新地址为默认地址） （验证登录）
+    http://119.23.73.39/data/user/addAddress?uid=10002&province=广东省&city=深圳市&address=龙岗区龙岗中心城&mobile=18018738562
+    4，删除收货地址（默认设置最新地址为默认地址） （验证登录）
+    http://shanwei.boss.com/data/user/delAddress?addressid=4
+    5，修改收货地址 （验证登录）
     http://119.23.73.39/data/user/modAddress?addressid=1&province=广东省&city=深圳市&address=龙岗区龙岗中心城&mobile=18018738562
-    6，获取收货地址列表（isactive=1表示默认地址）
-    http://119.23.73.39/data/user/getAddressList?userid=10002
-    7，获取收货地址信息（isactive=1表示默认地址）
+    6，获取收货地址列表（isactive=1表示默认地址） （验证登录）
+    http://119.23.73.39/data/user/getAddressList?uid=10002
+    7，获取收货地址信息（isactive=1表示默认地址） （验证登录）
     http://119.23.73.39/data/user/getAddressInfo?addressid=1
-    8，设置默认地址
-    http://119.23.73.39/data/user/setDefAddress?userid=10001&addressid=1
+    8，设置默认地址 （验证登录）
+    http://119.23.73.39/data/user/setDefAddress?uid=10001&addressid=1
     
     9、获取登录用户信息
     http://119.23.73.39/data/User/getuserinfo?ck=ck_xxx
