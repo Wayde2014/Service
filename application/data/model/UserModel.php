@@ -68,8 +68,8 @@ class UserModel extends Model
             );
             Db::name($table_name)->insert($data);
         } else {
-            $lasttime = $ret[0]['lasttime'];
-            $curtime = $ret[0]['curtime'];
+            $lasttime = $ret['lasttime'];
+            $curtime = $ret['curtime'];
             if(strtotime($curtime)-strtotime($lasttime) <= 60){
                 return false;
             }
