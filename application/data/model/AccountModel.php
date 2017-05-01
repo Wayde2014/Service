@@ -138,31 +138,6 @@ class AccountModel extends Model
     }
 
     /**
-     * 通过UID获取用户信息
-     * @param $uid
-     * @return array|false|\PDOStatement|string|Model
-     */
-    public function getUserInfoByUid($uid){
-        $table_name = 'user_info';
-        $userinfo = Db::name($table_name)
-            ->where('f_uid',$uid)
-            ->field('f_uid as uid')
-            ->field('f_nickname as nickname')
-            ->field('f_mobile as mobile')
-            ->field('f_realname as realname')
-            ->field('f_sex as sex')
-            ->field('f_idcard as idcard')
-            ->field('f_auth_status as auth_status')
-            ->field('f_usermoney as usermoney')
-            ->field('f_freezemoney as freezemoney')
-            ->field('f_depositmoney as depositmoney')
-            ->field('f_user_status as user_status')
-            ->field('f_regtime as regtime')
-            ->find();
-        return $userinfo;
-    }
-
-    /**
      * 存款接口(原子接口)
      * @param $uid
      * @param $money
@@ -178,7 +153,8 @@ class AccountModel extends Model
         Db::startTrans();
         try{
             //获取用户当前账户信息
-            $userinfo = self::getUserInfoByUid($uid);
+            $UserModel = new UserModel();
+            $userinfo = $UserModel->getUserInfoByUid($uid);
             $ori_usermoney = $userinfo['usermoney'];
             $ori_freezemoney = $userinfo['freezemoney'];
             $ori_depositmoney = $userinfo['depositmoney'];
@@ -252,7 +228,8 @@ class AccountModel extends Model
         Db::startTrans();
         try{
             //获取用户当前账户信息
-            $userinfo = self::getUserInfoByUid($uid);
+            $UserModel = new UserModel();
+            $userinfo = $UserModel->getUserInfoByUid($uid);
             $ori_usermoney = $userinfo['usermoney'];
             $ori_freezemoney = $userinfo['freezemoney'];
             $ori_depositmoney = $userinfo['depositmoney'];
@@ -373,7 +350,14 @@ class AccountModel extends Model
         $retup = self::updateRechargeOrderStatus($orderid,$this->paysuc,$bankorderid,$bankmoney,$account,$paynote);
         if($retup){
             //存款
-            return self::deposit($uid,$bankmoney,$paytype,$orderid);
+            $deposit = self::deposit($uid,$bankmoney,$paytype,$orderid);
+            //押金充值成功后,更新用户状态为200
+            if($deposit && $paytype == 1002){
+                $UserModel = new UserModel();
+                return $UserModel->updateUserInfo($uid,array('user_status'=>200));
+            }else{
+                return $deposit;
+            }
         }
         return false;
     }
@@ -428,7 +412,14 @@ class AccountModel extends Model
         $retup = self::updateDrawOrderStatus($orderid,$this->drawsuc,$channel,$bankorderid,$bankmoney,$account,$drawnote);
         if($retup){
             //解冻扣款
-            return self::unfreeze($uid,$bankmoney,$tradetype,$drawnote,$orderid);
+            $unfreeze = self::unfreeze($uid,$bankmoney,$tradetype,$drawnote,$orderid);
+            //押金退款成功后,更新用户状态为-200
+            if($unfreeze && $tradetype == 2101){
+                $UserModel = new UserModel();
+                return $UserModel->updateUserInfo($uid,array('user_status'=>-200));
+            }else{
+                return $unfreeze;
+            }
         }
         return false;
     }
