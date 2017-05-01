@@ -401,7 +401,7 @@ class UserModel extends Model
         $userinfo = self::getUserInfoByUid($uid);
         $userstatus = intval($userinfo['user_status']);
         //0-默认,100-已实名认证,200-已充值押金,-100-黑名单,-200-已清户(余额为0,押金退回)
-        switch($$checktype){
+        switch($checktype){
             case 'auth':
                 //尚未实名认证方可进行实名认证
                 $checkstatus = 0;
@@ -411,7 +411,9 @@ class UserModel extends Model
                 $checkstatus = 100;
                 break;
             case 'trade':
+            case 'draw':
                 //必须实名认证且充值押金后方可交易
+                //必须用户状态正常方可退押金
                 $checkstatus = 200;
                 break;
             default:

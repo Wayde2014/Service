@@ -16,3 +16,9 @@ http://www.shanwei.com/index.php/data/User/draw?ck=ck_xxx&uid=xxx&drawtype=200&d
 
 6、获取登录用户信息
 http://www.shanwei.com/index.php/data/User/getuserinfo?ck=ck_xxx&uid=1
+
+7、更新用户信息
+http://www.shanwei.com/index.php/data/User/updateuserinfo?ck=ck_xxx&uid=10001&nickname=Wayde&mobile=&realname=张三&sex=1&idcard=430121198012263231
+
+8、实名认证
+http://www.shanwei.com/index.php/data/User/auth?ck=ck_xxx&uid=10001

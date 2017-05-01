@@ -41,6 +41,7 @@ function check_idcode($idcode)
 /**
  * 检测时间格式
  * @param $datetime
+ * @param string $formate
  * @return bool
  */
 function check_datetime($datetime, $formate = 'yyyy-mm-dd hh:ii:ss')

@@ -355,8 +355,9 @@ class AccountModel extends Model
             if($deposit && $paytype == 1002){
                 $UserModel = new UserModel();
                 return $UserModel->updateUserInfo($uid,array('user_status'=>200));
+            }else{
+                return $deposit;
             }
-
         }
         return false;
     }
@@ -411,7 +412,14 @@ class AccountModel extends Model
         $retup = self::updateDrawOrderStatus($orderid,$this->drawsuc,$channel,$bankorderid,$bankmoney,$account,$drawnote);
         if($retup){
             //解冻扣款
-            return self::unfreeze($uid,$bankmoney,$tradetype,$drawnote,$orderid);
+            $unfreeze = self::unfreeze($uid,$bankmoney,$tradetype,$drawnote,$orderid);
+            //押金退款成功后,更新用户状态为-200
+            if($unfreeze && $tradetype == 2101){
+                $UserModel = new UserModel();
+                return $UserModel->updateUserInfo($uid,array('user_status'=>-200));
+            }else{
+                return $unfreeze;
+            }
         }
         return false;
     }

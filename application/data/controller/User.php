@@ -364,8 +364,22 @@ class User extends Base
         $userinfo = $UserModel->getUserInfoByUid($uid);
         $usermoney = $userinfo['usermoney'];
         $depositmoney = $userinfo['depositmoney'];
-        if($drawtype == 200 && $depositmoney < $drawmoney){
-            return json(self::erres("押金余额不足"));
+        $freezemoney = $userinfo['freezemoney'];
+
+        //清户(退押金)时,检查用户状态
+        if($drawtype == 200){
+            if(!$UserModel->checkUserStatus($uid,'draw')){
+                return json(self::erres("用户状态异常,当前不能退押金"));
+            }
+            if($usermoney > 0){
+                return json(self::erres("您账户还有余额未消费完"));
+            }
+            if($freezemoney > 0){
+                return json(self::erres("您还有未完成交易"));
+            }
+            if($depositmoney < $drawmoney){
+                return json(self::erres("押金余额不足"));
+            }
         }
         if($drawtype == 100 && $usermoney < $drawmoney){
             return json(self::erres("账户余额不足"));
@@ -437,17 +451,43 @@ class User extends Base
             'nickname' => input('nickname'),
             'mobile' => input('mobile'),
             'realname' => input('realname'),
-            'sex' => input('sex'),
+            'sex' => intval(input('sex',0)),
             'idcard' => input('idcard'),
         );
+        //检查参数
+        if (!empty($userinfo['mobile']) && !check_mobile($userinfo['mobile'])) {
+            return json(self::erres("手机号码格式错误"));
+        }
+        if (!empty($userinfo['sex']) && !in_array($userinfo['sex'],array(0,1,2))) {
+            return json(self::erres("性别类型错误"));
+        }
+        if (!empty($userinfo['idcard']) && !check_idcode($userinfo['idcard'])) {
+            return json(self::erres("身份证号码格式错误"));
+        }
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
             return json(self::erres("用户未登录，请先登录"));
         }
 
-        //更新
         $UserModel = new UserModel();
+        $ori_userinfo = $UserModel->getUserInfoByUid($uid);
+
+        //用户已通过实名认证时,不允许更新真实姓名和身份证号码
+        if((!empty($userinfo['realname']) && $userinfo['realname'] != $ori_userinfo['realname']) || (!empty($userinfo['idcard']) && $userinfo['idcard'] != $ori_userinfo['idcard'])){
+            if($ori_userinfo['auth_status'] == 100){
+                return json(self::erres("已通过实名认证,不允许修改真实姓名和身份证号码"));
+            }
+        }
+
+        //检查该手机号是否已注册
+        if(!empty($userinfo['mobile']) && $ori_userinfo['mobile'] != $userinfo['mobile']){
+            if($UserModel->checkMobile($userinfo['mobile'])){
+                return json(self::erres("该手机号码已被注册"));
+            }
+        }
+
+        //更新
         if($UserModel->updateUserInfo($uid,$userinfo)){
             return json(self::sucres());
         }else{
@@ -463,6 +503,8 @@ class User extends Base
         //获取参数
         $ck = input('ck');
         $uid = input('uid');
+        $realname = input('realname');
+        $idcard = input('idcard');
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
