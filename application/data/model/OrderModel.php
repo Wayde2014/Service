@@ -84,4 +84,20 @@ class OrderModel extends Model
         }
         return $orderid;
     }
+    
+    /**
+     * 检测订单是否已经存在
+     */
+    public function checkOrder($userid, $shopid, $orderdetail, $ordertype)
+    {
+        $table_name = 'orders';
+        $check = Db::name($table_name)
+            ->field('f_oid orderid')
+            ->where('f_shopid', $shopid)
+            ->where('f_userid', $userid)
+            ->where('f_orderdetail', $orderdetail)
+            ->where('f_type', $ordertype)
+            ->find();
+        return $check?$check['orderid']:false;
+    }
 }

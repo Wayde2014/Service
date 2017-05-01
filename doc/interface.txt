@@ -140,3 +140,11 @@
     结果说明：
         {"code":1,"msg":"success","info":[],"list":[]}
         code > 0，即认证成功
+        
+订单相关
+    1，创建订单
+    #创建外卖订单 http://119.23.73.39/data/order/createOrder?uid=10002&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=&shopid=8&orderdetail=1|1@1,2|2@1,23|3@1&ordermoney=216&deliverymoney=9&allmoney=225&paytype=0&ordertype=1&deliverytime=2017-05-02%2012:00:00&addressid=1  
+    #创建食堂订单 http://119.23.73.39/data/order/createOrder?uid=10002&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=&shopid=8&orderdetail=1|1@1,2|2@1,23|3@1&ordermoney=216&deliverymoney=9&allmoney=225&paytype=0&ordertype=2&mealsnum=2&startime=2017-05-02%2012:00:00&endtime=2017-05-02%2012:00:00
+    参数说明 uid用户ID，ck用户登录ck，shopid店铺ID，orderdetail订单详情（菜品ID|口味ID@数量），ordermoney订单金额，deliverymoney配送金额，allmoney订单总金额，paytype支付方式（0余额，1微信，2支付宝），ordertype订单类型（1,外卖订单  2,食堂订单）
+    外卖订单特有参数 deliverytime配送时间（格式 2017-05-02 12:00:00），addressid配送地址ID
+    食堂订单特有参数 mealsnum就餐人数，startime预计就餐开始时间（格式 2017-05-02 12:00:00），endtime预计就餐结束时间

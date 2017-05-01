@@ -2,7 +2,10 @@
 namespace app\data\controller;
 
 use base\Base;
-use \app\data\model\UserAddressModel;
+use \app\data\model\UserModel;
+use \app\data\model\DineshopModel;
+use \app\data\model\DishesModel;
+use \app\data\model\OrderModel;
 
 class Order extends Base
 {
@@ -10,9 +13,9 @@ class Order extends Base
      * 新增订单
      * @return \think\response\Json
      */
-    //http://shanwei.boss.com/data/order/addOrders?uid=10002&shopid=8&orderdetail=1@1,2@1,23@1&ordermoney=216&deliverymoney=9&allmoney=225&paytype=0&ordertype=1&deliverytime=2017-05-02%2012:00:00&addressid=1
-    //http://shanwei.boss.com/data/order/addOrders?uid=10002&shopid=8&orderdetail=1@1,2@1,23@1&ordermoney=216&deliverymoney=9&allmoney=225&paytype=0&ordertype=2&mealsnum=2&startime=2017-05-02%2012:00:00&endtime=2017-05-02%2012:00:00
-    public function addOrders()
+    //http://shanwei.boss.com/data/order/createOrder?uid=10002&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=&shopid=8&orderdetail=1|1@1,2|2@1,23|3@1&ordermoney=216&deliverymoney=9&allmoney=225&paytype=0&ordertype=1&deliverytime=2017-05-02%2012:00:00&addressid=1
+    //http://shanwei.boss.com/data/order/createOrder?uid=10002&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=&shopid=8&orderdetail=1|1@1,2|2@1,23|3@1&ordermoney=216&deliverymoney=9&allmoney=225&paytype=0&ordertype=2&mealsnum=2&startime=2017-05-02%2012:00:00&endtime=2017-05-02%2012:00:00
+    public function createOrder()
     {
         $uid = input('uid'); //用户ID
         $shopid = input('shopid'); //店铺ID
@@ -49,15 +52,49 @@ class Order extends Base
         //判断用户登录
         if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
         //验证用户
-        
+        $UserModel = new UserModel();
+        $userinfo = $UserModel->getUserInfoByUid($uid);
+        if(empty($userinfo)) return json($this->erres("用户信息不存在"));
         //验证店铺
-        
+        $DineshopModel = new DineshopModel();
+        $shopinfo = $DineshopModel->getShopInfo($shopid);
+        if(empty($shopinfo)) return json($this->erres("店铺信息不存在"));
         //验证订单金额
-        
+        if($ordermoney + $deliverymoney != $allmoney) return json($this->erres("订单总金额不正确"));
+        $DishesModel = new DishesModel();
+        $_orderinfo = array();
+        foreach(explode(',', $orderdetail) as $key=>$val){
+            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
+            $_orderinfo[$match[1]] = $match[3];
+        }
+        $list = $DishesModel->getDishesList(implode(',', array_keys($_orderinfo)));
+        $_ordermoney = 0;
+        foreach($list as $val){
+            $_ordermoney += floatval($val['price']) * $_orderinfo[$val['id']];
+        }
+        if($_ordermoney != $ordermoney) return json($this->erres("订单金额不正确"));
         //验证外卖配送地址
         if($ordertype == 1){
-            
+            $addressinfo = $UserModel->getAddressInfo($addressid);
+            if(empty($addressinfo)) return json($this->erres("地址信息不存在"));
         }
-        echo '222222222';
+        //创建订单
+        $OrderModel = new OrderModel();
+        //先验证订单是否已添加
+        $orderid = $OrderModel->checkOrder($uid, $shopid, $orderdetail, $ordertype);
+        if($orderid){
+            return json($this->sucres(array('orderid' => $orderid)));
+        }else{
+            if($ordertype == 1){
+                $orderid = $OrderModel->addTakeoutOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $deliverytime, $addressid);
+            }else{
+                $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime);
+            }
+            if($orderid){
+                return json($this->sucres(array('orderid' => $orderid)));
+            }else{
+                return json($this->erres("创建订单失败"));
+            }
+        }
     }
 }

@@ -2,6 +2,8 @@
 namespace app\data\controller;
 use \base\Base;
 use think\Db;
+use \app\data\model\DineshopModel;
+use \app\data\model\DishesModel;
 
 class Shop extends Base
 {
@@ -55,47 +57,14 @@ class Shop extends Base
         $list = array();
         $shopid = input('shopid'); //店铺ID
         if($shopid){
-            $res = Db::query(
-            'SELECT
-                a.f_sid sid, 
-                a.f_shopname shopname,
-                a.f_shopicon shopicon,
-                a.f_shophone shophone,
-                a.f_address address,
-                a.f_menulist menulist,
-                a.f_sales sales,
-                a.f_deliveryfee deliveryfee,
-                a.f_minprice minprice,
-                a.f_preconsume preconsume,
-                a.f_isbooking isbooking,
-                a.f_isaway isaway,
-                a.f_opentime opentime,
-                a.f_deliverytime deliverytime,
-                b.f_cname cuisinename
-            FROM
-                t_dineshop a left join t_food_cuisine b on a.f_cuisineid = b.f_cid
-            WHERE
-                f_sid = :shopid',['shopid'=>intval($shopid)]);
+            $DineshopModel = new DineshopModel();
+            $res = $DineshopModel->getShopInfo($shopid);
             if($res){
-                $info = $res[0];
+                $info = $res;
                 $menulist = $info['menulist'];
                 $shopdishes = array();
-                $list = Db::query(
-                "SELECT
-                    a.f_id id,
-                    a.f_icon icon,
-                    a.f_name dishesname,
-                    a.f_price price,
-                    a.f_tastesid tastesid,
-                    b.f_cname classifyname,
-                    c.f_cname cuisinename
-                FROM
-                    t_food_dishes a
-                LEFT JOIN t_food_classify b ON a.f_classid = b.f_cid
-                LEFT JOIN t_food_cuisine c ON a.f_cuisineid = c.f_cid
-                WHERE
-                    instr(concat(',','".$menulist."',','),concat(',',f_id,',')) > 0
-                ORDER BY classifyname");
+                $DishesModel = new DishesModel();
+                $list = $DishesModel->getDishesList($menulist);
                 if($list){
                     foreach($list as $key=>$val){
                         $shopdishes[$val['classifyname']][] = $val;
@@ -104,8 +73,6 @@ class Shop extends Base
                 $info["shopdishes"] = $shopdishes;
             }
         }
-        $this->res['code'] = 1;
-        $this->res['info'] = $info;
-        return json($this->res);
+        return json($this->sucres($info));
     }
 }

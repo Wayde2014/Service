@@ -255,6 +255,7 @@ class UserModel extends Model
         if($params['city']) $data['f_city'] = $params['city'];
         if($params['address']) $data['f_address'] = $params['address'];
         if($params['mobile']) $data['f_mobile'] = $params['mobile'];
+        if(count($data) < 1) return true;
         $ret = Db::name($table_name)
             ->where('f_id', $addressid)
             ->update($data);
@@ -274,11 +275,8 @@ class UserModel extends Model
             ->where('f_id', $addressid)
             ->field('f_id id,f_province province,f_city city,f_address address,f_mobile mobile,f_isactive isactive')
             ->order('f_addtime', 'desc')
-            ->select();
-        if(empty($address)){
-            return false;
-        }
-        return $address[0];
+            ->find();
+        return $address?$address:false;
     }
     /**
      * 删除地址信息
