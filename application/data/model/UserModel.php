@@ -331,4 +331,98 @@ class UserModel extends Model
         }
         return $address;
     }
+
+
+    /**
+     * 通过UID获取用户信息
+     * @param $uid
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getUserInfoByUid($uid){
+        $table_name = 'user_info';
+        $userinfo = Db::name($table_name)
+            ->where('f_uid',$uid)
+            ->field('f_uid as uid')
+            ->field('f_nickname as nickname')
+            ->field('f_mobile as mobile')
+            ->field('f_realname as realname')
+            ->field('f_sex as sex')
+            ->field('f_idcard as idcard')
+            ->field('f_auth_status as auth_status')
+            ->field('f_usermoney as usermoney')
+            ->field('f_freezemoney as freezemoney')
+            ->field('f_depositmoney as depositmoney')
+            ->field('f_user_status as user_status')
+            ->field('f_regtime as regtime')
+            ->find();
+        return $userinfo;
+    }
+
+    /**
+     * 更新用户信息
+     * @param $uid
+     * @param $new_userinfo
+     * @return bool
+     */
+    public function updateUserInfo($uid, $new_userinfo){
+        $table_name = 'user_info';
+        //获取更新前用户信息
+        $ori_userinfo = self::getUserInfoByUid($uid);
+        $userinfo = array(
+            'f_nickname' => empty($new_userinfo['nickname']) ? $ori_userinfo['nickname'] : $new_userinfo['nickname'],
+            'f_mobile' => empty($new_userinfo['mobile']) ? $ori_userinfo['mobile'] : $new_userinfo['mobile'],
+            'f_realname' => empty($new_userinfo['realname']) ? $ori_userinfo['realname'] : $new_userinfo['realname'],
+            'f_sex' => empty($new_userinfo['sex']) ? $ori_userinfo['sex'] : $new_userinfo['sex'],
+            'f_idcard' => empty($new_userinfo['idcard']) ? $ori_userinfo['idcard'] : $new_userinfo['idcard'],
+            'f_auth_status' => empty($new_userinfo['auth_status']) ? $ori_userinfo['auth_status'] : $new_userinfo['auth_status'],
+            'f_user_status' => empty($new_userinfo['user_status']) ? $ori_userinfo['user_status'] : $new_userinfo['user_status'],
+        );
+        //实名认证成功,用户状态从0更新成100
+        if(intval($userinfo['f_auth_status']) == 100 && intval($userinfo['f_user_status']) == 0){
+            $userinfo['f_user_status'] = 100;
+        }
+        $retup = Db::name($table_name)
+            ->where('f_uid',$uid)
+            ->update($userinfo);
+        if($retup !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 检查用户状态
+     * @param $uid
+     * @param string $checktype
+     * @return bool
+     */
+    public function checkUserStatus($uid, $checktype='trade'){
+        $userinfo = self::getUserInfoByUid($uid);
+        $userstatus = intval($userinfo['user_status']);
+        //0-默认,100-已实名认证,200-已充值押金,-100-黑名单,-200-已清户(余额为0,押金退回)
+        switch($checktype){
+            case 'auth':
+                //尚未实名认证方可进行实名认证
+                $checkstatus = 0;
+                break;
+            case 'charge':
+                //必须实名认证后方可充值押金
+                $checkstatus = 100;
+                break;
+            case 'trade':
+            case 'draw':
+                //必须实名认证且充值押金后方可交易
+                //必须用户状态正常方可退押金
+                $checkstatus = 200;
+                break;
+            default:
+                $checkstatus = -1;
+        }
+        if($userstatus !== $checkstatus){
+            return false;
+        }else{
+            return true;
+        }
+    }
 }

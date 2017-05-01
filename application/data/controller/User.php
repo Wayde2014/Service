@@ -298,10 +298,6 @@ class User extends Base
             return json(self::erres("用户未登录，请先登录"));
         }
 
-        //校验参数
-        if(empty($ck)){
-            return json(self::erres("CK不能为空"));
-        }
         if(!in_array($paytype,$this->paytype_config)){
             return json(self::erres("充值类型错误"));
         }
@@ -310,6 +306,12 @@ class User extends Base
         }
         if($paymoney <= 0){
             return json(self::erres("充值金额不能小于0"));
+        }
+
+        //必须实名认证后方可充值
+        $UserModel = new UserModel();
+        if(!$UserModel->checkUserStatus($uid,'charge')){
+            return json(self::erres("实名认证后方可充值"));
         }
 
         $AccountModel = new AccountModel();
@@ -350,9 +352,6 @@ class User extends Base
         }
 
         //校验参数
-        if(empty($ck)){
-            return json(self::erres("CK不能为空"));
-        }
         if(!in_array($drawtype,$this->drawtype_config)){
             return json(self::erres("提款类型错误"));
         }
@@ -361,18 +360,33 @@ class User extends Base
         }
 
         //获取用户信息
-        $AccountModel = new AccountModel();
-        $userinfo = $AccountModel->getUserInfoByUid($uid);
+        $UserModel = new UserModel();
+        $userinfo = $UserModel->getUserInfoByUid($uid);
         $usermoney = $userinfo['usermoney'];
         $depositmoney = $userinfo['depositmoney'];
-        if($drawtype == 200 && $depositmoney < $drawmoney){
-            return json(self::erres("押金余额不足"));
+        $freezemoney = $userinfo['freezemoney'];
+
+        //清户(退押金)时,检查用户状态
+        if($drawtype == 200){
+            if(!$UserModel->checkUserStatus($uid,'draw')){
+                return json(self::erres("用户状态异常,当前不能退押金"));
+            }
+            if($usermoney > 0){
+                return json(self::erres("您账户还有余额未消费完"));
+            }
+            if($freezemoney > 0){
+                return json(self::erres("您还有未完成交易"));
+            }
+            if($depositmoney < $drawmoney){
+                return json(self::erres("押金余额不足"));
+            }
         }
         if($drawtype == 100 && $usermoney < $drawmoney){
             return json(self::erres("账户余额不足"));
         }
 
         //冻结
+        $AccountModel = new AccountModel();
         $tradenote = '用户提款冻结';
         $freeze = $AccountModel->freeze($uid,$drawmoney,2001,$tradenote);
         if(!$freeze){
@@ -414,14 +428,100 @@ class User extends Base
         }
 
         //获取用户信息
-        $AccountModel = new AccountModel();
-        $userinfo = $AccountModel->getUserInfoByUid($uid);
+        $UserModel = new UserModel();
+        $userinfo = $UserModel->getUserInfoByUid($uid);
         if(empty($userinfo)){
             return json(self::erres("用户信息不存在"));
         }
 
         $resinfo = $userinfo;
         return json(self::sucres($resinfo));
+    }
+
+
+    /**
+     * 更新用户信息
+     * @return \think\response\Json
+     */
+    public function updateUserInfo(){
+        //获取参数
+        $ck = input('ck');
+        $uid = input('uid');
+        $userinfo = array(
+            'nickname' => input('nickname'),
+            'mobile' => input('mobile'),
+            'realname' => input('realname'),
+            'sex' => intval(input('sex',0)),
+            'idcard' => input('idcard'),
+        );
+        //检查参数
+        if (!empty($userinfo['mobile']) && !check_mobile($userinfo['mobile'])) {
+            return json(self::erres("手机号码格式错误"));
+        }
+        if (!empty($userinfo['sex']) && !in_array($userinfo['sex'],array(0,1,2))) {
+            return json(self::erres("性别类型错误"));
+        }
+        if (!empty($userinfo['idcard']) && !check_idcode($userinfo['idcard'])) {
+            return json(self::erres("身份证号码格式错误"));
+        }
+
+        //检查用户是否登录
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
+        }
+
+        $UserModel = new UserModel();
+        $ori_userinfo = $UserModel->getUserInfoByUid($uid);
+
+        //用户已通过实名认证时,不允许更新真实姓名和身份证号码
+        if((!empty($userinfo['realname']) && $userinfo['realname'] != $ori_userinfo['realname']) || (!empty($userinfo['idcard']) && $userinfo['idcard'] != $ori_userinfo['idcard'])){
+            if($ori_userinfo['auth_status'] == 100){
+                return json(self::erres("已通过实名认证,不允许修改真实姓名和身份证号码"));
+            }
+        }
+
+        //检查该手机号是否已注册
+        if(!empty($userinfo['mobile']) && $ori_userinfo['mobile'] != $userinfo['mobile']){
+            if($UserModel->checkMobile($userinfo['mobile'])){
+                return json(self::erres("该手机号码已被注册"));
+            }
+        }
+
+        //更新
+        if($UserModel->updateUserInfo($uid,$userinfo)){
+            return json(self::sucres());
+        }else{
+            return json(self::erres("用户信息更新失败"));
+        }
+    }
+
+    /**
+     * 实名认证
+     * @return \think\response\Json
+     */
+    public function auth(){
+        //获取参数
+        $ck = input('ck');
+        $uid = input('uid');
+        $realname = input('realname');
+        $idcard = input('idcard');
+
+        //检查用户是否登录
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
+        }
+
+        //进行实名认证
+        $auth = true;
+        if(!$auth){
+            return json(self::erres("实名认证失败"));
+        }else{
+            $UserModel = new UserModel();
+            if(!$UserModel->updateUserInfo($uid,array('auth_status'=>100))){
+                return json(self::erres("实名认证成功,更新用户信息失败"));
+            }
+        }
+        return json(self::sucres());
     }
 
 }
