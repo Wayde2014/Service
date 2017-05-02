@@ -29,8 +29,8 @@ class Base
      * 错误返回
      * @param array $res
      */
-    public function erres($msg){
-        $this->res['code'] = -1;
+    public function erres($msg, $code = -1){
+        $this->res['code'] = $code;
         $this->res['msg'] = $msg;
         return $this->res;
     }

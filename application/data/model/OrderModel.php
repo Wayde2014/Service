@@ -86,6 +86,26 @@ class OrderModel extends Model
     }
     
     /**
+     * 完成订单
+     */
+    public function finishOrder($userid, $orderid, $allmoney)
+    {
+        // 启动事务
+        Db::startTrans();
+        try{
+            Db::table('t_user_info')->where('f_uid', $userid)->setDec('f_usermoney', $allmoney);
+            Db::table('t_orders')->where('f_oid', $orderid)->update(array('f_status' => 2));
+            // 提交事务
+            Db::commit();
+            return true;
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            return false;
+        }
+    }
+    
+    /**
      * 检测订单是否已经存在
      */
     public function checkOrder($userid, $shopid, $orderdetail, $ordertype)
@@ -99,5 +119,18 @@ class OrderModel extends Model
             ->where('f_type', $ordertype)
             ->find();
         return $check?$check['orderid']:false;
+    }
+    
+    /**
+     * 获取订单详情
+     */
+    public function getOrderinfo($orderid)
+    {
+        $table_name = 'orders';
+        $orderinfo = Db::name($table_name)
+            ->field('f_oid orderid,f_shopid shopid,f_userid userid,f_type ordertype,f_status status,f_orderdetail orderdetail,f_ordermoney ordermoney,f_deliverymoney deliverymoney,f_allmoney allmoney,f_paymoney paymoney,f_paytype paytype,f_mealsnum mealsnum,f_startime startime,f_endtime endtime,f_deliveryid deliveryid,f_deliverytime deliverytime,f_addressid addressid')
+            ->where('f_oid', $orderid)
+            ->find();
+        return $orderinfo?$orderinfo:false;
     }
 }
