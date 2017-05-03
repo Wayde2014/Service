@@ -64,15 +64,16 @@ class Shop extends Base
                 $menulist = $info['menulist'];
                 $shopdishes = array();
                 $DishesModel = new DishesModel();
-                $list = $DishesModel->getDishesList($menulist);
-                if($list){
-                    foreach($list as $key=>$val){
+                $reslist = $DishesModel->getDishesList($menulist);
+                if($reslist){
+                    foreach($reslist as $key=>$val){
                         $shopdishes[$val['classifyname']][] = $val;
                     }
                 }
+                $list = array_keys($shopdishes);
                 $info["shopdishes"] = $shopdishes;
             }
         }
-        return json($this->sucres($info));
+        return json($this->sucres($info,$list));
     }
 }
