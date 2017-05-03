@@ -120,16 +120,32 @@ class OrderModel extends Model
             ->find();
         return $check?$check['orderid']:false;
     }
-    
+    /**
+     * 获取订单列表
+     */
+    public function getOrderlist($ordertype = 1)
+    {
+        $orderlist = Db::table('t_orders')
+            ->alias('a')
+            ->field('a.f_oid orderid,a.f_shopid shopid,a.f_userid userid,a.f_type ordertype,a.f_status STATUS,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,a.f_deliveryid deliveryid,a.f_deliverytime deliverytime,a.f_addressid addressid,b.f_shopname shopname')
+            ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
+            ->where('a.f_type', $ordertype)
+            ->select();
+        return $orderlist?$orderlist:false;
+    }
     /**
      * 获取订单详情
      */
     public function getOrderinfo($orderid)
     {
         $table_name = 'orders';
-        $orderinfo = Db::name($table_name)
-            ->field('f_oid orderid,f_shopid shopid,f_userid userid,f_type ordertype,f_status status,f_orderdetail orderdetail,f_ordermoney ordermoney,f_deliverymoney deliverymoney,f_allmoney allmoney,f_paymoney paymoney,f_paytype paytype,f_mealsnum mealsnum,f_startime startime,f_endtime endtime,f_deliveryid deliveryid,f_deliverytime deliverytime,f_addressid addressid')
-            ->where('f_oid', $orderid)
+        $orderinfo = Db::table('t_orders')
+            ->alias('a')
+            ->field('a.f_oid orderid,a.f_shopid shopid,a.f_userid userid,a.f_type ordertype,a.f_status STATUS,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,a.f_deliveryid deliveryid,a.f_deliverytime deliverytime,a.f_addressid addressid,b.f_shopname shopname,c.f_address deliveryaddress,d.f_username deliveryname,d.f_mobile deliveryphone')
+            ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
+            ->join('t_user_address_info c', 'a.f_addressid = c.f_id','left')
+            ->join('t_store_distripersion d', 'a.f_deliveryid = d.f_id','left')
+            ->where('a.f_oid', $orderid)
             ->find();
         return $orderinfo?$orderinfo:false;
     }

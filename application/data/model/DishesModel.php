@@ -79,8 +79,8 @@ class DishesModel extends Model
         $disheslist = Db::table('t_food_dishes')
             ->alias('a')
             ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, a.f_price price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename')
-            ->join('t_food_classify b','a.f_classid = b.f_cid')
-            ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid')
+            ->join('t_food_classify b','a.f_classid = b.f_cid','left')
+            ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->whereIn('a.f_id', explode(',',$menulist))
             ->select();
         return $disheslist?$disheslist:false;
