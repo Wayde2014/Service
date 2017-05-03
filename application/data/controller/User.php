@@ -222,6 +222,8 @@ class User extends Base
         if(empty($city)) return json($this->erres('请传入省份地址'));
         $address = input('address');
         if(empty($address)) return json($this->erres('请传入详细地址'));
+        $name = input('name');
+        if(empty($name)) return json($this->erres('请传入收件人'));
         $mobile = input('mobile');
         if(empty($mobile)) return json($this->erres('请传入用户手机号'));
     
@@ -230,9 +232,9 @@ class User extends Base
         
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
-        $addressid = $UserModel->checkAddress($uid, $province, $city, $address, $mobile);
+        $addressid = $UserModel->checkAddress($uid, $province, $city, $address);
         if ($addressid === false) {
-            $addressid = $UserModel->addAddress($uid, $province, $city, $address, $mobile);
+            $addressid = $UserModel->addAddress($uid, $province, $city, $address, $name, $mobile);
             if ($addressid === false) {
                 return json($this->erres('新增地址失败'));
             }else{
@@ -258,7 +260,8 @@ class User extends Base
         $city = input('city');
         $address = input('address');
         $mobile = input('mobile');
-        if(empty($province)&&empty($city)&&empty($address)&&empty($mobile)){
+        $name = input('name');
+        if(empty($province)&&empty($city)&&empty($address)&&empty($name)&&empty($mobile)){
             return json($this->erres('请传入要修改的值'));
         }
         
@@ -269,6 +272,7 @@ class User extends Base
             "province" => $province,
             "city" => $city,
             "address" => $address,
+            "name" => $name,
             "mobile" => $mobile,
         );
         $UserModel = new UserModel();

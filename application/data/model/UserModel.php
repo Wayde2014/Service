@@ -206,7 +206,7 @@ class UserModel extends Model
     /**
      * 新增地址
      */
-    public function addAddress($userid, $province, $city, $address, $mobile)
+    public function addAddress($userid, $province, $city, $address, $name, $mobile)
     {
         $table_name = 'user_address_info';
         $data = array(
@@ -214,6 +214,7 @@ class UserModel extends Model
             'f_province' => $province,
             'f_city' => $city,
             'f_address' => $address,
+            'f_name' => $name,
             'f_mobile' => $mobile,
             'f_addtime' => date("Y-m-d H:i:s"),
         );
@@ -227,7 +228,7 @@ class UserModel extends Model
     /**
      * 检测地址是否已经注册
      */
-    public function checkAddress($userid, $province, $city, $address, $mobile)
+    public function checkAddress($userid, $province, $city, $address)
     {
         $table_name = 'user_address_info';
         $checkaddress = Db::name($table_name)
@@ -236,11 +237,11 @@ class UserModel extends Model
             ->where('f_province', $province)
             ->where('f_city', $city)
             ->where('f_address', $address)
-            ->select();
+            ->find();
         if(empty($checkaddress)){
             return false;
         }else{
-            return $checkaddress[0]["id"];
+            return $checkaddress["id"];
         }
     }
 
@@ -254,7 +255,9 @@ class UserModel extends Model
         if($params['province']) $data['f_province'] = $params['province'];
         if($params['city']) $data['f_city'] = $params['city'];
         if($params['address']) $data['f_address'] = $params['address'];
+        if($params['name']) $data['f_name'] = $params['name'];
         if($params['mobile']) $data['f_mobile'] = $params['mobile'];
+        if(count($data) < 1) return true;
         $ret = Db::name($table_name)
             ->where('f_id', $addressid)
             ->update($data);
@@ -272,13 +275,10 @@ class UserModel extends Model
         $table_name = 'user_address_info';
         $address = Db::name($table_name)
             ->where('f_id', $addressid)
-            ->field('f_id id,f_province province,f_city city,f_address address,f_mobile mobile,f_isactive isactive')
+            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_mobile mobile,f_isactive isactive')
             ->order('f_addtime', 'desc')
-            ->select();
-        if(empty($address)){
-            return false;
-        }
-        return $address[0];
+            ->find();
+        return $address?$address:false;
     }
     /**
      * 删除地址信息
@@ -322,7 +322,7 @@ class UserModel extends Model
         $table_name = 'user_address_info';
         $address = Db::name($table_name)
             ->where('f_uid', $userid)
-            ->field('f_id id,f_province province,f_city city,f_address address,f_mobile mobile,f_isactive isactive')
+            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_mobile mobile,f_isactive isactive')
             ->order('f_addtime', 'desc')
             ->select();
         //var_dump(Db::name($table_name)->getLastSql());
