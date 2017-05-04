@@ -152,3 +152,7 @@
     #完成订单 http://119.23.73.39/data/order/finishOrder?orderid=6&uid=10002&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=
     参数说明
     orderid订单ID 要求验证登录
+    3，订单列表
+    http://119.23.73.39/data/order/getOrderlist
+    4，订单详情
+    http://119.23.73.39/data/order/getOrderinfo?orderid=11

@@ -144,4 +144,55 @@ class Order extends Base
         $usermoney = floatval($userinfo['usermoney']);
         return $usermoney >= $allmoney;
     }
+    
+    /**
+     * 获取订单列表
+     */
+    public function getOrderlist(){
+        $info = array();
+        $list = array();
+        $ordertype = input('ordertype', 1); //订单类型（1,外卖订单  2,食堂订单）
+        $OrderModel = new OrderModel();
+        $res = $OrderModel->getOrderlist($ordertype);
+        if($res) {
+            $list = $res;
+            $orderlist = array();
+            $dishid = array();
+            foreach($list as $key=>$val){
+                $orderdetail = $val['orderdetail'];
+                preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
+                if($match){
+                    $orderlist = array_combine($match[1], $match[3]);
+                    $dishid = array_merge($dishid, $match[1]);
+                }
+                $list[$key]['orderlist'] = $orderlist;
+            }
+            $DishesModel = new DishesModel();
+            $reslist = $DishesModel->getDishesList(implode(',', array_unique($dishid)));
+            if($reslist){
+                foreach($reslist as $key => $val){
+                    $info[$val['id']]['id'] = $val['id'];
+                    $info[$val['id']]['icon'] = $val['icon'];
+                    $info[$val['id']]['price'] = $val['price'];
+                    $info[$val['id']]['dishesname'] = $val['dishesname'];
+                }
+            }
+        }
+        return json($this->sucres($info, $list));
+    }
+    
+    /**
+     * 获取订单详情
+     */
+    public function getOrderinfo(){
+        $info = array();
+        $list = array();
+        $orderid = input('orderid', 1); 
+        $OrderModel = new OrderModel();
+        $res = $OrderModel->getOrderinfo($orderid);
+        if($res) {
+            
+        }
+        return json($this->sucres($res, $list));
+    }
 }
