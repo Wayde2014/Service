@@ -156,3 +156,25 @@
     http://119.23.73.39/data/order/getOrderlist
     4，订单详情
     http://119.23.73.39/data/order/getOrderinfo?orderid=11
+    返回结果字段：
+    orderid: "11", //订单ID
+    shopid: "8", //店铺ID
+    userid: "10002", //用户ID
+    ordertype: "2", //订单类型（1,外卖订单  2,食堂订单）
+    status: "0", //订单状态（0,初始 1,未付款 2,已付款 3,配送中 4,配送完成 5,用餐中 100,已完成 -100逾期）
+    orderdetail: "1|1@1,2|2@1,23|3@1", //订单详情
+    ordermoney: "216", //订单金额
+    deliverymoney: "9", //配送费
+    allmoney: "225", 总金额
+    paymoney: "0", 已支付金额
+    paytype: "0", 支付方式（0余额，1微信，2支付宝）
+    mealsnum: "2", 就餐人数（仅食堂订单有）
+    startime: "2017-05-02 12:00:00", 用餐开始时间（仅食堂订单有）
+    endtime: "2017-05-02 12:00:00", 用餐结束时间（仅食堂订单有）
+    deliveryid: null, 配送员ID（仅外卖订单有）
+    deliverytime: null, 配送时间（仅外卖订单有）
+    addressid: null, 配送地址ID（仅外卖订单有）
+    shopname: "味千拉面(深圳福华三路分店)",
+    deliveryaddress: null,  配送地址（仅外卖订单有）
+    deliveryname: null, 配送收货人（仅外卖订单有）
+    deliveryphone: null  配送联系电话（仅外卖订单有）
