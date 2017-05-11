@@ -103,6 +103,28 @@ class Base
         $UserModel->extendExpireTime($ck);
         return true;
     }
+    
+    /**
+     * 检查管理员用户是否登录
+     * @param string $uid
+     * @param string $ck
+     * @return bool
+     */
+    public function checkAdminLogin($uid = '', $ck = ''){
+        if(!$uid) $uid = input('uid');
+        if(!$ck) $ck = input('ck');
+        return true;
+        if(empty($uid) || empty($ck)){
+            return false;
+        }
+        $UserModel = new UserModel();
+        $userinfo = $UserModel->getLoginUserInfo($ck,$uid);
+        if(empty($userinfo)){
+            return false;
+        }
+        $UserModel->extendExpireTime($ck);
+        return true;
+    }
 }
 
 ?>
