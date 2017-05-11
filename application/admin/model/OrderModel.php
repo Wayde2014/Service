@@ -13,9 +13,9 @@ use think\Db;
 class OrderModel extends Model
 {
     /**
-     * 获取订单列表
+     * 获取外卖订单列表
      */
-    public function getTakeoutlist($ordertype = 1)
+    public function getTakeoutlist($page, $pagesize)
     {
         $orderlist = Db::table('t_orders')
             ->alias('a')
@@ -23,7 +23,24 @@ class OrderModel extends Model
             ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
             ->join('t_store_distripersion c','a.f_deliveryid = c.f_id','left')
             ->join('t_user_address_info d','a.f_addressid = d.f_id','left')
-            ->where('a.f_type', $ordertype)
+            ->where('a.f_type', 1)
+            ->order('a.f_addtime desc')
+            ->page($page, $pagesize)
+            ->select();
+        return $orderlist?$orderlist:false;
+    }
+    /**
+     * 获取食堂订单列表
+     */
+    public function getEatinlist($page, $pagesize)
+    {
+        $orderlist = Db::table('t_orders')
+            ->alias('a')
+            ->field('a.f_oid orderid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,a.f_addtime addtime')
+            ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
+            ->where('a.f_type', 2)
+            ->order('a.f_addtime desc')
+            ->page($page, $pagesize)
             ->select();
         return $orderlist?$orderlist:false;
     }

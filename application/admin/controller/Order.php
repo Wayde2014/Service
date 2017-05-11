@@ -12,14 +12,21 @@ class Order extends Base
      * 后台查询外卖订单
      * @return \think\response\Json
      */
-    public function getTakeoutlist(){
+    public function getOrderlist(){
         $info = array();
         $list = array();
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        $ordertype = input('ordertype',1); //ordertype订单类型 1外卖订单 2食堂订单
         if(!$this->checkAdminLogin()){
             return json($this->erres("用户未登录，请先登录"));
         }
         $OrderModel = new OrderModel();
-        $res = $OrderModel->getTakeoutlist();
+        if($ordertype == 1){
+            $res = $OrderModel->getTakeoutlist($page, $pagesize);
+        }else{
+            $res = $OrderModel->getEatinlist($page, $pagesize);
+        }
         if($res) {
             $list = $res;
             $orderlist = array();
