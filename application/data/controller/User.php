@@ -86,7 +86,7 @@ class User extends Base
         }
 
         //写登录信息
-        $ck = 'ck_' . strtoupper(base64_encode(md5($uid + $mobile + time())));
+        $ck = 'ck_' . strtoupper(base64_encode(md5($uid.$mobile.time())));
         $platform = intval($platform);
         $ret_login = $UserModel->addUserLogin($ck, $uid, $deviceid, $platform, $ip, $remark);
         if ($ret_login === false) {
