@@ -11,7 +11,6 @@ class Sms extends Base{
      * @return string
      */
     public function sendsms($mobile){
-        return ["code"=>1, "msg"=>"successs", "info"=>array(), "list"=>array()];
         $url = Config::get('sms_sendurl');
         $Curl = new \third\Curl();
         $res = $Curl->post($url, array("mobile"=>$mobile), $this->getHttpHeader());
@@ -38,7 +37,6 @@ class Sms extends Base{
      * @return string
      */
     public function checksms($mobile, $code){
-        return ["code"=>1, "msg"=>"successs", "info"=>[], "list"=>[]];
         $url = Config::get('sms_verifyurl');
         $Curl = new \third\Curl();
         $params = array("mobile" => $mobile, "code" => $code);
