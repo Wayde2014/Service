@@ -198,6 +198,7 @@ CREATE TABLE `t_store_distripersion` (
 
 
 /*后台管理-用户信息表*/
+DROP TABLE IF EXISTS `t_admin_userinfo`;
 CREATE TABLE `t_admin_userinfo` (
   `f_uid` int NOT NULL AUTO_INCREMENT COMMENT '用户uid(自增)',
   `f_username` varchar(50) NOT NULL COMMENT '用户名',
@@ -207,55 +208,73 @@ CREATE TABLE `t_admin_userinfo` (
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_uid`),
-  UNIQUE KEY `f_username` (`f_username`)
+  UNIQUE KEY `u_admin_userinfo` (`f_username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='后台管理-用户信息表';
+INSERT INTO `t_admin_userinfo`(`f_username`,`f_realname`,`f_password`,`f_addtime`) VALUE('sysadmin','系统管理员','775176899ABFF5302681A561BA7239DD',NOW());
 
 
 /*后台管理-角色信息表*/
+DROP TABLE IF EXISTS `t_admin_role`;
 CREATE TABLE `t_admin_role` (
   `f_rid` int NOT NULL AUTO_INCREMENT COMMENT '角色rid(自增)',
   `f_name` varchar(100) NOT NULL COMMENT '角色名称',
   `f_describle` varchar(1000) default NULL COMMENT '角色描述',
-  `f_status` tinyint not null default 1 comment '状态(1-有效,0-无效/已删除)',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`f_rid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='后台管理-角色信息表';
+  PRIMARY KEY (`f_rid`),
+  UNIQUE KEY `u_admin_role` (`f_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='后台管理-角色信息表';
+INSERT INTO `t_admin_role`(`f_name`,`f_describle`) VALUE('管理员','管理员描述');
 
 
 /*后台管理-模块信息表*/
+DROP TABLE IF EXISTS `t_admin_module`;
 CREATE TABLE `t_admin_module` (
   `f_mid` int NOT NULL AUTO_INCREMENT COMMENT '模块mid(自增)',
   `f_name` varchar(100) NOT NULL COMMENT '模块名称',
   `f_describle` varchar(1000) default NULL COMMENT '模块描述',
-  `f_url` varchar(1000) default NULL COMMENT '链接地址',
-  `f_parentid` smallint default 0 comment '父模块ID',
+  `f_moduletype` tinyint default 0 comment '模块类型(0-虚节点,1-实节点)',
+  `f_xpath` varchar(1000) default NULL COMMENT '模块访问路径(实节点不能为空)',
+  `f_parentid` smallint default 0 comment '父模块ID(0为顶级模块)',
   `f_order` smallint default 1 comment '显示顺序',
-  `f_status` tinyint not null default 1 comment '状态(1-有效,0-无效/已删除)',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`f_mid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='后台管理-模块信息表';
+  PRIMARY KEY (`f_mid`),
+  UNIQUE KEY `u_admin_module` (`f_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='后台管理-模块信息表';
+INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('权限管理','权限管理描述',0,'',0);
+INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('用户管理','用户增删改查',1,'/admin/user',10001);
+INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('角色管理','角色增删改查',1,'/admin/role',10001);
+INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('模块管理','模块增删改查',1,'/admin/module',10001);
 
 
 /*后台管理-用户角色关联信息表*/
+DROP TABLE IF EXISTS `t_admin_user_role`;
 CREATE TABLE `t_admin_user_role` (
   `f_id` int not null AUTO_INCREMENT comment '自增ID',
   `f_uid` int NOT NULL COMMENT '用户ID',
   `f_rid` int NOT NULL COMMENT '角色ID',
   `f_describle` varchar(1000) default NULL COMMENT '说明',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`f_id`)
+  PRIMARY KEY (`f_id`),
+  UNIQUE KEY `u_admin_user_role` (`f_uid`,`f_rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='后台管理-用户角色关联信息表';
+INSERT INTO `t_admin_user_role`(`f_uid`,`f_rid`,`f_describle`) VALUE(10001,10001,'说明');
 
 
 /*后台管理-角色模块关联信息表*/
+DROP TABLE IF EXISTS `t_admin_role_module`;
 CREATE TABLE `t_admin_role_module` (
   `f_id` int not null AUTO_INCREMENT comment '自增ID',
   `f_rid` int NOT NULL COMMENT '角色ID',
   `f_mid` int NOT NULL COMMENT '模块ID',
   `f_describle` varchar(1000) default NULL COMMENT '说明',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`f_id`)
+  PRIMARY KEY (`f_id`),
+  UNIQUE KEY `u_admin_role_module` (`f_rid`,`f_mid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='后台管理-角色模块关联信息表';
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10001,'说明1');
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10002,'说明2');
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10003,'说明3');
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10004,'说明4');
 
 /*菜肴管理-口味信息表*/
 CREATE TABLE `t_food_tastes` (

@@ -12,19 +12,21 @@ use think\Db;
 
 class UserModel extends Model
 {
+
     /**
-     * 检查该手机号码是否已注册
-     * @param $mobile
+     * 检查该用户名是否已注册
+     * @param $username
      * @return bool
      */
-    public function checkMobile($mobile)
+    public function checkUserName($username)
     {
-        $table_name = 'user_info';
-        $ret = Db::name($table_name)->field('f_uid as uid')->where('f_mobile', $mobile)->find();
+        $table_name = 'admin_userinfo';
+        $ret = Db::name($table_name)->field('f_uid as uid')->where('f_username', $username)->find();
         if (empty($ret)) {
             return false;
+        }else{
+            return true;
         }
-        return $ret['uid'];
     }
 
     /**
@@ -44,56 +46,6 @@ class UserModel extends Model
             return false;
         }
         return $userId;
-    }
-
-    /**
-     * 检查并记录短信发送日志
-     * @param $uid
-     * @param $mobile
-     * @return bool
-     */
-    public function checkSmslog($uid, $mobile)
-    {
-        $table_name = 'user_smslog';
-        $ret = Db::name($table_name)->where('f_uid', $uid)
-            ->where('f_mobile', $mobile)
-            ->field('f_lasttime as lasttime')
-            ->field('now() as curtime')
-            ->find();
-        if (empty($ret)) {
-            $data = array(
-                'f_uid' => $uid,
-                'f_mobile' => $mobile,
-            );
-            Db::name($table_name)->insert($data);
-        } else {
-            $lasttime = $ret['lasttime'];
-            $curtime = $ret['curtime'];
-            if(strtotime($curtime)-strtotime($lasttime) <= 60){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 更新短信发送日志
-     * @param $uid
-     * @param $mobile
-     * @return bool
-     */
-    public function updateSmslog($uid, $mobile)
-    {
-        $table_name = 'user_smslog';
-        $ret = Db::name($table_name)
-            ->where('f_uid', $uid)
-            ->where('f_mobile', $mobile)
-            ->setInc('f_count');
-        if(intval($ret) > 0){
-            return true;
-        }else{
-            return false;
-        }
     }
 
     /**
@@ -201,136 +153,6 @@ class UserModel extends Model
             ->find();
         return $userinfo;
     }
-
-    /**
-     * 新增地址
-     */
-    public function addAddress($userid, $province, $city, $address, $name, $mobile)
-    {
-        $table_name = 'user_address_info';
-        $data = array(
-            'f_uid' => $userid,
-            'f_province' => $province,
-            'f_city' => $city,
-            'f_address' => $address,
-            'f_name' => $name,
-            'f_mobile' => $mobile,
-            'f_addtime' => date("Y-m-d H:i:s"),
-        );
-        $addressid = intval(Db::name($table_name)->insertGetId($data));
-        if ($addressid <= 0) {
-            return false;
-        }
-        return $addressid;
-    }
-
-    /**
-     * 检测地址是否已经注册
-     */
-    public function checkAddress($userid, $province, $city, $address)
-    {
-        $table_name = 'user_address_info';
-        $checkaddress = Db::name($table_name)
-            ->field('f_id id')
-            ->where('f_uid', $userid)
-            ->where('f_province', $province)
-            ->where('f_city', $city)
-            ->where('f_address', $address)
-            ->find();
-        if(empty($checkaddress)){
-            return false;
-        }else{
-            return $checkaddress["id"];
-        }
-    }
-
-    /**
-     * 更新地址
-     */
-    public function updateAddress($addressid, $params)
-    {
-        $table_name = 'user_address_info';
-        $data = array();
-        if($params['province']) $data['f_province'] = $params['province'];
-        if($params['city']) $data['f_city'] = $params['city'];
-        if($params['address']) $data['f_address'] = $params['address'];
-        if($params['name']) $data['f_name'] = $params['name'];
-        if($params['mobile']) $data['f_mobile'] = $params['mobile'];
-        if(count($data) < 1) return true;
-        $ret = Db::name($table_name)
-            ->where('f_id', $addressid)
-            ->update($data);
-        if($ret !== false){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    /**
-     * 获取某一条地址信息
-     */
-    public function getAddressInfo($addressid){
-        $table_name = 'user_address_info';
-        $address = Db::name($table_name)
-            ->where('f_id', $addressid)
-            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_mobile mobile,f_isactive isactive')
-            ->order('f_addtime', 'desc')
-            ->find();
-        return $address?$address:false;
-    }
-    /**
-     * 删除地址信息
-     */
-    public function delAddress($addressid){
-        $table_name = 'user_address_info';
-        $res = Db::name($table_name)
-            ->where('f_id', $addressid)
-            ->delete();
-        if($res !== false){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    /**
-     * 设置默认地址
-     */
-    public function setDefAddress($userid, $addressid){
-        $table_name = 'user_address_info';
-        $ret = Db::name($table_name)
-            ->where('f_uid', $userid)
-            ->update(array( 'f_isactive' => 0 ));
-        if($ret !== false){
-            $ret = Db::name($table_name)
-                ->where('f_id', $addressid)
-                ->update(array( 'f_isactive' => 1 ));
-            if($ret !== false){
-                return true;
-            }else{
-                return false;
-            }
-        }else{
-            return false;
-        }
-    }
-    /**
-     * 获取用户配送地址信息
-     */
-    public function getAddressList($userid){
-        $table_name = 'user_address_info';
-        $address = Db::name($table_name)
-            ->where('f_uid', $userid)
-            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_mobile mobile,f_isactive isactive')
-            ->order('f_addtime', 'desc')
-            ->select();
-        //var_dump(Db::name($table_name)->getLastSql());
-        if(empty($address)){
-            return false;
-        }
-        return $address;
-    }
-
 
     /**
      * 通过UID获取用户信息
