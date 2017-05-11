@@ -64,9 +64,10 @@ class Order extends Base
                     preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $match);
                     $tastesid = $match[2];
                     $num = $match[3];
-                    $orderlist[$k] = isset($dishinfo[$k])?$dishinfo[$k]:array();
-                    $orderlist[$k]['num'] = $num;
-                    $orderlist[$k]['tastes'] = isset($tastesinfo[$tastesid])?$tastesinfo[$tastesid]:'';
+                    $orderinfo = isset($dishinfo[$k])?$dishinfo[$k]:array();
+                    $orderinfo['num'] = $num;
+                    $orderinfo['tastes'] = isset($tastesinfo[$tastesid])?$tastesinfo[$tastesid]:'';
+                    array_push($orderlist, $orderinfo);
                 }
                 $list[$key]['orderlist'] = $orderlist;
             }
