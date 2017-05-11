@@ -190,9 +190,35 @@ class Order extends Base
         $orderid = input('orderid', 1); 
         $OrderModel = new OrderModel();
         $res = $OrderModel->getOrderinfo($orderid);
+        $dishid = array();
+        $orderlist = array();
         if($res) {
-            
+            $info = $res;
+            $orderdetail = $res['orderdetail'];
+            preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
+            preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
+            if($match){
+                $orderlist = array_combine($match[1], $match[0]);
+                $dishid = array_merge($dishid, $match[1]);
+            }
+            $DishesModel = new DishesModel();
+            $dishlist = $DishesModel->getDishesList(implode(',', array_unique($dishid)));
+            $dishinfo = array();
+            if($dishlist){
+                foreach($dishlist as $key => $val){
+                    $dishinfo[$val['id']]['icon'] = $val['icon'];
+                    $dishinfo[$val['id']]['dishesname'] = $val['dishesname'];
+                    $dishinfo[$val['id']]['price'] = $val['price'];
+                }
+            }
+            foreach($orderlist as $k => $v){
+                preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $match);
+                $num = $match[3];
+                $orderlist[$k] = isset($dishinfo[$k])?$dishinfo[$k]:array();
+                $orderlist[$k]['num'] = $num;
+            }
+            $info['orderlist'] = $orderlist;
         }
-        return json($this->sucres($res, $list));
+        return json($this->sucres($info, $list));
     }
 }
