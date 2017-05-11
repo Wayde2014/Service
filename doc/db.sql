@@ -204,7 +204,7 @@ CREATE TABLE `t_admin_userinfo` (
   `f_username` varchar(50) NOT NULL COMMENT '用户名',
   `f_realname` varchar(200) DEFAULT NULL COMMENT '真实姓名',
   `f_password` varchar(32) NOT NULL COMMENT '用户密码',
-  `f_status` smallint default 100 COMMENT '用户状态(默认100-正常用户,-100-禁用用户)',
+  `f_userstatus` smallint default 100 COMMENT '用户状态(默认100-正常用户,-100-禁用用户)',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_uid`),
@@ -212,6 +212,18 @@ CREATE TABLE `t_admin_userinfo` (
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='后台管理-用户信息表';
 INSERT INTO `t_admin_userinfo`(`f_username`,`f_realname`,`f_password`,`f_addtime`) VALUE('sysadmin','系统管理员','775176899ABFF5302681A561BA7239DD',NOW());
 
+/*后台管理-登录信息表*/
+DROP TABLE IF EXISTS `t_admin_login`;
+CREATE TABLE `t_admin_login` (
+  `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增长ID',
+  `f_usercheck` varchar(200) NOT NULL COMMENT '登录ck',
+  `f_uid` int NOT NULL COMMENT '登录用户ID',
+  `f_ip` varchar(50) DEFAULT NULL COMMENT '登录ip',
+  `f_expiretime` timestamp not null default '0000-00-00 00:00:00' comment '登录过期时间(默认30min后过期)',
+  `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`f_id`),
+  unique key (`f_usercheck`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 comment '用户管理-登录信息表';
 
 /*后台管理-角色信息表*/
 DROP TABLE IF EXISTS `t_admin_role`;

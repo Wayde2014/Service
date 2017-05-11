@@ -2,6 +2,7 @@
 namespace base;
 
 use \app\data\model\UserModel;
+use \app\admin\model\AdminUserModel;
 
 class Base
 {
@@ -113,16 +114,15 @@ class Base
     public function checkAdminLogin($uid = '', $ck = ''){
         if(!$uid) $uid = input('uid');
         if(!$ck) $ck = input('ck');
-        return true;
         if(empty($uid) || empty($ck)){
             return false;
         }
-        $UserModel = new UserModel();
-        $userinfo = $UserModel->getLoginUserInfo($ck,$uid);
+        $AdminUserModel = new AdminUserModel();
+        $userinfo = $AdminUserModel->getLoginUserInfo($ck,$uid);
         if(empty($userinfo)){
             return false;
         }
-        $UserModel->extendExpireTime($ck);
+        $AdminUserModel->extendExpireTime($ck);
         return true;
     }
 }

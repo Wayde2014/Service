@@ -56,3 +56,22 @@ function check_datetime($datetime, $formate = 'yyyy-mm-dd hh:ii:ss')
         return false;
     }
 }
+
+/**
+ * 检测用户名格式
+ * @param $str
+ * @return bool
+ */
+function checkUserName($str)
+{
+    if (strlen($str) == 0 || is_null($str))
+    {
+        return false;
+    }
+    //输入的数据必须是英文和数字
+    $pattern = "/^([A-Z|a-z|0-9])+$/";
+    if (! preg_match($pattern, $str)){
+        return false;
+    }
+    return true;
+}
