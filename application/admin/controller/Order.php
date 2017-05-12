@@ -15,20 +15,28 @@ class Order extends Base
     public function getOrderlist(){
         $info = array();
         $list = array();
+        $startime = input('startime'); //起始时间
+        $endtime = input('endtime'); //结束时间
+        $shopname = input('shopname',''); //店铺名称
         $page = input('page',1); //页码
         $pagesize = input('pagesize',20); //每页显示数
         $ordertype = input('ordertype',1); //ordertype订单类型 1外卖订单 2食堂订单
+        if($startime) $startime = Date('Y-m-d', strtotime($startime));
+        else $startime = Date('Y-m-d');
+        if($endtime) $endtime = Date('Y-m-d', strtotime($endtime));
+        else $endtime = Date('Y-m-d');
         if(!$this->checkAdminLogin()){
             return json($this->erres("用户未登录，请先登录"));
         }
         $OrderModel = new OrderModel();
         if($ordertype == 1){
-            $res = $OrderModel->getTakeoutlist($page, $pagesize);
+            $res = $OrderModel->getTakeoutlist($startime, $endtime, $shopname, $page, $pagesize);
         }else{
-            $res = $OrderModel->getEatinlist($page, $pagesize);
+            $res = $OrderModel->getEatinlist($startime, $endtime, $shopname, $page, $pagesize);
         }
-        if($res) {
-            $list = $res;
+        $info['allnum'] = $res['allnum'];
+        if($res['orderlist']) {
+            $list = $res['orderlist'];
             $orderlist = array();
             $tastid = array();
             $dishid = array();
@@ -71,7 +79,7 @@ class Order extends Base
                 }
                 $list[$key]['orderlist'] = $orderlist;
             }
-            $info['num'] = $OrderModel->getOrderNum($ordertype);
+            
         }
         return json($this->sucres($info, $list));
     }
@@ -80,7 +88,8 @@ class Order extends Base
      * 订单派送
      */
     public function getOrderinfo(){
-        
-        return json($this->sucres());
+        $info = array("test"=>"test");
+        $list = array();
+        return json($this->sucres($info, $list));
     }
 }
