@@ -153,7 +153,9 @@
     参数说明
     orderid订单ID 要求验证登录
     3，订单列表
-    http://119.23.73.39/data/order/getOrderlist
+    参数说明
+    ordertype = 1  外面订单 2食堂订单
+    http://119.23.73.39/data/order/getOrderlist?ordertype=1
     4，订单详情
     http://119.23.73.39/data/order/getOrderinfo?orderid=11
     返回结果字段：
