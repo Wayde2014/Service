@@ -249,8 +249,7 @@ CREATE TABLE `t_admin_module` (
   `f_parentid` smallint default 0 comment '父模块ID(0为顶级模块)',
   `f_order` smallint default 1 comment '显示顺序',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`f_mid`),
-  UNIQUE KEY `u_admin_module` (`f_name`)
+  PRIMARY KEY (`f_mid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='后台管理-模块信息表';
 INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('权限管理','权限管理描述',0,'',0);
 INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('用户管理','用户增删改查',1,'/admin/user',10001);

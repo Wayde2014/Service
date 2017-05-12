@@ -7,6 +7,8 @@
  */
 namespace app\admin\model;
 
+use think\Exception;
+use think\Log;
 use think\Model;
 use think\Db;
 
@@ -194,15 +196,29 @@ class AdminUserModel extends Model
     }
 
     /**
-     * 删除用户
-     * @param $uid
+     * 删除用户信息
+     * 一并删除用户角色关联信息
+     * 一并删除用户登录信息
+     * @param $uidlist
      * @return bool
      */
-    public function delUser($uid){
-        $table_name = 'admin_userinfo';
-        if(Db::name($table_name)->delete($uid) > 0){
+    public function delUser($uidlist){
+        $table_user_info = 'admin_userinfo';
+        $table_user_role = 'admin_user_role';
+        $table_user_login = 'admin_login';
+        Db::startTrans();
+        try{
+            //删除用户信息
+            Db::name($table_user_info)->delete($uidlist);
+            //删除用户角色关联信息
+            Db::name($table_user_role)->where('f_uid','in',$uidlist)->delete();
+            //删除用户登录信息
+            Db::name($table_user_login)->where('f_uid','in',$uidlist)->delete();
+            Db::commit();
             return true;
-        }else{
+        }catch (Exception $e){
+            Log::record($e);
+            Db::rollback();
             return false;
         }
     }
@@ -219,6 +235,93 @@ class AdminUserModel extends Model
             return false;
         }else{
             return true;
+        }
+    }
+
+    /**
+     * 检查角色名是否存在
+     * @param $rolename
+     * @return bool
+     */
+    public function checkRoleName($rolename)
+    {
+        $table_name = 'admin_role';
+        $ret = Db::name($table_name)->field('f_rid as rid')->where('f_name', $rolename)->find();
+        if (empty($ret)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 新增角色信息
+     * @param $rolename
+     * @param $describle
+     * @return bool|int
+     */
+    public function addRole($rolename,$describle)
+    {
+        $table_name = 'admin_role';
+        $data = array(
+            'f_name' => $rolename,
+            'f_describle' => $describle,
+        );
+        $roleId = intval(Db::name($table_name)->insertGetId($data));
+        if ($roleId <= 0) {
+            return false;
+        }
+        return $roleId;
+    }
+
+    /**
+     * 新增模块信息
+     * @param $modulename
+     * @param $describle
+     * @param $moduletype
+     * @param $xpath
+     * @param $parentid
+     * @param $order
+     * @return bool|int
+     */
+    public function addModule($modulename,$describle,$moduletype,$xpath,$parentid,$order)
+    {
+        $table_name = 'admin_module';
+        $data = array(
+            'f_name' => $modulename,
+            'f_describle' => $describle,
+            'f_moduletype' => $moduletype,
+            'f_xpath' => $xpath,
+            'f_parentid' => $parentid,
+            'f_order' => $order,
+        );
+        $moduleId = intval(Db::name($table_name)->insertGetId($data));
+        if ($moduleId <= 0) {
+            return false;
+        }
+        return $moduleId;
+    }
+
+    /**
+     * 删除模块信息
+     * 一并删除模块角色关联信息
+     * @param $midlist
+     * @return bool
+     */
+    public function delModule($midlist){
+        $table_module_info = 'admin_module';
+        $table_role_module = 'admin_role_module';
+        Db::startTrans();
+        try{
+            //删除模块信息
+            Db::name($table_module_info)->delete($midlist);
+            //删除模块角色关联信息
+            Db::name($table_role_module)->where('f_mid','in',$midlist)->delete();
+            Db::commit();
+            return true;
+        }catch (Exception $e){
+            Log::record($e);
+            Db::rollback();
+            return false;
         }
     }
 }

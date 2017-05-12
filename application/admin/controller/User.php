@@ -113,13 +113,22 @@ class User extends Base
     }
 
     /**
-     * 删除用户
+     * 删除用户信息(禁止删除自己)
+     * 一并删除用户角色关联信息
+     * 一并删除用户登录信息
      */
     public function delUser(){
-        if($this->model->delUser($this->uid)){
+        $uidlist = explode(',',trim(input('uidlist')));
+        if(empty($uidlist)){
+            return json(self::erres("待删除用户ID列表为空"));
+        }
+        if(in_array($this->uid,$uidlist)){
+            return json(self::erres("不能删除自己"));
+        }
+        if($this->model->delUser($uidlist)){
             return json(self::sucres());
         }else{
-            return json(self::erres("删除用户失败"));
+            return json(self::erres("删除用户信息失败"));
         }
     }
 
@@ -203,7 +212,24 @@ class User extends Base
      * 新增角色信息
      */
     public function addRole(){
+        $rolename = trim(input('rolename'));
+        $describle = trim(input('describle'));
 
+        //角色名不能为空
+        if (empty($rolename)) {
+            return json(self::erres("角色名不能为空"));
+        }
+
+        //检测角色名是否可用
+        if(!$this->model->checkRoleName($rolename)){
+            return json(self::erres("该角色名已被使用"));
+        }
+
+        $rid = $this->model->addRole($rolename,$describle);
+        if ($rid === false) {
+            return json(self::erres("新增角色信息失败"));
+        }
+        return json(self::sucres());
     }
 
     /**
@@ -241,7 +267,23 @@ class User extends Base
      * 新增模块信息
      */
     public function addModule(){
+        $modulename = trim(input('modulename'));
+        $describle = trim(input('describle'));
+        $moduletype = intval(input('moduletype',0));
+        $xpath = trim(input('xpath'));
+        $parentid = intval(input('parentid',0));
+        $order = intval(input('order',0));
 
+        //角色名不能为空
+        if (empty($modulename)) {
+            return json(self::erres("模块名称不能为空"));
+        }
+
+        $mid = $this->model->addModule($modulename,$describle,$moduletype,$xpath,$parentid,$order);
+        if ($mid === false) {
+            return json(self::erres("新增模块信息失败"));
+        }
+        return json(self::sucres());
     }
 
     /**
@@ -253,9 +295,18 @@ class User extends Base
 
     /**
      * 删除模块信息
+     * 一并删除模块角色关联信息
      */
     public function delModule(){
-
+        $midlist = explode(',',trim(input('midlist')));
+        if(empty($midlist)){
+            return json(self::erres("待删除模块ID列表为空"));
+        }
+        if($this->model->delModule($midlist)){
+            return json(self::sucres());
+        }else{
+            return json(self::erres("删除模块信息失败"));
+        }
     }
 
     /**
