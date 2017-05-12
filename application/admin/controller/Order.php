@@ -87,9 +87,13 @@ class Order extends Base
     /**
      * 订单派送
      */
-    public function getOrderinfo(){
-        $info = array("test"=>"test");
+    public function deliveryOrder(){
+        $info = array();
         $list = array();
-        return json($this->sucres($info, $list));
+        $orderid = input('orderid');
+        $distripid = input('distripid'); //配送员ID
+        $OrderModel = new OrderModel();
+        $info = $OrderModel->deliveryOrder($orderid, $distripid);
+        return json($this->sucres($info));
     }
 }
