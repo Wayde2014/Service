@@ -49,7 +49,7 @@ class OrderModel extends Model
      */
     public function getOrderNum($ordertype)
     {
-        $orderlist = Db::table('t_orders')->where('a.f_type', $ordertype)->select();
+        $orderlist = Db::table('t_orders')->where('f_type', $ordertype)->select();
         return $orderlist?count($orderlist):0;
     }
     
