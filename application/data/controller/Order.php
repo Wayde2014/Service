@@ -177,7 +177,7 @@ class Order extends Base
             }
             foreach($list as $key => $val){
                 $orderlist = array();
-                foreach($val['orderlist'] as $k => $v){
+                foreach($val['orderlists'] as $k => $v){
                     preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $match);
                     $tastesid = $match[2];
                     $num = $match[3];
@@ -185,7 +185,7 @@ class Order extends Base
                     $orderinfo['num'] = $num;
                     array_push($orderlist, $orderinfo);
                 }
-                $list[$key]['orderlist'] = $orderlist;
+                $list[$key]['orderlists'] = $orderlist;
             }
         }
         return json($this->sucres($info, $list));
