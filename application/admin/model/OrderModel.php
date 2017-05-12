@@ -45,6 +45,15 @@ class OrderModel extends Model
         return $orderlist?$orderlist:false;
     }
     /**
+     * 获取订单总记录数
+     */
+    public function getOrderNum($ordertype)
+    {
+        $orderlist = Db::table('t_orders')->where('a.f_type', $ordertype)->select();
+        return $orderlist?count($orderlist):0;
+    }
+    
+    /**
      * 获取订单详情
      */
     public function getOrderinfo($orderid)

@@ -71,6 +71,7 @@ class Order extends Base
                 }
                 $list[$key]['orderlist'] = $orderlist;
             }
+            $info['num'] = $OrderModel->getOrderNum($ordertype);
         }
         return json($this->sucres($info, $list));
     }
