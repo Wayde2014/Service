@@ -177,7 +177,7 @@ class Order extends Base
             }
             foreach($list as $key => $val){
                 $orderlist = array();
-                foreach($val['orderlists'] as $k => $v){
+                foreach($val['orderlist'] as $k => $v){
                     preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $match);
                     $tastesid = $match[2];
                     $num = $match[3];
