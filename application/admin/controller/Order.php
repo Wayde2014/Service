@@ -77,17 +77,10 @@ class Order extends Base
     }
     
     /**
-     * 获取订单详情
+     * 订单派送
      */
     public function getOrderinfo(){
-        $info = array();
-        $list = array();
-        $orderid = input('orderid', 1); 
-        $OrderModel = new OrderModel();
-        $res = $OrderModel->getOrderinfo($orderid);
-        if($res) {
-            
-        }
-        return json($this->sucres($res, $list));
+        
+        return json($this->sucres());
     }
 }
