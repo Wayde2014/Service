@@ -14,6 +14,8 @@ use think\Db;
 
 class AdminUserModel extends Model
 {
+    //最大目录层级限制
+    public $max_module_level = 5;
 
     /**
      * 检查该用户名是否已注册
@@ -280,10 +282,11 @@ class AdminUserModel extends Model
      * @param $moduletype
      * @param $xpath
      * @param $parentid
+     * @param $levelinfo
      * @param $order
      * @return bool|int
      */
-    public function addModule($modulename,$describle,$moduletype,$xpath,$parentid,$order)
+    public function addModule($modulename,$describle,$moduletype,$xpath,$parentid,$levelinfo,$order)
     {
         $table_name = 'admin_module';
         $data = array(
@@ -292,6 +295,7 @@ class AdminUserModel extends Model
             'f_moduletype' => $moduletype,
             'f_xpath' => $xpath,
             'f_parentid' => $parentid,
+            'f_levelinfo' => $levelinfo,
             'f_order' => $order,
         );
         $moduleId = intval(Db::name($table_name)->insertGetId($data));
@@ -323,5 +327,104 @@ class AdminUserModel extends Model
             Db::rollback();
             return false;
         }
+    }
+
+    /**
+     * 获取模块基本信息
+     * @param $mid
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getModuleInfo($mid){
+        $table_name = 'admin_module';
+        $moduleinfo = Db::name($table_name)
+            ->where('f_mid',$mid)
+            ->field('f_mid as mid')
+            ->field('f_name as modulename')
+            ->field('f_describle as describle')
+            ->field('f_moduletype as moduletype')
+            ->field('f_xpath as xpath')
+            ->field('f_parentid as parentid')
+            ->field('f_levelinfo as levelinfo')
+            ->field('f_order as order')
+            ->field('f_lasttime as lasttime')
+            ->find();
+        return $moduleinfo;
+    }
+
+    /**
+     * 根据角色ID获取用户列表(默认查全部用户)
+     */
+    public function getUserList($rid){
+        if($rid > 0){
+            $sql = "select f_uid as uid,f_username as username,f_userstatus as userstatus from t_admin_userinfo where f_uid in (select f_uid from t_admin_user_role where f_rid = :rid group by f_uid) order by username";
+            $args = array(
+                'rid' => $rid,
+            );
+            $userlist = Db::query($sql,$args);
+        }else{
+            $sql = "select f_uid as uid,f_username as username,f_userstatus as userstatus from t_admin_userinfo order by username";
+            $userlist = Db::query($sql);
+        }
+        return $userlist;
+    }
+
+    /**
+     * 删除角色信息
+     * 一并删除角色模块关联信息
+     * @param $rid
+     * @return bool
+     */
+    public function delRole($rid){
+        $table_role_info = 'admin_role';
+        $table_role_module = 'admin_role_module';
+        Db::startTrans();
+        try{
+            //删除角色信息
+            Db::name($table_role_info)->delete($rid);
+            //删除角色模块关联信息
+            Db::name($table_role_module)->where('f_rid','in',$rid)->delete();
+            Db::commit();
+            return true;
+        }catch (Exception $e){
+            Log::record($e);
+            Db::rollback();
+            return false;
+        }
+    }
+
+    /**
+     * 获取角色列表
+     */
+    public function getRoleList(){
+        $table_name = 'admin_role';
+        $rolelist = Db::name($table_name)
+            ->field('f_mid as rid')
+            ->field('f_name as rolename')
+            ->field('f_describle as describle')
+            ->field('f_lasttime as lasttime')
+            ->field('f_order as order')
+            ->order('rolename asc')
+            ->select();
+        return $rolelist;
+    }
+
+    /**
+     * 获取模块列表
+     */
+    public function getModuleList(){
+        $table_name = 'admin_module';
+        $modulelist = Db::name($table_name)
+            ->field('f_mid as mid')
+            ->field('f_name as modulename')
+            ->field('f_describle as describle')
+            ->field('f_moduletype as moduletype')
+            ->field('f_xpath as xpath')
+            ->field('f_parentid as parentid')
+            ->field('f_levelinfo as levelinfo')
+            ->field('f_order as order')
+            ->field('f_lasttime as lasttime')
+            ->order('modulename asc')
+            ->select();
+        return $modulelist;
     }
 }
