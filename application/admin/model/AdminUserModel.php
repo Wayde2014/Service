@@ -283,10 +283,10 @@ class AdminUserModel extends Model
      * @param $xpath
      * @param $parentid
      * @param $levelinfo
-     * @param $order
+     * @param $showorder
      * @return bool|int
      */
-    public function addModule($modulename,$describle,$moduletype,$xpath,$parentid,$levelinfo,$order)
+    public function addModule($modulename,$describle,$moduletype,$xpath,$parentid,$levelinfo,$showorder)
     {
         $table_name = 'admin_module';
         $data = array(
@@ -296,7 +296,7 @@ class AdminUserModel extends Model
             'f_xpath' => $xpath,
             'f_parentid' => $parentid,
             'f_levelinfo' => $levelinfo,
-            'f_order' => $order,
+            'f_showorder' => $showorder,
         );
         $moduleId = intval(Db::name($table_name)->insertGetId($data));
         if ($moduleId <= 0) {
@@ -345,7 +345,7 @@ class AdminUserModel extends Model
             ->field('f_xpath as xpath')
             ->field('f_parentid as parentid')
             ->field('f_levelinfo as levelinfo')
-            ->field('f_order as order')
+            ->field('f_showorder as showorder')
             ->field('f_lasttime as lasttime')
             ->find();
         return $moduleinfo;
@@ -402,7 +402,7 @@ class AdminUserModel extends Model
             ->field('f_name as rolename')
             ->field('f_describle as describle')
             ->field('f_lasttime as lasttime')
-            ->field('f_order as order')
+            ->field('f_showorder as showorder')
             ->order('rolename asc')
             ->select();
         return $rolelist;
@@ -416,15 +416,47 @@ class AdminUserModel extends Model
         $modulelist = Db::name($table_name)
             ->field('f_mid as mid')
             ->field('f_name as modulename')
+            //->field('f_describle as describle')
+            //->field('f_moduletype as moduletype')
+            //->field('f_xpath as xpath')
+            ->field('f_parentid as parentid')
+            ->field('f_levelinfo as levelinfo')
+            //->field('f_showorder as showorder')
+            //->field('f_lasttime as lasttime')
+            ->order('modulename asc')
+            ->select();
+        return $modulelist;
+    }
+
+    /**
+     * 根据模块ID获取子模块信息
+     */
+    public function getChildModuleList($mid){
+        $table_name = 'admin_module';
+        $modulelist = Db::name($table_name)
+            ->where('f_parentid',$mid)
+            ->field('f_mid as mid')
+            ->field('f_name as modulename')
             ->field('f_describle as describle')
             ->field('f_moduletype as moduletype')
             ->field('f_xpath as xpath')
             ->field('f_parentid as parentid')
             ->field('f_levelinfo as levelinfo')
-            ->field('f_order as order')
+            ->field('f_showorder as showorder')
             ->field('f_lasttime as lasttime')
             ->order('modulename asc')
             ->select();
         return $modulelist;
+    }
+
+    /**
+     * 根据用户ID获取所有可用模块信息
+     */
+    public function getUserModuleList($uid){
+        $sql = "select a.f_mid as mid,a.f_name as modulename,a.f_moduletype as moduletype,a.f_xpath as xpath,a.f_parentid as f_parentid,a.f_levelinfo as levelinfo,a.f_showorder as showorder from t_admin_module a inner join t_admin_role_module b on a.f_mid = b.f_mid inner join t_admin_user_role c on b.f_rid = c.f_rid where c.f_uid = :uid;";
+        $args = array(
+            'uid' => $uid,
+        );
+        return Db::query($sql,$args);
     }
 }

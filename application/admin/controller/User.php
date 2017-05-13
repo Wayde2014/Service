@@ -47,7 +47,20 @@ class User extends Base
      * 获取登录用户管理菜单
      */
     public function getMenuList(){
-        //TODO
+        //获取用户所有可用模块信息
+        $modulelist = $this->model->getUserModuleList($this->uid);
+        $resinfo = $resinfo = self::packMenuInfo($modulelist);
+        return json(self::sucres($resinfo));
+    }
+
+    /**
+     * 获取所有管理菜单
+     */
+    public function getAllMenuList(){
+        //获取所有模块信息
+        $modulelist = $this->model->getModuleList();
+        $resinfo = self::packMenuInfo($modulelist);
+        return json(self::sucres($resinfo));
     }
 
     /**
@@ -298,7 +311,7 @@ class User extends Base
         $moduletype = intval(input('moduletype',0));
         $xpath = trim(input('xpath'));
         $parentid = intval(input('parentid',0));
-        $order = intval(input('order',0));
+        $showorder = intval(input('showorder',0));
 
         //角色名不能为空
         if (empty($modulename)) {
@@ -313,12 +326,13 @@ class User extends Base
                 return json(self::erres("父模块信息不存在"));
             }
             $level = explode(',',$moduleinfo['levelinfo']);
+            array_push($level,$parentid);
         }
         if(count($level) > $this->model->max_module_level){
             return json(self::erres("目录层级不能超过".$this->model->max_module_level));
         }
         $levelinfo = implode(',',$level);
-        $mid = $this->model->addModule($modulename,$describle,$moduletype,$xpath,$parentid,$levelinfo,$order);
+        $mid = $this->model->addModule($modulename,$describle,$moduletype,$xpath,$parentid,$levelinfo,$showorder);
         if ($mid === false) {
             return json(self::erres("新增模块信息失败"));
         }
@@ -334,6 +348,7 @@ class User extends Base
 
     /**
      * 删除模块信息
+     * 虚节点子模块不为空时禁止删除
      * 一并删除模块角色关联信息
      * @return \think\response\Json
      */
@@ -341,6 +356,16 @@ class User extends Base
         $midlist = explode(',',trim(input('midlist')));
         if(empty($midlist)){
             return json(self::erres("待删除模块ID列表为空"));
+        }
+        //检查待删除模块是否子节点为空
+        foreach($midlist as $mid){
+            $moduleinfo = $this->model->getModuleInfo($mid);
+            if($moduleinfo['moduletype'] == 0){
+                $modulelist = $this->model->getChildModuleList($mid);
+                if(!empty($modulelist)){
+                    return json(self::erres("待删除模块子模块不为空"));
+                }
+            }
         }
         if($this->model->delModule($midlist)){
             return json(self::sucres());
@@ -371,6 +396,47 @@ class User extends Base
         $resinfo = array();
         $reslist = $modulelist;
         return json(self::sucres($resinfo,$reslist));
+    }
+
+    /**
+     * 组装目录信息
+     */
+    public function packMenuInfo($modulelist){
+        $menuinfo = array();
+        if(!empty($modulelist)){
+            foreach($modulelist as $module){
+                $mid = $module['mid'];
+                print_r('-------'.$mid.'---------   ');
+                $levelinfo = explode(',',$module['levelinfo']);
+                $level = count($levelinfo);
+                $parentid = intval($module['parentid']);
+                if($parentid == 0 && $level == 1){
+                    $module['childinfo'] = array();
+                    $menuinfo[$mid] = $module;
+                }else if($level > 1){
+                    $newlevelinfo = array_slice($levelinfo,1);
+                    $last_menu = $menuinfo;
+                    foreach($newlevelinfo as $pid){
+                        echo 'last_menu ';
+                        print_r($last_menu);
+                        if(!array_key_exists($pid,$last_menu)){
+                            $last_menu[$pid] = array(
+                                'childinfo' => array(),
+                            );
+                        }
+                        if($parentid == $pid){
+                            $last_menu[$pid]['childinfo'][$mid] = $module;
+                            break;
+                        }
+                    }
+                    $menuinfo = $last_menu;
+                }
+                echo '------------------------';
+                //print_r($menuinfo);
+            }
+        }
+        //TODO 排序 usort($arr,'sortByShowOrder')
+        return $menuinfo;
     }
 
 }
