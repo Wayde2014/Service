@@ -427,6 +427,7 @@ class AccountModel extends Model
     /**
      * 提款失败处理
      * @param $orderid
+     * @param $channel
      * @param $account
      * @param $drawynote
      * @return bool

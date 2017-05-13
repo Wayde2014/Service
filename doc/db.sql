@@ -6,11 +6,11 @@ CREATE TABLE `t_user_info` (
   `f_realname` varchar(200) DEFAULT NULL COMMENT '真实姓名',
   `f_sex` tinyint DEFAULT 0 COMMENT '性别(0-未知,1-男,2-女)',
   `f_idcard` varchar(50) DEFAULT NULL COMMENT '身份证号码',
-  `f_auth_status` smallint default 0 COMMENT '实名认证状态(0-未认证,100-已认证,-100-认证失败)',
+  `f_auth_status` smallint default 100 COMMENT '实名认证状态(0-未认证,100-已认证,-100-认证失败)',
   `f_usermoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '用户余额',
   `f_freezemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '冻结金额',
   `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '押金金额',
-  `f_user_status` smallint default 0 COMMENT '用户状态(0-默认,100-已实名认证,200-已充值押金,-100-黑名单,-200-已清户(余额为0,押金退回))',
+  `f_user_status` smallint default 100 COMMENT '用户状态(0-默认,100-已实名认证,200-已充值押金,-100-黑名单,-200-已清户(余额为0,押金退回))',
   `f_regtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '注册时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_uid`),
@@ -247,10 +247,9 @@ CREATE TABLE `t_admin_module` (
   `f_moduletype` tinyint default 0 comment '模块类型(0-虚节点,1-实节点)',
   `f_xpath` varchar(1000) default NULL COMMENT '模块访问路径(实节点不能为空)',
   `f_parentid` smallint default 0 comment '父模块ID(0为顶级模块)',
-  `f_order` smallint default 1 comment '显示顺序',
+  `f_showorder` smallint default 1 comment '显示顺序',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`f_mid`),
-  UNIQUE KEY `u_admin_module` (`f_name`)
+  PRIMARY KEY (`f_mid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='后台管理-模块信息表';
 INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('权限管理','权限管理描述',0,'',0);
 INSERT INTO `t_admin_module`(`f_name`,`f_describle`,`f_moduletype`,`f_xpath`,`f_parentid`) VALUE('用户管理','用户增删改查',1,'/admin/user',10001);
@@ -264,12 +263,11 @@ CREATE TABLE `t_admin_user_role` (
   `f_id` int not null AUTO_INCREMENT comment '自增ID',
   `f_uid` int NOT NULL COMMENT '用户ID',
   `f_rid` int NOT NULL COMMENT '角色ID',
-  `f_describle` varchar(1000) default NULL COMMENT '说明',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`),
   UNIQUE KEY `u_admin_user_role` (`f_uid`,`f_rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='后台管理-用户角色关联信息表';
-INSERT INTO `t_admin_user_role`(`f_uid`,`f_rid`,`f_describle`) VALUE(10001,10001,'说明');
+INSERT INTO `t_admin_user_role`(`f_uid`,`f_rid`) VALUE(10001,10001);
 
 
 /*后台管理-角色模块关联信息表*/
@@ -278,15 +276,14 @@ CREATE TABLE `t_admin_role_module` (
   `f_id` int not null AUTO_INCREMENT comment '自增ID',
   `f_rid` int NOT NULL COMMENT '角色ID',
   `f_mid` int NOT NULL COMMENT '模块ID',
-  `f_describle` varchar(1000) default NULL COMMENT '说明',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`),
   UNIQUE KEY `u_admin_role_module` (`f_rid`,`f_mid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='后台管理-角色模块关联信息表';
-INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10001,'说明1');
-INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10002,'说明2');
-INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10003,'说明3');
-INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`,`f_describle`) VALUE(10001,10004,'说明4');
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`) VALUE(10001,10001);
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`) VALUE(10001,10002);
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`) VALUE(10001,10003);
+INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`) VALUE(10001,10004);
 
 /*菜肴管理-口味信息表*/
 CREATE TABLE `t_food_tastes` (
