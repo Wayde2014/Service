@@ -44,22 +44,20 @@ class User extends Base
     }
 
     /**
-     * 获取登录用户管理菜单
+     * 获取登录用户管理菜单(树状)
      */
     public function getMenuList(){
         //获取用户所有可用模块信息
-        $modulelist = $this->model->getUserModuleList($this->uid);
-        $resinfo = $resinfo = self::packMenuInfo($modulelist);
+        $resinfo = self::packMenuInfo(0,$this->uid);
         return json(self::sucres($resinfo));
     }
 
     /**
-     * 获取所有管理菜单
+     * 获取所有管理菜单(树状)
      */
     public function getAllMenuList(){
         //获取所有模块信息
-        $modulelist = $this->model->getModuleList();
-        $resinfo = self::packMenuInfo($modulelist);
+        $resinfo = self::packMenuInfo();
         return json(self::sucres($resinfo));
     }
 
@@ -94,13 +92,18 @@ class User extends Base
      * 修改用户信息
      */
     public function updateUserInfo(){
+        $userid = intval(input('userid',0));
+        if($userid <= 0){
+            return json(self::erres("用户ID不能为空"));
+        }
         $userinfo = array(
             'username' => input('username'),
             'password' => input('password'),
             'realname' => input('realname'),
             'userstatus' => intval(input('userstatus',100)),
+            'rolelist' => explode(',',trim(input('rolelist'))),
         );
-        $ori_userinfo = $this->model->getUserInfoByUid($this->uid);
+        $ori_userinfo = $this->model->getUserInfoByUid($userid);
 
         //修改用户名时需检测新用户名是否可用
         if((!empty($userinfo['username']) && $userinfo['username'] != $ori_userinfo['username'])){
@@ -118,8 +121,8 @@ class User extends Base
             }
         }
 
-        //更新
-        if($this->model->updateUserInfo($this->uid,$userinfo)){
+        //更新用户信息
+        if($this->model->updateUserInfo($userid,$userinfo)){
             return json(self::sucres());
         }else{
             return json(self::erres("修改用户信息失败"));
@@ -153,12 +156,16 @@ class User extends Base
      */
     public function getUserInfo()
     {
+        $userid = intval(input('userid',0));
+        if($userid <= 0){
+            return json(self::erres("用户ID不能为空"));
+        }
         //获取用户信息
-        $userinfo = $this->model->getUserInfoByUid($this->uid);
+        $userinfo = $this->model->getUserInfoByUid($userid);
         if(empty($userinfo)){
             return json(self::erres("用户信息不存在"));
         }
-        //TODO 含所在角色组
+        $userinfo['roleinfo'] = $this->model->getUserRoleList($userid);
         $resinfo = $userinfo;
         return json(self::sucres($resinfo));
     }
@@ -199,6 +206,10 @@ class User extends Base
 
         if(strtoupper($password) !== $userinfo['password']){
             return json(self::erres("登录密码不正确"));
+        }
+
+        if(!$this->model->checkUserStatus($this->uid)){
+            return json(self::erres("该用户已被禁用"));
         }
 
         //写登录信息
@@ -255,7 +266,22 @@ class User extends Base
      * 修改角色信息
      */
     public function updateRoleInfo(){
-        //TODO
+        $rid = intval(input('rid',0));
+        if($rid <= 0){
+            return json(self::erres("角色ID不能为空"));
+        }
+        $roleinfo = array(
+            'rolename' => trim(input('rolename')),
+            'describle' => trim(input('describle')),
+            'modulelist' => explode(',',trim(input('modulelist'))),
+        );
+
+        //更新角色信息
+        if($this->model->updatRoleInfo($rid,$roleinfo)){
+            return json(self::sucres());
+        }else{
+            return json(self::erres("修改角色信息失败"));
+        }
     }
 
     /**
@@ -295,10 +321,25 @@ class User extends Base
      * 获取单个角色信息
      * 1)角色基本信息
      * 2)使用该角色的用户信息列表
-     * 3)该角色包含的模块信息列表
+     * 3)该角色包含的模块ID信息列表
      */
     public function getRoleInfo(){
-        //TODO
+        $rid = intval(input('rid',0));
+        if($rid <= 0){
+            return json(self::erres("角色ID不能为空"));
+        }
+        $roleinfo = $this->model->getRoleInfo($rid);
+        $roleinfo['userinfo'] = $this->model->getUserList($rid);
+        $moduleinfo = $this->model->getModuleListByRid($rid);
+        $modulelist = array();
+        if(!empty($moduleinfo)){
+            foreach($moduleinfo as $module){
+                array_push($modulelist,$module['mid']);
+            }
+        }
+        $roleinfo['modulelist'] = $modulelist;
+        $resinfo = $roleinfo;
+        return json(self::sucres($resinfo));
     }
 
     /**
@@ -319,20 +360,13 @@ class User extends Base
         }
 
         //组装目录层级信息
-        $level = array(0);
         if($parentid > 0){
             $moduleinfo = $this->model->getModuleInfo($parentid);
             if(empty($moduleinfo)){
                 return json(self::erres("父模块信息不存在"));
             }
-            $level = explode(',',$moduleinfo['levelinfo']);
-            array_push($level,$parentid);
         }
-        if(count($level) > $this->model->max_module_level){
-            return json(self::erres("目录层级不能超过".$this->model->max_module_level));
-        }
-        $levelinfo = implode(',',$level);
-        $mid = $this->model->addModule($modulename,$describle,$moduletype,$xpath,$parentid,$levelinfo,$showorder);
+        $mid = $this->model->addModule($modulename,$describle,$moduletype,$xpath,$parentid,$showorder);
         if ($mid === false) {
             return json(self::erres("新增模块信息失败"));
         }
@@ -343,7 +377,25 @@ class User extends Base
      * 修改模块信息
      */
     public function updateModuleInfo(){
-        //TODO
+        $mid = intval(input('mid',0));
+        if($mid <= 0){
+            return json(self::erres("模块ID不能为空"));
+        }
+        $moduleinfo = array(
+            'modulename' => input('modulename'),
+            'describle' => input('describle'),
+            'moduletype' => input('moduletype'),
+            'xpath' => input('xpath'),
+            'parentid' => input('parentid'),
+            'showorder' => input('showorder'),
+        );
+
+        //更新模块信息
+        if($this->model->updateModuleInfo($mid,$moduleinfo)){
+            return json(self::sucres());
+        }else{
+            return json(self::erres("修改模块信息失败"));
+        }
     }
 
     /**
@@ -361,7 +413,7 @@ class User extends Base
         foreach($midlist as $mid){
             $moduleinfo = $this->model->getModuleInfo($mid);
             if($moduleinfo['moduletype'] == 0){
-                $modulelist = $this->model->getChildModuleList($mid);
+                $modulelist = $this->model->getModuleByParentid($mid);
                 if(!empty($modulelist)){
                     return json(self::erres("待删除模块子模块不为空"));
                 }
@@ -399,43 +451,18 @@ class User extends Base
     }
 
     /**
-     * 组装目录信息
+     * 组装目录信息(多维数组)
      */
-    public function packMenuInfo($modulelist){
+    public function packMenuInfo($parentid=0,$uid=0){
+        $modulelist = $this->model->getModuleByParentid($parentid,$uid);
         $menuinfo = array();
         if(!empty($modulelist)){
             foreach($modulelist as $module){
                 $mid = $module['mid'];
-                print_r('-------'.$mid.'---------   ');
-                $levelinfo = explode(',',$module['levelinfo']);
-                $level = count($levelinfo);
-                $parentid = intval($module['parentid']);
-                if($parentid == 0 && $level == 1){
-                    $module['childinfo'] = array();
-                    $menuinfo[$mid] = $module;
-                }else if($level > 1){
-                    $newlevelinfo = array_slice($levelinfo,1);
-                    $last_menu = $menuinfo;
-                    foreach($newlevelinfo as $pid){
-                        echo 'last_menu ';
-                        print_r($last_menu);
-                        if(!array_key_exists($pid,$last_menu)){
-                            $last_menu[$pid] = array(
-                                'childinfo' => array(),
-                            );
-                        }
-                        if($parentid == $pid){
-                            $last_menu[$pid]['childinfo'][$mid] = $module;
-                            break;
-                        }
-                    }
-                    $menuinfo = $last_menu;
-                }
-                echo '------------------------';
-                //print_r($menuinfo);
+                $module['childinfo'] = self::packMenuInfo($mid,$uid);
+                $menuinfo[$mid] = $module;
             }
         }
-        //TODO 排序 usort($arr,'sortByShowOrder')
         return $menuinfo;
     }
 

@@ -75,17 +75,3 @@ function checkUserName($str)
     }
     return true;
 }
-
-/**
- * 目录菜单根据showorder排序
- * @param $arr1
- * @param $arr2
- * @return int
- */
-function sortByShowOrder($arr1, $arr2){
-    $keyname = 'showorder';
-    if($arr1[$keyname] == $arr2[$keyname]){
-        return 0;
-    }
-    return $arr1[$keyname] > $arr2[$keyname] ? 1 : -1;
-}
