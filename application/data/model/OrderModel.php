@@ -123,29 +123,42 @@ class OrderModel extends Model
     /**
      * 获取订单列表
      */
-    public function getOrderlist($ordertype = 1)
+    public function getOrderlist($userid, $ordertype = 1, $page = 1, $pagesize = 20)
     {
+        $where = array(
+            'a.f_userid' => $userid,
+            'a.f_type' => $ordertype
+        );
+        $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
         $orderlist = Db::table('t_orders')
             ->alias('a')
             ->field('a.f_oid orderid,a.f_shopid shopid,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,a.f_deliveryid deliveryid,a.f_deliverytime deliverytime,a.f_addressid addressid,a.f_addtime addtime,b.f_shopname shopname')
             ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
-            ->where('a.f_type', $ordertype)
+            ->where($where)
+            ->order('a.f_addtime desc')
+            ->page($page, $pagesize)
             ->select();
-        return $orderlist?$orderlist:false;
+        return array(
+            "allnum" => $allnum,
+            "orderlist" => $orderlist
+        );
     }
     /**
      * 获取订单详情
      */
-    public function getOrderinfo($orderid)
+    public function getOrderinfo($userid, $orderid)
     {
-        $table_name = 'orders';
+        $where = array(
+            'a.f_userid' => $userid,
+            'a.f_oid' => $orderid
+        );
         $orderinfo = Db::table('t_orders')
             ->alias('a')
             ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime')
             ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
             ->join('t_user_address_info c', 'a.f_addressid = c.f_id','left')
             ->join('t_dineshop_distripersion d', 'a.f_deliveryid = d.f_id','left')
-            ->where('a.f_oid', $orderid)
+            ->where($where)
             ->find();
         return $orderinfo?$orderinfo:false;
     }

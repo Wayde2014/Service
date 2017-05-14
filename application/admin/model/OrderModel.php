@@ -65,7 +65,21 @@ class OrderModel extends Model
             "allnum" => $allnum,
             "orderlist" => $orderlist
         );
-    }    
+    }  
+    /**
+     * 处理订单
+     */
+    public function processOrder($orderid, $data)
+    {
+        $res = array();
+        $update = array();
+        if(isset($data['status'])) $update['f_status'] = $data['status'];
+        if(isset($data['distripid'])) $update['f_deliveryid'] = $data['distripid'];
+        if(count($update) > 0){
+            $res = Db::table('t_orders')->where('f_oid', $orderid)->update($update);
+        }
+        return $res;
+    }
     /**
      * 获取订单详情
      */

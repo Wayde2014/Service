@@ -1,6 +1,7 @@
 <?php
 namespace base;
 
+use base\Errcode;
 use \app\data\model\UserModel;
 use \app\admin\model\AdminUserModel;
 
@@ -25,7 +26,29 @@ class Base
             //die(json_encode($this->res));
         }
     }
-    
+    /**
+     * 错误返回
+     * @param array $res
+     */
+    public function errjson($code, $info = array(), $list = array()){
+        $Errcode = new Errcode();
+        $this->res['code'] = $code;
+        $this->res['msg'] = isset($Errcode->errcode[$code])?$Errcode->errcode[$code]:'';
+        $this->res['info'] = $info;
+        $this->res['list'] = $list;
+        return $this->res;
+    }
+    /**
+     * 成功返回
+     * @param array $res
+     */
+    public function sucjson($info = array(), $list = array()){
+        $this->res['code'] = 1;
+        $this->res['msg'] = 'success';
+        $this->res['info'] = $info;
+        $this->res['list'] = $list;
+        return $this->res;
+    }
     /**
      * 错误返回
      * @param array $res

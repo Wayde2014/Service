@@ -26,7 +26,7 @@ class Order extends Base
         if($endtime) $endtime = Date('Y-m-d', strtotime($endtime));
         else $endtime = Date('Y-m-d');
         if(!$this->checkAdminLogin()){
-            return json($this->erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
         $OrderModel = new OrderModel();
         if($ordertype == 1){
@@ -49,6 +49,12 @@ class Order extends Base
                     $tastid = array_merge($tastid, $match[2]);
                 }
                 $list[$key]['orderlist'] = $orderlist;
+                if(isset($list[$key]['deliveryname']) && $list[$key]['deliveryname'] == null){
+                    $list[$key]['deliveryname'] = '';
+                }
+                if(isset($list[$key]['deliverymobie']) && $list[$key]['deliverymobie'] == null){
+                    $list[$key]['deliverymobie'] = '';
+                }
             }
             $DishesModel = new DishesModel();
             $dishlist = $DishesModel->getDishesList(implode(',', array_unique($dishid)));
@@ -83,7 +89,31 @@ class Order extends Base
         }
         return json($this->sucres($info, $list));
     }
-    
+    /**
+     * 订单处理
+     */
+    public function processOrder(){
+        $info = array();
+        $list = array();
+        $orderid = input('orderid');
+        $status = input('status');
+        $data = array();
+        if($status == 2){ //已付款处理
+            $distripid = input('distripid'); //配送员ID;
+            if(empty($distripid)) return json($this->erres("缺少参数"));
+            $data['status'] = 3;
+            $data['distripid'] = $distripid;
+        }else if($status == 3){ //配送中处理
+            $data['status'] = 4;
+        }else if($status == 4) { //配送完成处理
+            $data['status'] = 100;
+        }
+        if(count($data) == 0) return json($this->erres("参数错误"));
+        $OrderModel = new OrderModel();
+        $info = $OrderModel->processOrder($orderid, $data);
+        if(!$info) return json($this->erres("更新失败"));
+        return json($this->sucres($info));
+    }
     /**
      * 订单派送
      */

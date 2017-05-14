@@ -155,9 +155,9 @@
     3，订单列表
     参数说明
     ordertype = 1  外面订单 2食堂订单
-    http://119.23.73.39/data/order/getOrderlist?ordertype=1
+    http://119.23.73.39/data/order/getOrderlist?ordertype=1&uid=10002&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=&page=1&pagesize=20
     4，订单详情
-    http://119.23.73.39/data/order/getOrderinfo?orderid=11
+    http://119.23.73.39/data/order/getOrderinfo?orderid=11&uid=10002&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=
     返回结果字段：
     orderid: "11", //订单ID
     shopid: "8", //店铺ID
