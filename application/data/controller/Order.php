@@ -30,37 +30,37 @@ class Order extends Base
         $mealsnum = input('mealsnum'); //食堂就餐 就餐人数
         $startime = input('startime'); //食堂订餐 开始时间
         $endtime = input('endtime'); //食堂订餐 结束时间
-        
-        if(!$shopid) return json($this->erres('未指定订单店铺', -30001));
-        if(!$orderdetail) return json($this->erres('订单不能为空', -30002));
-        if($ordermoney == 0 || $allmoney == 0 || $ordermoney + $deliverymoney != $allmoney){
-            return json($this->erres('订单金额错误', -30003)); 
-        }
-        if($paytype == '') return json($this->erres('请选择支付方式', -30004));
-        if(!in_array($ordertype, array('1','2'))) return json($this->erres('订单类型错误', -30005));
-        if($ordertype == 1){
-            if(!$deliverytime) return json($this->erres('请选择配送时间', -30006));
-            if(!check_datetime($deliverytime)) return json($this->erres('配送时间格式不对', -30007));
-            if(!$addressid) return json($this->erres('请选择配送地址', -30008));
-        }else if($ordertype == 2){
-            if(!$mealsnum) return json($this->erres('请选择就餐人数', -30009));
-            if(!$startime) return json($this->erres('请选择预计就餐开始时间', -30010));
-            if(!check_datetime($startime)) return json($this->erres('就餐时间格式不对', -30011));
-            if(!$endtime) return json($this->erres('请选择预计就餐结束时间', -30012));
-            if(!check_datetime($endtime)) return json($this->erres('就餐时间格式不对', -30013));
-        }
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录', -10001));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
+        //判断参数
+        if(!$shopid) return json($this->errjson(-30001));
+        if(!$orderdetail) return json($this->errjson(-30002));
+        if($ordermoney == 0 || $allmoney == 0 || $ordermoney + $deliverymoney != $allmoney){
+            return json($this->errjson(-30003)); 
+        }
+        if($paytype == '') return json($this->errjson(-30004));
+        if(!in_array($ordertype, array('1','2'))) return json($this->errjson(-30005));
+        if($ordertype == 1){
+            if(!$deliverytime) return json($this->errjson( -30006));
+            if(!check_datetime($deliverytime)) return json($this->errjson(-30007));
+            if(!$addressid) return json($this->errjson(-30008));
+        }else if($ordertype == 2){
+            if(!$mealsnum) return json($this->errjson(-30009));
+            if(!$startime) return json($this->errjson(-30010));
+            if(!check_datetime($startime)) return json($this->errjson(-30011));
+            if(!$endtime) return json($this->errjson(-30012));
+            if(!check_datetime($endtime)) return json($this->errjson(-30013));
+        }
         //验证用户
         $UserModel = new UserModel();
         $userinfo = $UserModel->getUserInfoByUid($uid);
-        if(empty($userinfo)) return json($this->erres("用户信息不存在", -30014));
+        if(empty($userinfo)) return json($this->errjson(-30014));
         //验证店铺
         $DineshopModel = new DineshopModel();
         $shopinfo = $DineshopModel->getShopInfo($shopid);
-        if(empty($shopinfo)) return json($this->erres("店铺信息不存在", -30015));
+        if(empty($shopinfo)) return json($this->errjson(-30015));
         //验证订单金额
-        if($ordermoney + $deliverymoney != $allmoney) return json($this->erres("订单总金额不正确", -30016));
+        if($ordermoney + $deliverymoney != $allmoney) return json($this->errjson(-30016));
         $DishesModel = new DishesModel();
         $_orderinfo = array();
         foreach(explode(',', $orderdetail) as $key=>$val){
@@ -72,18 +72,18 @@ class Order extends Base
         foreach($list as $val){
             $_ordermoney += floatval($val['price']) * $_orderinfo[$val['id']];
         }
-        if($_ordermoney != $ordermoney) return json($this->erres("订单金额不正确", -30017));
+        if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
         //验证外卖配送地址
         if($ordertype == 1){
             $addressinfo = $UserModel->getAddressInfo($addressid);
-            if(empty($addressinfo)) return json($this->erres("地址信息不存在", -30018));
+            if(empty($addressinfo)) return json($this->errjson(-30018));
         }
         //创建订单
         $OrderModel = new OrderModel();
         //先验证订单是否已添加
         $orderid = $OrderModel->checkOrder($uid, $shopid, $orderdetail, $ordertype);
         if($orderid){
-            return json($this->sucres(array('orderid' => $orderid)));
+            return json($this->sucjson(array('orderid' => $orderid)));
         }else{
             if($ordertype == 1){
                 $orderid = $OrderModel->addTakeoutOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $deliverytime, $addressid);
@@ -92,15 +92,12 @@ class Order extends Base
             }
             if($orderid){
                 if($this->checkMoneyEnough($uid,$allmoney)){
-                    return json($this->sucres(array('orderid' => $orderid)));
+                    return json($this->sucjson(array('orderid' => $orderid)));
                 }else{
-                    $this->res['code'] = -10002; //用户余额不足
-                    $this->res['msg'] = '用户余额不足';
-                    $this->res['info'] = array('orderid' => $orderid);
-                    return json($this->res);
+                    return json($this->errjson(-10002, array('orderid' => $orderid)));
                 }
             }else{
-                return json($this->erres("创建订单失败", -30019));
+                return json($this->errjson(-30019));
             }
         }
     }
@@ -112,24 +109,22 @@ class Order extends Base
     public function finishOrder(){
         $uid = input('uid'); //用户ID
         $orderid = input('orderid'); //用户ID
-        if(empty($orderid)) return json($this->erres('订单信息为空', -30020));
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录', -10001));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         //获取订单信息
         $OrderModel = new OrderModel();
-        $orderinfo = $OrderModel->getOrderinfo($orderid);
-        if(!$orderinfo)  return json($this->erres('订单信息不存在', -30021));
+        $orderinfo = $OrderModel->getOrderinfo($orderid, $uid);
+        if(!$orderinfo)  return json($this->errjson(-30020));
         $status = $orderinfo['status'];
         $allmoney = floatval($orderinfo['allmoney']);
         $userid = $orderinfo['userid'];
-        
         if($status < 2){
             //验证用户余额
-            if(!$this->checkMoneyEnough($userid,$allmoney)) return json($this->erres('用户余额不足', -30021));
+            if(!$this->checkMoneyEnough($userid,$allmoney)) return json($this->errjson(10002));
             //完成订单 事务处理
             $ret = $OrderModel->finishOrder($userid, $orderid, $allmoney);
             if(!$ret){
-                return json($this->erres('完成订单失败', -30022));
+                return json($this->errjson(-30021));
             }
         }
         return json($this->sucres());
@@ -151,11 +146,17 @@ class Order extends Base
     public function getOrderlist(){
         $info = array();
         $list = array();
+        $uid = input('uid'); //用户ID
         $ordertype = input('ordertype', 1); //订单类型（1,外卖订单  2,食堂订单）
+        $page = input('page', 1); //页数
+        $pagesize = input('pagesize', 20); //每页显示条数
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         $OrderModel = new OrderModel();
-        $res = $OrderModel->getOrderlist($ordertype);
-        if($res) {
-            $list = $res;
+        $res = $OrderModel->getOrderlist($uid, $ordertype, $page, $pagesize);
+        $info["allnum"] = $res["allnum"];
+        if($res["orderlist"]) {
+            $list = $res["orderlist"];
             $orderlist = array();
             $dishid = array();
             foreach($list as $key=>$val){
@@ -185,7 +186,7 @@ class Order extends Base
                     $orderinfo['num'] = $num;
                     array_push($orderlist, $orderinfo);
                 }
-                $list[$key]['orderlists'] = $orderlist;
+                $list[$key]['orderlist'] = $orderlist;
             }
         }
         return json($this->sucres($info, $list));
@@ -197,12 +198,15 @@ class Order extends Base
     public function getOrderinfo(){
         $info = array();
         $list = array();
-        $orderid = input('orderid', 1); 
+        $orderid = input('orderid'); 
+        $uid = input('uid');
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         $OrderModel = new OrderModel();
-        $res = $OrderModel->getOrderinfo($orderid);
+        $res = $OrderModel->getOrderinfo($uid, $orderid);
         $dishid = array();
         $orderlist = array();
-        if($res) {
+        if($res){
             $info = $res;
             $orderdetail = $res['orderdetail'];
             preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
