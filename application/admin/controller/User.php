@@ -96,12 +96,17 @@ class User extends Base
         if($userid <= 0){
             return json(self::erres("用户ID不能为空"));
         }
+        $rolelist = array();
+        $rolestr = trim(input('rolelist'));
+        if(!empty($rolestr)){
+            $rolelist = explode(',',$rolestr);
+        }
         $userinfo = array(
             'username' => input('username'),
             'password' => input('password'),
             'realname' => input('realname'),
             'userstatus' => intval(input('userstatus',100)),
-            'rolelist' => explode(',',trim(input('rolelist'))),
+            'rolelist' => $rolelist,
         );
         $ori_userinfo = $this->model->getUserInfoByUid($userid);
 
@@ -135,7 +140,11 @@ class User extends Base
      * 一并删除用户登录信息
      */
     public function delUser(){
-        $uidlist = explode(',',trim(input('uidlist')));
+        $uidlist = array();
+        $uidstr = trim(input('uidlist'));
+        if(!empty($uidstr)){
+            $uidlist = explode(',',$uidstr);
+        }
         if(empty($uidlist)){
             return json(self::erres("待删除用户ID列表为空"));
         }
@@ -204,7 +213,7 @@ class User extends Base
             return json(self::erres("用户ID不存在"));
         }
 
-        if(strtoupper($password) !== $userinfo['password']){
+        if(strtoupper(md5($password)) !== $userinfo['password']){
             return json(self::erres("登录密码不正确"));
         }
 
@@ -231,7 +240,7 @@ class User extends Base
      */
     public function logout()
     {
-        if ($this->model->setCkExpired($$this->ck)) {
+        if ($this->model->setCkExpired($this->ck)) {
             return json(self::sucres());
         } else {
             return json(self::erres("退出登录失败"));
@@ -270,10 +279,15 @@ class User extends Base
         if($rid <= 0){
             return json(self::erres("角色ID不能为空"));
         }
+        $modulelist = array();
+        $modulestr = trim(input('modulelist'));
+        if(!empty($modulestr)){
+            $modulelist = explode(',',$modulestr);
+        }
         $roleinfo = array(
             'rolename' => trim(input('rolename')),
             'describle' => trim(input('describle')),
-            'modulelist' => explode(',',trim(input('modulelist'))),
+            'modulelist' => $modulelist,
         );
 
         //更新角色信息
@@ -405,7 +419,11 @@ class User extends Base
      * @return \think\response\Json
      */
     public function delModule(){
-        $midlist = explode(',',trim(input('midlist')));
+        $midlist = array();
+        $midstr = trim(input('midlist'));
+        if(!empty($midstr)){
+            $midlist = explode(',',$midstr);
+        }
         if(empty($midlist)){
             return json(self::erres("待删除模块ID列表为空"));
         }
@@ -453,7 +471,7 @@ class User extends Base
     /**
      * 组装目录信息(多维数组)
      */
-    public function packMenuInfo($parentid=0,$uid=0){
+    private function packMenuInfo($parentid=0,$uid=0){
         $modulelist = $this->model->getModuleByParentid($parentid,$uid);
         $menuinfo = array();
         if(!empty($modulelist)){

@@ -162,6 +162,7 @@ class AdminUserModel extends Model
         $userinfo = Db::name($table_name)
             ->where('f_uid',$uid)
             ->field('f_uid as uid')
+            ->field('f_username as username')
             ->field('f_password as password')
             ->field('f_realname as realname')
             ->field('f_userstatus as userstatus')
@@ -184,7 +185,7 @@ class AdminUserModel extends Model
             //获取更新前用户信息
             $ori_userinfo = self::getUserInfoByUid($uid);
             $userinfo = array(
-                'f_password' => empty($new_userinfo['password']) ? $ori_userinfo['password'] : $new_userinfo['password'],
+                'f_password' => empty($new_userinfo['password']) ? $ori_userinfo['password'] : strtoupper(md5($new_userinfo['password'])),
                 'f_realname' => empty($new_userinfo['realname']) ? $ori_userinfo['realname'] : $new_userinfo['realname'],
                 'f_userstatus' => empty($new_userinfo['userstatus']) ? $ori_userinfo['userstatus'] : $new_userinfo['userstatus'],
             );
@@ -381,13 +382,13 @@ class AdminUserModel extends Model
      */
     public function getUserList($rid){
         if($rid > 0){
-            $sql = "select f_uid as uid,f_username as username,f_userstatus as userstatus from t_admin_userinfo where f_uid in (select f_uid from t_admin_user_role where f_rid = :rid group by f_uid) order by username";
+            $sql = "select f_uid as uid,f_username as username,f_realname realname,f_userstatus as userstatus from t_admin_userinfo where f_uid in (select f_uid from t_admin_user_role where f_rid = :rid group by f_uid) order by username";
             $args = array(
                 'rid' => $rid,
             );
             $userlist = Db::query($sql,$args);
         }else{
-            $sql = "select f_uid as uid,f_username as username,f_userstatus as userstatus from t_admin_userinfo order by username";
+            $sql = "select f_uid as uid,f_username as username,f_realname realname,f_userstatus as userstatus from t_admin_userinfo order by username";
             $userlist = Db::query($sql);
         }
         return $userlist;
@@ -480,7 +481,7 @@ class AdminUserModel extends Model
                 ->select();
             return $modulelist;
         }else{
-            $sql = "select a.f_mid as mid,a.f_name as modulename,a.f_moduletype as moduletype,a.f_xpath as xpath,a.f_parentid as f_parentid,a.f_showorder as showorder from t_admin_module a inner join t_admin_role_module b on a.f_mid = b.f_mid inner join t_admin_user_role c on b.f_rid = c.f_rid where c.f_uid = :uid and a.f_parentid = :parentid";
+            $sql = "select a.f_mid as mid,a.f_name as modulename,a.f_moduletype as moduletype,a.f_xpath as xpath,a.f_parentid as parentid,a.f_showorder as showorder from t_admin_module a inner join t_admin_role_module b on a.f_mid = b.f_mid inner join t_admin_user_role c on b.f_rid = c.f_rid where c.f_uid = :uid and a.f_parentid = :parentid";
             $args = array(
                 'uid' => $uid,
                 'parentid' => $parentid,
@@ -495,7 +496,7 @@ class AdminUserModel extends Model
     public function updateModuleInfo($mid, $new_moduleinfo){
         $table_name = 'admin_module';
         //获取更新前用户信息
-        $ori_moduleinfo = self::getUserInfoByUid($mid);
+        $ori_moduleinfo = self::getModuleInfo($mid);
         $moduleinfo = array(
             'f_name' => empty($new_moduleinfo['modulename']) ? $ori_moduleinfo['modulename'] : $new_moduleinfo['modulename'],
             'f_describle' => empty($new_moduleinfo['describle']) ? $ori_moduleinfo['describle'] : $new_moduleinfo['realname'],
