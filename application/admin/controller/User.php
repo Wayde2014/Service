@@ -27,7 +27,6 @@ class User extends Base
             }
         }
     }
-
     /**
      * 检测用户名是否可用
      */
