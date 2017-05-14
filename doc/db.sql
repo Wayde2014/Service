@@ -210,7 +210,7 @@ CREATE TABLE `t_admin_userinfo` (
   PRIMARY KEY (`f_uid`),
   UNIQUE KEY `u_admin_userinfo` (`f_username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='后台管理-用户信息表';
-INSERT INTO `t_admin_userinfo`(`f_username`,`f_realname`,`f_password`,`f_addtime`) VALUE('sysadmin','系统管理员','775176899ABFF5302681A561BA7239DD',NOW());
+INSERT INTO `t_admin_userinfo`(`f_username`,`f_realname`,`f_password`,`f_addtime`) VALUE('sysadmin','系统管理员','F59BD65F7EDAFB087A81D4DCA06C4910',NOW());
 
 /*后台管理-登录信息表*/
 DROP TABLE IF EXISTS `t_admin_login`;
