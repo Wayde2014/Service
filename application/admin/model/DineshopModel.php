@@ -59,19 +59,25 @@ class DineshopModel extends Model
      * 添加店铺折扣时间段
      */
     public function addDiscountTimeslot($startime, $endtime){
-        $data = array(
-            'f_starttime' => $startime,
-            'f_endtime' => $endtime,
-            'f_addtime' => date('Y-m-d H:i:s')
-        );
-        $slotid = intval(Db::table('t_dineshop_discount_timeslot')->insertGetId($data));
-        return $slotid;
+        $ret = Db::table('t_dineshop_discount_timeslot')->field('f_id slotid')->where('f_starttime', $startime)->where('f_endtime', $endtime)->find();
+        if($ret){
+            return $ret['slotid'];
+        }else{
+            $data = array(
+                'f_starttime' => $startime,
+                'f_endtime' => $endtime,
+                'f_addtime' => date('Y-m-d H:i:s')
+            );
+            $slotid = intval(Db::table('t_dineshop_discount_timeslot')->insertGetId($data));
+            return $slotid;
+        }
     }
     /**
      * 删除店铺折扣时间段
      */
     public function delDiscountTimeslot($slotid){
-        return Db::table('t_dineshop_discount_timeslot')->where('f_id', $slotid)->delete();
+        $ret = Db::table('t_dineshop_discount_timeslot')->where('f_id', $slotid)->delete();
+        return $ret<0?false:true;
     }
     /**
      * 获取店铺折扣时间段
@@ -93,5 +99,55 @@ class DineshopModel extends Model
             ->where('f_dineshopid', $shopid)
             ->select();
         return $distriplist;
+    }
+    /**
+     * 添加店铺桌型
+     */
+    public function addDesk($shopid, $seatnum, $desknum){
+        $ret = Db::table('t_dineshop_deskinfo')->field('f_id deskid')->where('f_sid', $shopid)->where('f_seatnum', $seatnum)->find();
+        if($ret){
+            return $ret['deskid'];
+        }else{
+            $data = array(
+                'f_sid' => $shopid,
+                'f_seatnum' => $seatnum,
+                'f_amount' => $desknum,
+                'f_addtime' => date('Y-m-d H:i:s')
+            );
+            $deskid = intval(Db::table('t_dineshop_deskinfo')->insertGetId($data));
+            return $deskid;
+        }
+    }
+    /**
+     * 删除店铺桌型
+     */
+    public function delDesk($deskid){
+        $ret = Db::table('t_dineshop_deskinfo')->where('f_id', $deskid)->delete();
+        return $ret<0?false:true;
+    }
+    /**
+     * 获取店铺桌型列表
+     */
+    public function getDesklist($shopid){
+        $desklist = Db::table('t_dineshop_deskinfo')
+            ->field('f_id id, f_sid shopid, f_seatnum seatnum, f_amount desknum, f_addtime addtime')
+            ->where('f_sid', $shopid)
+            ->where('f_status', 1)
+            ->order('f_seatnum asc')
+            ->select();
+        return $desklist;
+    }
+    /**
+     * 获取店铺桌型信息
+     */
+    public function getDeskinfo($deskid){
+        $deskinfo = Db::table('t_dineshop_deskinfo')
+            ->alias('a')
+            ->field('a.f_id id, a.f_sid shopid, b.f_shopname shopname, b.f_shopdesc shopdesc, b.f_shopicon shopicon, b.f_shophone shophone, b.f_address address, a.f_seatnum seatnum, a.f_amount desknum, a.f_addtime addtime')
+            ->join('t_dineshop b','a.f_sid = b.f_sid','left')
+            ->where('a.f_id', $deskid)
+            ->where('a.f_status', 1)
+            ->find();
+        return $deskinfo;
     }
 }

@@ -91,7 +91,7 @@ class Shop extends Base
         }
         $DineshopModel = new DineshopModel();
         $slotid = $DineshopModel->addDiscountTimeslot($startime, $endtime);
-        return json($this->sucres(array('slotid' => $slotid)));
+        return json($this->sucjson(array('slotid' => $slotid)));
     }
     /**
      * 删除折扣时间段
@@ -126,7 +126,7 @@ class Shop extends Base
         }
         $DineshopModel = new DineshopModel();
         $list = $DineshopModel->getDiscountTimeslot();
-        return json($this->sucres($info, $list));
+        return json($this->sucjson($info, $list));
     }
     /**
      * 获取店铺折扣信息
@@ -188,7 +188,90 @@ class Shop extends Base
     /**
      * 修改店铺折扣信息
      */
-    public function getDineshopDiscount(){
+    public function modDineshopDiscount(){
+        
+    }
+    /**
+     * 添加店铺桌型
+     */
+    public function addDesk(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        $seatnum = input('seatnum'); //就餐人数
+        $desknum = input('desknum'); //数量
+        if(empty($seatnum) || empty($desknum)) {
+            return json($this->errjson(-20001));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $deskid = $DineshopModel->addDesk($shopid, $seatnum, $desknum);
+        return json($this->sucjson(array('deskid' => $deskid)));
+    }
+    /**
+     * 删除店铺桌型
+     */
+    public function delDesk(){
+        $info = array();
+        $list = array();
+        $deskid = input('deskid'); //桌型ID
+        if(empty($deskid)){
+            return json($this->errjson(-20001));
+        }        
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $info = $DineshopModel->delDesk($deskid);
+        if($info){
+           return json($this->sucjson()); 
+        }else{
+           return json($this->errjson()); 
+        }
+    }
+    /**
+     * 获取店铺桌型
+     */
+    public function getDesklist(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        if(empty($shopid)){
+            return json($this->errjson(-20001));
+        }        
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $shopinfo = $DineshopModel->getDineshopInfo($shopid);
+        if($shopinfo){
+            $info['shopid'] = $shopinfo['id'];
+            $info['shopname'] = $shopinfo['shopname'];
+            $info['shopicon'] = $shopinfo['shopicon'];
+            $info['shopaddress'] = $shopinfo['address'];
+        }
+        $list = $DineshopModel->getDesklist($shopid);
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 获取店铺桌型信息
+     */
+    public function getDeskinfo(){
+        $info = array();
+        $list = array();
+        $deskid = input('deskid'); //店铺ID
+        if(empty($deskid)){
+            return json($this->errjson(-20001));
+        }        
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $info = $DineshopModel->getDeskinfo($deskid);
+        return json($this->sucjson($info, $list));
+    }
     /**
      * 获取店铺对应的配送员信息
      */
