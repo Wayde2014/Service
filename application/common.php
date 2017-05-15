@@ -46,10 +46,9 @@ function check_idcode($idcode)
  */
 function check_datetime($datetime, $formate = 'yyyy-mm-dd hh:ii:ss')
 {
-    $matchstr = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/s';
-    if($formate == 'mm-dd hh:ii'){
-        $matchstr = '/^\d{2}-\d{2} \d{2}:\d{2}$/s';
-    }
+    $matchstr = '/^'.$formate.'$/s';
+    $matchstr = preg_replace('/yyyy/i', '\d{4}', $matchstr);
+    $matchstr = preg_replace('/mm|dd|hh|ii|ss/i', '\d{2}', $matchstr);
     if (preg_match($matchstr, $datetime)) {
         return true;
     } else {

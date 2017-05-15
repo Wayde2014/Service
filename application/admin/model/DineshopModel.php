@@ -56,6 +56,24 @@ class DineshopModel extends Model
         return $discountlist;
     }
     /**
+     * 添加店铺折扣时间段
+     */
+    public function addDiscountTimeslot($startime, $endtime){
+        $data = array(
+            'f_starttime' => $startime,
+            'f_endtime' => $endtime,
+            'f_addtime' => date('Y-m-d H:i:s')
+        );
+        $slotid = intval(Db::table('t_dineshop_discount_timeslot')->insertGetId($data));
+        return $slotid;
+    }
+    /**
+     * 删除店铺折扣时间段
+     */
+    public function delDiscountTimeslot($slotid){
+        return Db::table('t_dineshop_discount_timeslot')->where('f_id', $slotid)->delete();
+    }
+    /**
      * 获取店铺折扣时间段
      */
     public function getDiscountTimeslot(){

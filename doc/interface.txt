@@ -410,8 +410,10 @@
             lasttime        最后更新时间
             
     8、店铺相关
-        1)获取店铺折扣时间表
-        http://119.23.73.39/admin/shop/getDiscountTimeslot
+        1)店铺折扣时间表
+            获取店铺折扣时间表  http://119.23.73.39/admin/shop/getDiscountTimeslot
+            新增店铺折扣时间表  http://119.23.73.39/admin/shop/addDiscountTimeslot?startime=08:00&endtime=09:00 
+            删除店铺折扣时间表  http://119.23.73.39/admin/shop/delDiscountTimeslot?slotid=12 slotid时间段对应的ID
         2)获取店铺折扣信息
         http://119.23.73.39/admin/shop/getDineshopDiscount?shopid=1
         3)后台获取店铺信息列表  

@@ -46,7 +46,7 @@ class Shop extends Base
                 $list[$key]['disheslist'] = $disheslist;
             }
         }
-        return json($this->sucres($info, $list));
+        return json($this->sucjson($info, $list));
     }
     /**
      * 获取店铺信息
@@ -73,7 +73,47 @@ class Shop extends Base
             }
         }
         $info['disheslist'] = $disheslist;
-        return json($this->sucres($info, $list));
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 添加折扣时间段
+     */
+    public function addDiscountTimeslot(){
+        $info = array();
+        $list = array();
+        $startime = input('startime'); //起始时间
+        $endtime = input('endtime'); //结束时间
+        if(!check_datetime($startime, 'hh:ii') || !check_datetime($endtime, 'hh:ii')) {
+            return json($this->errjson(-20002));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $slotid = $DineshopModel->addDiscountTimeslot($startime, $endtime);
+        return json($this->sucres(array('slotid' => $slotid)));
+    }
+    /**
+     * 删除折扣时间段
+     */
+    public function delDiscountTimeslot(){
+        $info = array();
+        $list = array();
+        $slotid = input('slotid'); //时间段ID
+        if(empty($slotid)){
+            return json($this->errjson(-20001));
+        }        
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $info = $DineshopModel->delDiscountTimeslot($slotid);
+        if($info){
+           return json($this->sucjson()); 
+        }else{
+           return json($this->errjson()); 
+        }
+        
     }
     /**
      * 获取折扣时间段
@@ -143,8 +183,12 @@ class Shop extends Base
             $list[$key]['timeslot'] = substr($startime,0,5).'-'.substr($endtime,0,5);
             $list[$key]['discountdata'] = $discountdata;
         }
-        return json($this->sucres($info, $list));
+        return json($this->sucjson($info, $list));
     }
+    /**
+     * 修改店铺折扣信息
+     */
+    public function getDineshopDiscount(){
     /**
      * 获取店铺对应的配送员信息
      */
@@ -158,6 +202,6 @@ class Shop extends Base
         $DineshopModel = new DineshopModel();
         $list = $DineshopModel->getDistripList($shopid);
         
-        return json($this->sucres($info, $list));
+        return json($this->sucjson($info, $list));
     }
 }
