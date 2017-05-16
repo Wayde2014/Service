@@ -114,16 +114,4 @@ class Order extends Base
         if(!$info) return json($this->erres("更新失败"));
         return json($this->sucres($info));
     }
-    /**
-     * 订单派送
-     */
-    public function deliveryOrder(){
-        $info = array();
-        $list = array();
-        $orderid = input('orderid');
-        $distripid = input('distripid'); //配送员ID
-        $OrderModel = new OrderModel();
-        $info = $OrderModel->deliveryOrder($orderid, $distripid);
-        return json($this->sucres($info));
-    }
 }

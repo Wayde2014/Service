@@ -10,7 +10,7 @@ class User extends Base
 {
     private $paytype_config = array(1001,1002); //1001-充值余额,1002-充值押金
     private $paychannel_config = array(1001,1002); //1001-支付宝充值,1002-微信充值
-    private $drawtype_config = array(200); //100-余额提款,200-押金退款
+    private $drawtype_config = array(200,300); //100-余额提款,200-押金退款,300-订单退款
     private $drawchannel_config = array(1001,1002); //1001-支付宝提款,1002-微信提款
 
     /**

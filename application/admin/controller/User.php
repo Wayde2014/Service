@@ -23,7 +23,7 @@ class User extends Base
         $request = Request::instance();
         if(!in_array($request->action(),array('login'))){
             if(!self::checkAdminLogin($this->uid,$this->ck)){
-                //die(json_encode(self::erres("用户未登录，请先登录")));
+                die(json_encode(self::erres("用户未登录，请先登录")));
             }
         }
     }

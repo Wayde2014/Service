@@ -30,7 +30,7 @@ class Base
      * 错误返回
      * @param array $res
      */
-    public function errjson($code, $info = array(), $list = array()){
+    public function errjson($code = -1, $info = array(), $list = array()){
         $Errcode = new Errcode();
         $this->res['code'] = $code;
         $this->res['msg'] = isset($Errcode->errcode[$code])?$Errcode->errcode[$code]:'';
