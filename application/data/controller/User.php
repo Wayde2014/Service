@@ -61,14 +61,13 @@ class User extends Base
     {
         $mobile = input('mobile');
         $vcode = input('vcode');
-        $deviceid = input('deviceid');
+        $deviceid = trim(input('deviceid'));
         $platform = input('platform');
         $ip = input('ip');
         $remark = input('remark');
 
         //设备号不能为空
-        $last_deviceid = trim($deviceid);
-        if (empty($last_deviceid)) {
+        if (empty($deviceid)) {
             return json(self::erres("设备号不能为空"));
         }
 
@@ -514,6 +513,7 @@ class User extends Base
         }
 
         $AccountModel = new AccountModel();
+        $paymoney = number_format($paymoney,2,'.','');
         $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
         if($orderid === false){
             return json(self::erres("创建充值订单失败"));
@@ -521,7 +521,7 @@ class User extends Base
 
         //返回支付宝APP支付所需参数
         $Alipay = new Alipay();
-        $retinfo = $Alipay->AlipayTradeAppPayRequest($subject,$describle,$orderid,$paychannel);
+        $retinfo = $Alipay->AlipayTradeAppPayRequest($subject,$describle,$orderid,$paymoney);
 
         return json(self::sucjson($retinfo));
     }

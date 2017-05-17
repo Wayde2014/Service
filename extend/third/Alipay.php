@@ -31,13 +31,13 @@ class Alipay
      */
     public function __construct()
     {
-        $this->appid = Config::get('APPID');
-        $this->uuid = Config::get('UUID');
-        $this->gateway = Config::get('GATEWAY');
-        $this->notify_url = Config::get('NOTIFY_URL');
-        $this->rsa_public_key = Config::get('RSA_PUBLIC_KEY');
-        $this->rsa_private_key = Config::get('RSA_PRIVATE_KEY');
-        $this->alipay_rsa_public_key = Config::get('ALIPAY_RSA_PUBLIC_KEY');
+        $this->appid = Config::get('alipay.APPID');
+        $this->uuid = Config::get('alipay.UUID');
+        $this->gateway = Config::get('alipay.GATEWAY');
+        $this->notify_url = Config::get('alipay.NOTIFY_URL');
+        $this->rsa_public_key = Config::get('alipay.RSA_PUBLIC_KEY');
+        $this->rsa_private_key = Config::get('alipay.RSA_PRIVATE_KEY');
+        $this->alipay_rsa_public_key = Config::get('alipay.ALIPAY_RSA_PUBLIC_KEY');
     }
 
     /**

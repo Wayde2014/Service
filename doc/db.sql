@@ -64,7 +64,7 @@ CREATE TABLE `t_user_recharge_order` (
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-充值订单表';
+) ENGINE=InnoDB AUTO_INCREMENT=100001 DEFAULT CHARSET=utf8 COMMENT='用户管理-充值订单表';
 
 
 /*用户管理-提款订单表*/
