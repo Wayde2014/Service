@@ -75,9 +75,9 @@ class Shop extends Base
         return json($this->sucjson($info, $list));
     }
     /**
-     * 添加折扣时间段
+     * 修改、删除折扣时间段
      */
-    public function addDiscountTimeslot(){
+    public function modDiscountTimeslot(){
         $info = array();
         $list = array();
         $timeslot = input('timeslot'); //时间段
@@ -96,34 +96,12 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $res = $DineshopModel->addDiscountTimeslot($data);
+        $res = $DineshopModel->modDiscountTimeslot($data);
         if($res){
             return json($this->sucjson());
         }else{
             return json($this->errjson(-1)); 
         }
-    }
-    /**
-     * 删除折扣时间段
-     */
-    public function delDiscountTimeslot(){
-        $info = array();
-        $list = array();
-        $slotid = input('slotid'); //时间段ID
-        if(empty($slotid)){
-            return json($this->errjson(-20001));
-        }        
-        if(!$this->checkAdminLogin()){
-            return json($this->errjson(-10001));
-        }
-        $DineshopModel = new DineshopModel();
-        $info = $DineshopModel->delDiscountTimeslot($slotid);
-        if($info){
-           return json($this->sucjson()); 
-        }else{
-           return json($this->errjson()); 
-        }
-        
     }
     /**
      * 获取折扣时间段
@@ -260,7 +238,7 @@ class Shop extends Base
             return json($this->errjson(-80003));
         }
         foreach(explode('$', $discount) as $key=>$val){
-            if(!preg_match( '/^\d+\|\d+\@([1-9]\d*|0)(\.\d{1,2})?$/i' , $val, $result)){
+            if(!preg_match( '/^\d+\|\d+\@([1-9]\d*|0)(\.\d{1,2})?$/i' , $val)){
                 return json($this->errjson(-80004)); exit;
             }
             preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $val, $match);
@@ -299,6 +277,7 @@ class Shop extends Base
         $info = array();
         $list = array();
         $shopid = input('shopid'); //店铺ID
+        if(empty($shopid)) return json($this->errjson(-20003));
         $seatnum = input('seatnum'); //就餐人数
         $desknum = input('desknum'); //数量
         if(empty($seatnum) || empty($desknum)) {
@@ -310,6 +289,29 @@ class Shop extends Base
         $DineshopModel = new DineshopModel();
         $deskid = $DineshopModel->addDesk($shopid, $seatnum, $desknum);
         return json($this->sucjson(array('deskid' => $deskid)));
+    }
+    /**
+     * 修改店铺桌型
+     */
+    public function modDesk(){
+        $info = array();
+        $list = array();
+        $deskid = input('deskid'); //桌型ID
+        $seatnum = input('seatnum'); //就餐人数
+        $desknum = input('desknum'); //数量
+        if(empty($deskid) || empty($seatnum) || empty($desknum)) {
+            return json($this->errjson(-20001));
+        }     
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $info = $DineshopModel->modDesk($deskid,$seatnum,$desknum);
+        if($info){
+           return json($this->sucjson()); 
+        }else{
+           return json($this->errjson()); 
+        }
     }
     /**
      * 删除店铺桌型

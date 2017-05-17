@@ -95,7 +95,7 @@ class DineshopModel extends Model
     /**
      * 添加店铺折扣时间段
      */
-    public function addDiscountTimeslot($data){
+    public function modDiscountTimeslot($data){
         $insertdata = array();
         foreach($data as $key => $val){
             array_push($insertdata, array(
@@ -104,8 +104,19 @@ class DineshopModel extends Model
                 'f_addtime' => date('Y-m-d H:i:s')
             ));
         }
-        $res = intval(Db::table('t_dineshop_discount_timeslot')->insertAll($insertdata));
-        return $res?true:false;
+        // 启动事务
+        Db::startTrans();
+        try{
+            Db::table('t_dineshop_discount_timeslot')->where("1=1")->delete();
+            Db::table('t_dineshop_discount_timeslot')->insertAll($insertdata);
+            // 提交事务
+            Db::commit();
+            return true;
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            return false;
+        }
     }
     /**
      * 删除店铺折扣时间段
@@ -139,10 +150,7 @@ class DineshopModel extends Model
      * 添加店铺桌型
      */
     public function addDesk($shopid, $seatnum, $desknum){
-        $ret = Db::table('t_dineshop_deskinfo')->field('f_id deskid')->where('f_sid', $shopid)->where('f_seatnum', $seatnum)->find();
-        if($ret){
-            return $ret['deskid'];
-        }else{
+        try{
             $data = array(
                 'f_sid' => $shopid,
                 'f_seatnum' => $seatnum,
@@ -151,6 +159,20 @@ class DineshopModel extends Model
             );
             $deskid = intval(Db::table('t_dineshop_deskinfo')->insertGetId($data));
             return $deskid;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+    /**
+     * 修改店铺桌型
+     */
+    public function modDesk($deskid, $seatnum, $desknum){
+        $data = array("f_seatnum" => $seatnum, "f_amount" => $desknum);
+        $ret = Db::table('t_dineshop_deskinfo')->where('f_id', $deskid)->update($data);
+        if($ret !== false){
+            return true;
+        }else{
+            return false;
         }
     }
     /**
