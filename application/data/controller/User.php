@@ -5,11 +5,12 @@ use base\Base;
 use \app\data\model\UserModel;
 use \app\data\model\AccountModel;
 use third\Sms;
+use third\Alipay;
 
 class User extends Base
 {
-    private $paytype_config = array(1001,1002); //1001-充值余额,1002-充值押金
-    private $paychannel_config = array(1001,1002); //1001-支付宝充值,1002-微信充值
+    private $paytype_config = array(1001,1002,1003); //1001-充值余额,1002-充值押金,1003-订单充值
+    private $paychannel_config = array(1001); //1001-支付宝充值,1002-微信充值
     private $drawtype_config = array(200,300); //100-余额提款,200-押金退款,300-订单退款
     private $drawchannel_config = array(1001,1002); //1001-支付宝提款,1002-微信提款
 
@@ -485,6 +486,8 @@ class User extends Base
         $paytype = intval(input('paytype',0));
         $paymoney = floatval(input('paymoney',0));
         $paychannel = intval(input('channel',0));
+        $subject = input('subject');
+        $describle = input('describle');
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
@@ -500,6 +503,9 @@ class User extends Base
         if($paymoney <= 0){
             return json(self::erres("充值金额不能小于0"));
         }
+        if(empty($subject)){
+            return json(self::erres("商品标题不能为空"));
+        }
 
         //必须实名认证后方可充值
         $UserModel = new UserModel();
@@ -513,7 +519,11 @@ class User extends Base
             return json(self::erres("创建充值订单失败"));
         }
 
-        return json(self::sucres());
+        //返回支付宝APP支付所需参数
+        $Alipay = new Alipay();
+        $retinfo = $Alipay->AlipayTradeAppPayRequest($subject,$describle,$orderid,$paychannel);
+
+        return json(self::sucjson($retinfo));
     }
 
     /**
@@ -568,5 +578,19 @@ class User extends Base
         }
 
         return json(self::sucres());
+    }
+
+    /**
+     * 获取用户充值记录
+     */
+    public function getUserRechargeList(){
+        //需要时再添加
+    }
+
+    /**
+     * 获取用户提款记录
+     */
+    public function getUserDrawList(){
+        //需要时再添加
     }
 }

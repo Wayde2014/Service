@@ -77,3 +77,5 @@ http://www.shanwei.com/index.php/admin/User/getModuleInfo?uid=10001&ck=ck_NZY1M2
 
 28、获取模块列表
 http://www.shanwei.com/index.php/admin/User/getModuleList?uid=10001&ck=ck_NZY1M2ZMOGQWOTU0MJE2M2JLZGVIMZGXZJBLMJG0ZJI=
+
+29、创建充值订单
