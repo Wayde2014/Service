@@ -1,286 +1,286 @@
-ºóÌ¨Ïà¹Ø½Ó¿Ú:
-    1¡¢µÇÂ¼½Ó¿Ú(ÏµÍ³¹ÜÀíÔ±: sysadmin£¬ÃÜÂë: 123456)
+åå°ç›¸å…³æ¥å£:
+    1ã€ç™»å½•æ¥å£(ç³»ç»Ÿç®¡ç†å‘˜: sysadminï¼Œå¯†ç : 123456)
         http://119.23.73.39/admin/User/login?username=sysadmin&passwordadmin/User/login?username=sysadmin&password=E10ADC3949BA59ABBE56E057F20F883E&ip=192.168.1.1
-        Èë²Î£º
-            username    µÇÂ¼ÓÃ»§Ãû
-            password    µÇÂ¼ÃÜÂë(32Î»MD5(123456))
-            ip          µÇÂ¼Éè±¸IPµØÖ·
-        ½á¹ûËµÃ÷£º
+        å…¥å‚ï¼š
+            username    ç™»å½•ç”¨æˆ·å
+            password    ç™»å½•å¯†ç (32ä½MD5(123456))
+            ip          ç™»å½•è®¾å¤‡IPåœ°å€
+        ç»“æœè¯´æ˜ï¼š
             {"code":1,"msg":"successs","info":{"ck":"ck_ZDYZODLMNWE1NTDIYJAWMJJMODCZMDJJM2EZMDA0MJM=","uid":10001},"list":[]}
-            code > 0£¬¼´µÇÂ¼³É¹¦
-            ck Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
+            code > 0ï¼Œå³ç™»å½•æˆåŠŸ
+            ck å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
 
-    2¡¢ÍË³öµÇÂ¼
+    2ã€é€€å‡ºç™»å½•
         http://119.23.73.39/admin/User/logout?ck=ck_xxx&uid=xxx
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-        ½á¹ûËµÃ÷£º
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+        ç»“æœè¯´æ˜ï¼š
             {"code":1,"msg":"successs","info":[],"list":[]}
-            code > 0£¬¼´ÍË³öµÇÂ¼³É¹¦
+            code > 0ï¼Œå³é€€å‡ºç™»å½•æˆåŠŸ
 
-    3¡¢»ñÈ¡µÇÂ¼ÓÃ»§¹ÜÀí²Ëµ¥
+    3ã€è·å–ç™»å½•ç”¨æˆ·ç®¡ç†èœå•
         http://119.23.73.39/admin/User/getMenuList?ck=ck_xxx&uid=xxx
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-        ½á¹ûËµÃ÷£º
-            mid             Ä£¿éID
-            modulename      Ä£¿éÃû³Æ
-            moduletype      Ä£¿éÀàĞÍ(0-Ğé½Úµã,1-Êµ½Úµã)
-            xpath           Ä£¿é·ÃÎÊÂ·¾¶(Ğé½ÚµãÎª¿Õ)
-            parentid        ¸¸Ä£¿éID(0Îª¶¥¼¶Ä£¿é)
-            showorder       ÏÔÊ¾Ë³Ğò
-            childinfo       ×Ó½ÚµãĞÅÏ¢
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+        ç»“æœè¯´æ˜ï¼š
+            mid             æ¨¡å—ID
+            modulename      æ¨¡å—åç§°
+            moduletype      æ¨¡å—ç±»å‹(0-è™šèŠ‚ç‚¹,1-å®èŠ‚ç‚¹)
+            xpath           æ¨¡å—è®¿é—®è·¯å¾„(è™šèŠ‚ç‚¹ä¸ºç©º)
+            parentid        çˆ¶æ¨¡å—ID(0ä¸ºé¡¶çº§æ¨¡å—)
+            showorder       æ˜¾ç¤ºé¡ºåº
+            childinfo       å­èŠ‚ç‚¹ä¿¡æ¯
 
-    4¡¢»ñÈ¡È«²¿¹ÜÀí²Ëµ¥(¹ÜÀíÓÃ)
+    4ã€è·å–å…¨éƒ¨ç®¡ç†èœå•(ç®¡ç†ç”¨)
         http://119.23.73.39/admin/User/getAllMenuList?ck=ck_xxx&uid=xxx
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-        ½á¹ûËµÃ÷£º
-            mid             Ä£¿éID
-            modulename      Ä£¿éÃû³Æ
-            moduletype      Ä£¿éÀàĞÍ(0-Ğé½Úµã,1-Êµ½Úµã)
-            xpath           Ä£¿é·ÃÎÊÂ·¾¶(Ğé½ÚµãÎª¿Õ)
-            parentid        ¸¸Ä£¿éID(0Îª¶¥¼¶Ä£¿é)
-            showorder       ÏÔÊ¾Ë³Ğò
-            childinfo       ×Ó½ÚµãĞÅÏ¢
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+        ç»“æœè¯´æ˜ï¼š
+            mid             æ¨¡å—ID
+            modulename      æ¨¡å—åç§°
+            moduletype      æ¨¡å—ç±»å‹(0-è™šèŠ‚ç‚¹,1-å®èŠ‚ç‚¹)
+            xpath           æ¨¡å—è®¿é—®è·¯å¾„(è™šèŠ‚ç‚¹ä¸ºç©º)
+            parentid        çˆ¶æ¨¡å—ID(0ä¸ºé¡¶çº§æ¨¡å—)
+            showorder       æ˜¾ç¤ºé¡ºåº
+            childinfo       å­èŠ‚ç‚¹ä¿¡æ¯
 
-    5¡¢ÓÃ»§Ïà¹Ø
-        1)¼ì²éÓÃ»§ÃûÊÇ·ñ±»Õ¼ÓÃ
+    5ã€ç”¨æˆ·ç›¸å…³
+        1)æ£€æŸ¥ç”¨æˆ·åæ˜¯å¦è¢«å ç”¨
         http://119.23.73.39/admin/User/getMenuList?ck=ck_xxx&uid=xxx&username=zhangsan
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            username ´ı¼ì²âÓÃ»§Ãû
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            username å¾…æ£€æµ‹ç”¨æˆ·å
 
-        2)ĞÂÔöÓÃ»§
-        http://119.23.73.39/admin/User/getMenuList?ck=ck_xxx&uid=xxx&username=zhangsan&password=E10ADC3949BA59ABBE56E057F20F883E&realname=ÕÅÈı
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            username ÓÃ»§Ãû
-            password µÇÂ¼ÃÜÂë(32Î»MD5(123456))
-            realname ÕæÊµĞÕÃû(¿ÉÑ¡)
+        2)æ–°å¢ç”¨æˆ·
+        http://119.23.73.39/admin/User/getMenuList?ck=ck_xxx&uid=xxx&username=zhangsan&password=E10ADC3949BA59ABBE56E057F20F883E&realname=å¼ ä¸‰
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            username ç”¨æˆ·å
+            password ç™»å½•å¯†ç (32ä½MD5(123456))
+            realname çœŸå®å§“å(å¯é€‰)
 
-        3)ĞŞ¸ÄÓÃ»§ĞÅÏ¢
-        http://119.23.73.39/admin/User/updateUserInfo?ck=ck_xxx&uid=xxx&userid=10002&username=zhangsan&password=E10ADC3949BA59ABBE56E057F20F883E&realname=ÕÅÈı&userstatus=100&rolelist=10001,10002
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            userid ĞŞ¸ÄÓÃ»§ID
-            username ÓÃ»§Ãû(¿ÉÑ¡)
-            password µÇÂ¼ÃÜÂë(¿ÉÑ¡)(32Î»MD5(123456))
-            realname ÕæÊµĞÕÃû(¿ÉÑ¡)
-            userstatus ÓÃ»§×´Ì¬(¿ÉÑ¡)(100-Õı³£,-100-½ûÓÃ)
-            rolelist ÓÃ»§·ÖÅäµÄ½ÇÉ«IDÁĞ±í(Ó¢ÎÄ¶ººÅ·Ö¸ô×Ö·û´®)
+        3)ä¿®æ”¹ç”¨æˆ·ä¿¡æ¯
+        http://119.23.73.39/admin/User/updateUserInfo?ck=ck_xxx&uid=xxx&userid=10002&username=zhangsan&password=E10ADC3949BA59ABBE56E057F20F883E&realname=å¼ ä¸‰&userstatus=100&rolelist=10001,10002
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            userid ä¿®æ”¹ç”¨æˆ·ID
+            username ç”¨æˆ·å(å¯é€‰)
+            password ç™»å½•å¯†ç (å¯é€‰)(32ä½MD5(123456))
+            realname çœŸå®å§“å(å¯é€‰)
+            userstatus ç”¨æˆ·çŠ¶æ€(å¯é€‰)(100-æ­£å¸¸,-100-ç¦ç”¨)
+            rolelist ç”¨æˆ·åˆ†é…çš„è§’è‰²IDåˆ—è¡¨(è‹±æ–‡é€—å·åˆ†éš”å­—ç¬¦ä¸²)
 
-        4)É¾³ıÓÃ»§ĞÅÏ¢
+        4)åˆ é™¤ç”¨æˆ·ä¿¡æ¯
         http://119.23.73.39/admin/User/delUser?ck=ck_xxx&uid=xxx&uidlist=10002,10003
-         Èë²Î£º
-             ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-             uid ÓÃ»§ID
-             uidlist É¾³ıÓÃ»§IDÁĞ±í(Ó¢ÎÄ¶ººÅ·Ö¸ô×Ö·û´®)
+         å…¥å‚ï¼š
+             ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+             uid ç”¨æˆ·ID
+             uidlist åˆ é™¤ç”¨æˆ·IDåˆ—è¡¨(è‹±æ–‡é€—å·åˆ†éš”å­—ç¬¦ä¸²)
 
-        5)»ñÈ¡µ¥¸öÓÃ»§ĞÅÏ¢
+        5)è·å–å•ä¸ªç”¨æˆ·ä¿¡æ¯
         http://119.23.73.39/admin/User/delUser?ck=ck_xxx&uid=xxx&userid=10001
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            userid ²éÑ¯ÓÃ»§ID
-        ½á¹ûËµÃ÷£º
-            uid           ÓÃ»§ID
-            username      ÓÃ»§Ãû
-            password      ÓÃ»§ÃÜÂë(ÒÑ¼ÓÃÜ)
-            realname      ÓÃ»§ÕæÊµĞÕÃû
-            userstatus    ÓÃ»§×´Ì¬(100-Õı³£,-100-½ûÓÃ)
-            addtime       ÓÃ»§Ìí¼ÓÊ±¼ä
-            lasttime      ÓÃ»§ĞÅÏ¢×îºó¸üĞÂÊ±¼ä
-            roleinfo      ÓÃ»§½ÇÉ«ĞÅÏ¢
-            rid           ½ÇÉ«ID
-            rolename      ½ÇÉ«Ãû³Æ
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            userid æŸ¥è¯¢ç”¨æˆ·ID
+        ç»“æœè¯´æ˜ï¼š
+            uid           ç”¨æˆ·ID
+            username      ç”¨æˆ·å
+            password      ç”¨æˆ·å¯†ç (å·²åŠ å¯†)
+            realname      ç”¨æˆ·çœŸå®å§“å
+            userstatus    ç”¨æˆ·çŠ¶æ€(100-æ­£å¸¸,-100-ç¦ç”¨)
+            addtime       ç”¨æˆ·æ·»åŠ æ—¶é—´
+            lasttime      ç”¨æˆ·ä¿¡æ¯æœ€åæ›´æ–°æ—¶é—´
+            roleinfo      ç”¨æˆ·è§’è‰²ä¿¡æ¯
+            rid           è§’è‰²ID
+            rolename      è§’è‰²åç§°
 
-        6)¸ù¾İ½ÇÉ«ID»ñÈ¡ÓÃ»§ÁĞ±í(Ä¬ÈÏ²éÈ«²¿ÓÃ»§)
+        6)æ ¹æ®è§’è‰²IDè·å–ç”¨æˆ·åˆ—è¡¨(é»˜è®¤æŸ¥å…¨éƒ¨ç”¨æˆ·)
         http://119.23.73.39/admin/User/getUserList?ck=ck_xxx&uid=xxx
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            rid ½ÇÉ«ID(¿ÉÑ¡)
-        ½á¹ûËµÃ÷£º
-            uid           ÓÃ»§ID
-            username      ÓÃ»§Ãû
-            realname      ÓÃ»§ÕæÊµĞÕÃû
-            userstatus    ÓÃ»§×´Ì¬(100-Õı³£,-100-½ûÓÃ)
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            rid è§’è‰²ID(å¯é€‰)
+        ç»“æœè¯´æ˜ï¼š
+            uid           ç”¨æˆ·ID
+            username      ç”¨æˆ·å
+            realname      ç”¨æˆ·çœŸå®å§“å
+            userstatus    ç”¨æˆ·çŠ¶æ€(100-æ­£å¸¸,-100-ç¦ç”¨)
 
-    6¡¢½ÇÉ«Ïà¹Ø
-        1)ĞÂÔö½ÇÉ«ĞÅÏ¢
-        http://119.23.73.39/admin/User/addRole?ck=ck_xxx&uid=xxx&rolename=½ÇÉ«Ãû³Æ&describle=ÃèÊö
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            rolename ½ÇÉ«Ãû³Æ
-            describle ½ÇÉ«ÃèÊö
+    6ã€è§’è‰²ç›¸å…³
+        1)æ–°å¢è§’è‰²ä¿¡æ¯
+        http://119.23.73.39/admin/User/addRole?ck=ck_xxx&uid=xxx&rolename=è§’è‰²åç§°&describle=æè¿°
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            rolename è§’è‰²åç§°
+            describle è§’è‰²æè¿°
 
-        2)ĞŞ¸Ä½ÇÉ«ĞÅÏ¢
-        http://119.23.73.39/admin/User/updateRoleInfo?ck=ck_xxx&uid=xxx&rolename=½ÇÉ«Ãû³Æ&describle=ÃèÊö&modulelist=10001,10002
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            rolename ½ÇÉ«Ãû³Æ
-            describle ½ÇÉ«ÃèÊö
-            modulelist ½ÇÉ«·ÖÅäµÄÄ£¿éIDÁĞ±í(Ó¢ÎÄ¶ººÅ·Ö¸ô×Ö·û´®)
+        2)ä¿®æ”¹è§’è‰²ä¿¡æ¯
+        http://119.23.73.39/admin/User/updateRoleInfo?ck=ck_xxx&uid=xxx&rolename=è§’è‰²åç§°&describle=æè¿°&modulelist=10001,10002
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            rolename è§’è‰²åç§°
+            describle è§’è‰²æè¿°
+            modulelist è§’è‰²åˆ†é…çš„æ¨¡å—IDåˆ—è¡¨(è‹±æ–‡é€—å·åˆ†éš”å­—ç¬¦ä¸²)
 
-        3)É¾³ı½ÇÉ«ĞÅÏ¢
+        3)åˆ é™¤è§’è‰²ä¿¡æ¯
         http://119.23.73.39/admin/User/delRole?ck=ck_xxx&uid=xxx&rid=10002
-         Èë²Î£º
-             ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-             uid ÓÃ»§ID
-             rid É¾³ı½ÇÉ«ID
+         å…¥å‚ï¼š
+             ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+             uid ç”¨æˆ·ID
+             rid åˆ é™¤è§’è‰²ID
 
-        4)»ñÈ¡½ÇÉ«ÁĞ±í
+        4)è·å–è§’è‰²åˆ—è¡¨
         http://119.23.73.39/admin/User/getRoleList?ck=ck_xxx&uid=xxx
-        ½á¹ûËµÃ÷£º
-            rid         ½ÇÉ«ID
-            rolename    ½ÇÉ«Ãû³Æ
-            describle   ½ÇÉ«ÃèÊö
-            lasttime    ×îºó¸üĞÂÊ±¼ä
+        ç»“æœè¯´æ˜ï¼š
+            rid         è§’è‰²ID
+            rolename    è§’è‰²åç§°
+            describle   è§’è‰²æè¿°
+            lasttime    æœ€åæ›´æ–°æ—¶é—´
 
-        5)»ñÈ¡µ¥¸ö½ÇÉ«ĞÅÏ¢
+        5)è·å–å•ä¸ªè§’è‰²ä¿¡æ¯
         http://119.23.73.39/admin/User/getRoleInfo?ck=ck_xxx&uid=xxx&userid=10001&rid=10001
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            rid ½ÇÉ«ID
-        ½á¹ûËµÃ÷£º
-            rid         ½ÇÉ«ID
-            rolename    ½ÇÉ«Ãû³Æ
-            describle   ½ÇÉ«ÃèÊö
-            userinfo    ½ÇÉ«ÓÃ»§ĞÅÏ¢
-            uid         ÓÃ»§ID
-            username    ÓÃ»§Ãû³Æ
-            realname    ÓÃ»§ÕæÊµĞÕÃû
-            userstatus  ÓÃ»§×´Ì¬
-            moduleinfo  ½ÇÉ«Ä£¿éÁĞ±í[10001,10002]
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            rid è§’è‰²ID
+        ç»“æœè¯´æ˜ï¼š
+            rid         è§’è‰²ID
+            rolename    è§’è‰²åç§°
+            describle   è§’è‰²æè¿°
+            userinfo    è§’è‰²ç”¨æˆ·ä¿¡æ¯
+            uid         ç”¨æˆ·ID
+            username    ç”¨æˆ·åç§°
+            realname    ç”¨æˆ·çœŸå®å§“å
+            userstatus  ç”¨æˆ·çŠ¶æ€
+            moduleinfo  è§’è‰²æ¨¡å—åˆ—è¡¨[10001,10002]
 
-    7¡¢Ä£¿éÏà¹Ø
-        1)ĞÂÔöÄ£¿éĞÅÏ¢
-        http://119.23.73.39/admin/User/addModule?ck=ck_xxx&uid=xxx&modulename=½ÇÉ«Ãû³Æ&describle=ÃèÊö
-        Èë²Î£º
-            ck              Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid             ÓÃ»§ID
-            modulename      Ä£¿éÃû³Æ
-            describle       Ä£¿éÃèÊö
-            moduletype      Ä£¿éÀàĞÍ(0-Ğé½Úµã,1-Êµ½Úµã)
-            xpath           Ä£¿é·ÃÎÊÂ·¾¶(Ğé½ÚµãÎª¿Õ)
-            parentid        ¸¸Ä£¿éID(0Îª¶¥¼¶Ä£¿é)
-            showorder       ÏÔÊ¾Ë³Ğò
+    7ã€æ¨¡å—ç›¸å…³
+        1)æ–°å¢æ¨¡å—ä¿¡æ¯
+        http://119.23.73.39/admin/User/addModule?ck=ck_xxx&uid=xxx&modulename=è§’è‰²åç§°&describle=æè¿°
+        å…¥å‚ï¼š
+            ck              å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid             ç”¨æˆ·ID
+            modulename      æ¨¡å—åç§°
+            describle       æ¨¡å—æè¿°
+            moduletype      æ¨¡å—ç±»å‹(0-è™šèŠ‚ç‚¹,1-å®èŠ‚ç‚¹)
+            xpath           æ¨¡å—è®¿é—®è·¯å¾„(è™šèŠ‚ç‚¹ä¸ºç©º)
+            parentid        çˆ¶æ¨¡å—ID(0ä¸ºé¡¶çº§æ¨¡å—)
+            showorder       æ˜¾ç¤ºé¡ºåº
 
-        2)ĞŞ¸ÄÄ£¿éĞÅÏ¢
-        http://119.23.73.39/admin/User/updateModuleInfo?ck=ck_xxx&uid=xxx&mid=10002&modulename=½ÇÉ«Ãû³Æ&describle=ÃèÊö
-        Èë²Î£º
-            ck              Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid             ÓÃ»§ID
-            mid             Ä£¿éID
-            modulename      Ä£¿éÃû³Æ
-            describle       Ä£¿éÃèÊö
-            moduletype      Ä£¿éÀàĞÍ(0-Ğé½Úµã,1-Êµ½Úµã)
-            xpath           Ä£¿é·ÃÎÊÂ·¾¶(Ğé½ÚµãÎª¿Õ)
-            parentid        ¸¸Ä£¿éID(0Îª¶¥¼¶Ä£¿é)
-            showorder       ÏÔÊ¾Ë³Ğò
+        2)ä¿®æ”¹æ¨¡å—ä¿¡æ¯
+        http://119.23.73.39/admin/User/updateModuleInfo?ck=ck_xxx&uid=xxx&mid=10002&modulename=è§’è‰²åç§°&describle=æè¿°
+        å…¥å‚ï¼š
+            ck              å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid             ç”¨æˆ·ID
+            mid             æ¨¡å—ID
+            modulename      æ¨¡å—åç§°
+            describle       æ¨¡å—æè¿°
+            moduletype      æ¨¡å—ç±»å‹(0-è™šèŠ‚ç‚¹,1-å®èŠ‚ç‚¹)
+            xpath           æ¨¡å—è®¿é—®è·¯å¾„(è™šèŠ‚ç‚¹ä¸ºç©º)
+            parentid        çˆ¶æ¨¡å—ID(0ä¸ºé¡¶çº§æ¨¡å—)
+            showorder       æ˜¾ç¤ºé¡ºåº
 
-        3)É¾³ıÄ£¿éĞÅÏ¢
+        3)åˆ é™¤æ¨¡å—ä¿¡æ¯
         http://119.23.73.39/admin/User/delModule?ck=ck_xxx&uid=xxx&midlist=10005
-         Èë²Î£º
-             ck         Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-             uid        ÓÃ»§ID
-             midlist    É¾³ıÓÃ»§IDÁĞ±í(Ó¢ÎÄ¶ººÅ·Ö¸ô×Ö·û´®)
+         å…¥å‚ï¼š
+             ck         å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+             uid        ç”¨æˆ·ID
+             midlist    åˆ é™¤ç”¨æˆ·IDåˆ—è¡¨(è‹±æ–‡é€—å·åˆ†éš”å­—ç¬¦ä¸²)
 
-        4)»ñÈ¡µ¥¸öÄ£¿éĞÅÏ¢
+        4)è·å–å•ä¸ªæ¨¡å—ä¿¡æ¯
         http://119.23.73.39/admin/User/getModuleInfo?ck=ck_xxx&uid=xxx&userid=10001&mid=10001
-        Èë²Î£º
-            ck  Î¨Ò»±êÊ¾ÓÃ»§µÇÂ¼Ì¬ĞÅÏ¢
-            uid ÓÃ»§ID
-            mid Ä£¿éID
-        ½á¹ûËµÃ÷£º
-            mid             Ä£¿éID
-            modulename      Ä£¿éÃû³Æ
-            describle       Ä£¿éÃèÊö
-            moduletype      Ä£¿éÀàĞÍ(0-Ğé½Úµã,1-Êµ½Úµã)
-            xpath           Ä£¿é·ÃÎÊÂ·¾¶(Ğé½ÚµãÎª¿Õ)
-            parentid        ¸¸Ä£¿éID(0Îª¶¥¼¶Ä£¿é)
-            showorder       ÏÔÊ¾Ë³Ğò
-            lasttime        ×îºó¸üĞÂÊ±¼ä
+        å…¥å‚ï¼š
+            ck  å”¯ä¸€æ ‡ç¤ºç”¨æˆ·ç™»å½•æ€ä¿¡æ¯
+            uid ç”¨æˆ·ID
+            mid æ¨¡å—ID
+        ç»“æœè¯´æ˜ï¼š
+            mid             æ¨¡å—ID
+            modulename      æ¨¡å—åç§°
+            describle       æ¨¡å—æè¿°
+            moduletype      æ¨¡å—ç±»å‹(0-è™šèŠ‚ç‚¹,1-å®èŠ‚ç‚¹)
+            xpath           æ¨¡å—è®¿é—®è·¯å¾„(è™šèŠ‚ç‚¹ä¸ºç©º)
+            parentid        çˆ¶æ¨¡å—ID(0ä¸ºé¡¶çº§æ¨¡å—)
+            showorder       æ˜¾ç¤ºé¡ºåº
+            lasttime        æœ€åæ›´æ–°æ—¶é—´
 
-        5)»ñÈ¡Ä£¿éÁĞ±í
+        5)è·å–æ¨¡å—åˆ—è¡¨
         http://119.23.73.39/admin/User/getModuleList?ck=ck_xxx&uid=xxx
-        ½á¹ûËµÃ÷£º
-            mid             Ä£¿éID
-            modulename      Ä£¿éÃû³Æ
-            describle       Ä£¿éÃèÊö
-            moduletype      Ä£¿éÀàĞÍ(0-Ğé½Úµã,1-Êµ½Úµã)
-            xpath           Ä£¿é·ÃÎÊÂ·¾¶(Ğé½ÚµãÎª¿Õ)
-            parentid        ¸¸Ä£¿éID(0Îª¶¥¼¶Ä£¿é)
-            showorder       ÏÔÊ¾Ë³Ğò
-            lasttime        ×îºó¸üĞÂÊ±¼ä
+        ç»“æœè¯´æ˜ï¼š
+            mid             æ¨¡å—ID
+            modulename      æ¨¡å—åç§°
+            describle       æ¨¡å—æè¿°
+            moduletype      æ¨¡å—ç±»å‹(0-è™šèŠ‚ç‚¹,1-å®èŠ‚ç‚¹)
+            xpath           æ¨¡å—è®¿é—®è·¯å¾„(è™šèŠ‚ç‚¹ä¸ºç©º)
+            parentid        çˆ¶æ¨¡å—ID(0ä¸ºé¡¶çº§æ¨¡å—)
+            showorder       æ˜¾ç¤ºé¡ºåº
+            lasttime        æœ€åæ›´æ–°æ—¶é—´
             
-    8¡¢µêÆÌÏà¹Ø
-        1)µêÆÌÕÛ¿ÛÊ±¼ä±í
-            »ñÈ¡µêÆÌÕÛ¿ÛÊ±¼ä±í  http://119.23.73.39/admin/shop/getDiscountTimeslot
-            ĞÂÔöµêÆÌÕÛ¿ÛÊ±¼ä±í  http://boss.yee.website/admin/shop/addDiscountTimeslot?timeslot=05:00-06:00,06:00-07:00
-            É¾³ıµêÆÌÕÛ¿ÛÊ±¼ä±í  http://boss.yee.website/admin/shop/delDiscountTimeslot?slotid=25,26 slotidÊ±¼ä¶Î¶ÔÓ¦µÄID
-        2)»ñÈ¡µêÆÌÕÛ¿ÛĞÅÏ¢
-            »ñÈ¡µêÆÌÕÛ¿ÛĞÅÏ¢ http://119.23.73.39/admin/shop/getDineshopDiscount?shopid=1
-            Ìí¼ÓµêÆÌÕÛ¿ÛĞÅÏ¢ http://boss.yee.website/admin/shop/addDineshopDiscount?shopid=1&date=2017-05-17&timeslot=6&discount=4|1@0.6$3|2@50
-            ĞŞ¸ÄµêÆÌÕÛ¿ÛĞÅÏ¢ http://boss.yee.website/admin/shop/modDineshopDiscount?id=10&discount=5|1@0.6$3|2@50
-            É¾³ıµêÆÌÕÛ¿ÛĞÅÏ¢ http://boss.yee.website/admin/shop/delDineshopDiscount?id=10&discount=5|1@0.6$3|2@50
-        3)ºóÌ¨»ñÈ¡µêÆÌĞÅÏ¢ÁĞ±í  
+    8ã€åº—é“ºç›¸å…³
+        1)åº—é“ºæŠ˜æ‰£æ—¶é—´è¡¨
+            è·å–åº—é“ºæŠ˜æ‰£æ—¶é—´è¡¨  http://119.23.73.39/admin/shop/getDiscountTimeslot
+            æ–°å¢åº—é“ºæŠ˜æ‰£æ—¶é—´è¡¨  http://boss.yee.website/admin/shop/addDiscountTimeslot?timeslot=05:00-06:00,06:00-07:00
+            åˆ é™¤åº—é“ºæŠ˜æ‰£æ—¶é—´è¡¨  http://boss.yee.website/admin/shop/delDiscountTimeslot?slotid=25,26 slotidæ—¶é—´æ®µå¯¹åº”çš„ID
+        2)è·å–åº—é“ºæŠ˜æ‰£ä¿¡æ¯
+            è·å–åº—é“ºæŠ˜æ‰£ä¿¡æ¯ http://119.23.73.39/admin/shop/getDineshopDiscount?shopid=1
+            æ·»åŠ åº—é“ºæŠ˜æ‰£ä¿¡æ¯ http://boss.yee.website/admin/shop/addDineshopDiscount?shopid=1&date=2017-05-17&timeslot=6&discount=4|1@0.6$3|2@50
+            ä¿®æ”¹åº—é“ºæŠ˜æ‰£ä¿¡æ¯ http://boss.yee.website/admin/shop/modDineshopDiscount?id=10&discount=5|1@0.6$3|2@50
+            åˆ é™¤åº—é“ºæŠ˜æ‰£ä¿¡æ¯ http://boss.yee.website/admin/shop/delDineshopDiscount?id=10&discount=5|1@0.6$3|2@50
+        3)åå°è·å–åº—é“ºä¿¡æ¯åˆ—è¡¨  
         http://119.23.73.39/admin/shop/getDineshopList?page=1&pagesize=20
-        4)»ñÈ¡µêÆÌÏêÇé
+        4)è·å–åº—é“ºè¯¦æƒ…
         http://119.23.73.39/admin/shop/getDineshopInfo?shopid=1
-        ·µ»Ø²ÎÊıËµÃ÷£º
-        id: 1,  ¶©µ¥ID
-        userid: 1,  ÓÃ»§ID
-        shopname: "ÉîÔË³±ÖİÖà",  µêÆÌÃû³Æ
-        status: 0,  µêÆÌ×´Ì¬£¨0³õÊ¼£¬1ÉóºËÖĞ£¬100ÉóºËÍ¨¹ı£¬-100ÉóºË²»Í¨¹ı£¬-300ÒÑÏÂ¼Ü£©
-        shopdesc: "",  µêÆÌÃèÊö
-        shopicon: "http://p1.meituan.net/200.0/deal/15c8885d14f18774938a88752f08bb1e49194.jpg@118_0_466_466a%7C267h_267w_2e_90Q",  µêÆÌÍ¼±ê
-        shophone: "0755-28635923",  µêÆÌÁªÏµ·½Ê½
-        address: "ÖĞÒø»¨Ô°1ºÅÂ¥B-8£¨ÖĞÒø´óÏÃÅÔ£©",  µêÆÌµØÖ·
-        cuisineid: 1, ²ËÏµID
-        cuisinename: "Â³²Ë",  ²ËÏµÃû³Æ
-        menulist: "1,2,3,4,5,6,7,8",  ²ËÆ·ID
-        maplon: "114.073984",  ×ø±ê
-        maplat: "22.553192",  ×ø±ê
-        sales: 200, ÔÂÏúÁ¿
-        deliveryfee: 6, ÅäËÍ·Ñ
-        minprice: 20, ÆğËÍ½ğ¶î
-        preconsume: 30, ÈË¾ùÏû·Ñ
-        isbooking: 0, ÊÇ·ñ¿ÉÒÔÔ¤¶¨
-        opentime: "10:00-23:00", ÓªÒµÊ±¼ä
-        isaway: 1, ÊÇ·ñ¿ÉÒÔÍâÂô
-        deliverytime: "00:01-02:45,16:50-23:59",  ¶©µ¥ÅäËÍÊ±¼ä
-        addtime: "2017-04-24 21:03:03", Ìí¼ÓÊ±¼ä
-        disheslist: [ ²ËÆ·ÁĞ±í
+        è¿”å›å‚æ•°è¯´æ˜ï¼š
+        id: 1,  è®¢å•ID
+        userid: 1,  ç”¨æˆ·ID
+        shopname: "æ·±è¿æ½®å·ç²¥",  åº—é“ºåç§°
+        status: 0,  åº—é“ºçŠ¶æ€ï¼ˆ0åˆå§‹ï¼Œ1å®¡æ ¸ä¸­ï¼Œ100å®¡æ ¸é€šè¿‡ï¼Œ-100å®¡æ ¸ä¸é€šè¿‡ï¼Œ-300å·²ä¸‹æ¶ï¼‰
+        shopdesc: "",  åº—é“ºæè¿°
+        shopicon: "http://p1.meituan.net/200.0/deal/15c8885d14f18774938a88752f08bb1e49194.jpg@118_0_466_466a%7C267h_267w_2e_90Q",  åº—é“ºå›¾æ ‡
+        shophone: "0755-28635923",  åº—é“ºè”ç³»æ–¹å¼
+        address: "ä¸­é“¶èŠ±å›­1å·æ¥¼B-8ï¼ˆä¸­é“¶å¤§å¦æ—ï¼‰",  åº—é“ºåœ°å€
+        cuisineid: 1, èœç³»ID
+        cuisinename: "é²èœ",  èœç³»åç§°
+        menulist: "1,2,3,4,5,6,7,8",  èœå“ID
+        maplon: "114.073984",  åæ ‡
+        maplat: "22.553192",  åæ ‡
+        sales: 200, æœˆé”€é‡
+        deliveryfee: 6, é…é€è´¹
+        minprice: 20, èµ·é€é‡‘é¢
+        preconsume: 30, äººå‡æ¶ˆè´¹
+        isbooking: 0, æ˜¯å¦å¯ä»¥é¢„å®š
+        opentime: "10:00-23:00", è¥ä¸šæ—¶é—´
+        isaway: 1, æ˜¯å¦å¯ä»¥å¤–å–
+        deliverytime: "00:01-02:45,16:50-23:59",  è®¢å•é…é€æ—¶é—´
+        addtime: "2017-04-24 21:03:03", æ·»åŠ æ—¶é—´
+        disheslist: [ èœå“åˆ—è¡¨
             {
-            id: 1,  ²ËÃûID
+            id: 1,  èœåID
             icon: "https://img.meituan.net/100.100.90/wmproduct/712a233b4018a100bdf7a668132ab49386611.jpg",
-            dishesname: "´ĞÏãÓÍìË´óÏº",  ²ËÃû
-            price: "88.0000",  ²Ë¼Û
-            classifyname: "ÕĞÅÆÍÆ¼ö",  ²ËÃû·ÖÀà
-            cuisinename: "Â³²Ë" ²ËÏµ
+            dishesname: "è‘±é¦™æ²¹ç„–å¤§è™¾",  èœå
+            price: "88.0000",  èœä»·
+            classifyname: "æ‹›ç‰Œæ¨è",  èœååˆ†ç±»
+            cuisinename: "é²èœ" èœç³»
             }
         ]
-        5)»ñÈ¡µêÆÌ¶ÔÓ¦ÅäËÍÔ±
+        5)è·å–åº—é“ºå¯¹åº”é…é€å‘˜
         http://119.23.73.39/admin/shop/getDistripList?shopid=1
-        id: 3,  ÅäËÍÔ±ID
-        shopid: 1,  µêÆÌID
-        distripname: "ÈÎÎÒĞĞ",  ÅäËÍÔ±ĞÕÃû
-        distripmobile: "18018738566"  ÅäËÍÔ±ÁªÏµ·½Ê½
-    9¡¢¶©µ¥Ïà¹Ø    
-        1)»ñÈ¡¶©µ¥ÁĞ±í
-        ordertype(¶©µ¥ÀàĞÍ)=1ÍâÂô¶©µ¥£¬2Ê³ÌÃ¶©µ¥£¬startime¶©µ¥ÆğÊ¼Ê±¼ä£¬endtime¶©µ¥½áÊøÊ±¼ä£¬shopnameµêÆÌÃû³Æ
+        id: 3,  é…é€å‘˜ID
+        shopid: 1,  åº—é“ºID
+        distripname: "ä»»æˆ‘è¡Œ",  é…é€å‘˜å§“å
+        distripmobile: "18018738566"  é…é€å‘˜è”ç³»æ–¹å¼
+    9ã€è®¢å•ç›¸å…³    
+        1)è·å–è®¢å•åˆ—è¡¨
+        ordertype(è®¢å•ç±»å‹)=1å¤–å–è®¢å•ï¼Œ2é£Ÿå ‚è®¢å•ï¼Œstartimeè®¢å•èµ·å§‹æ—¶é—´ï¼Œendtimeè®¢å•ç»“æŸæ—¶é—´ï¼Œshopnameåº—é“ºåç§°
         http://119.23.73.39/admin/order/getOrderlist?startime=2017/05/07&endtime=2017/05/14&shopname=&page=1&pagesize=20&ordertype=1
-        2)´¦Àí¶©µ¥
+        2)å¤„ç†è®¢å•
         http://119.23.73.39/admin/order/processOrder?orderid=1&status=3
