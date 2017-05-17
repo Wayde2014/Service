@@ -93,17 +93,29 @@
         user_status 用户状态(0-默认,100-已充值押金,200-已实名认证,-100-黑名单)
         regtime 用户注册时间
 
-    10、发起充值
+    10、发起充值(!!已废除,改调用10.1--创建充值订单接口-createRechargeOrder)
     http://119.23.73.39/data/User/recharge?ck=ck_xxx&uid=xxx&paytype=1001&paymoney=100&channel=1001
     入参：
         ck          唯一标示用户登录态信息
         uid         用户ID
         paytype     充值类型(1001-充值余额,1002-充值押金)
         paymoney    充值金额
-        channel     充值渠道(1001-支付宝提款,1002-微信提款)
+        channel     充值渠道(1001-支付宝充值,1002-微信充值)
     结果说明：
         {"code":1,"msg":"success","info":[],"list":[]}
         code > 0，即充值下单成功
+
+    10.1、创建充值订单接口
+    http://119.23.73.39/data/User/createRechargeOrder?ck=ck_xxx&uid=xxx&paytype=1001&paymoney=100&channel=1001&subject=商品标题&describle=商品描述
+    入参：
+        ck          唯一标示用户登录态信息
+        uid         用户ID
+        paytype     充值类型(1001-充值余额,1002-充值押金,1003-订单充值)
+        paymoney    充值金额(保留小数点后2位)
+        channel     充值渠道(1001-支付宝充值,1002-微信充值)
+    结果说明：
+        {"code":1,"msg":"success","info":[],"list":[]}
+        code > 0，即创建充值订单成功,info中包含第三方支付接口所需参数
 
     11、发起提款
     http://119.23.73.39/data/User/draw?ck=ck_xxx&uid=xxx&drawtype=200&drawmoney=99

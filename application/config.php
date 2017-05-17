@@ -243,5 +243,15 @@ return [
     'sms_verifyurl' => 'https://api.netease.im/sms/verifycode.action', //短信验证码验证接口
     'sms_appkey' => '018edc4085a14db5b25d6ada4e7ad12b', //发送短信验证码appkey
     'sms_appsecret' => 'd3a142e98b6d', //发送短信验证码App Secret
-    
+
+    //支付宝配置
+    'alipay' => array(
+        'APPID' => '2016080700188727', //支付宝应用ID
+        'UUID' => '2088102170359181', //商户ID
+        'GATEWAY' => 'https://openapi.alipaydev.com/gateway.do', //支付宝网关地址
+        'NOTIFY_URL' => 'http://www.shanwei.com/notify/alipay.php', //异步通知地址
+        'RSA_PUBLIC_KEY' => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6BPyYcB8VR82H2kZr6FwYDxhGdEJGSdlFD25fplxqFPkrdjfeWi1u1rPJ0nYMl5ElNwehV6nx3TfBsjDtaSGV0qRUXwYUi22VYr6eHQ+i3ANrq8zYHOMnzT38FDI8MvJfhgFeOIdGeX/QKsaMJ0azChDnh1VPtVeOssNVfp9uP81tZe0JRSgSOQbrwXiXSQ5bFB5LzYpPnOBrnXq/zDHLGMV//OJ7EOUUcOq1JECSjeOZsdis8NjxAFRG7m790YyjMVC1BhpjoppRnJ+EP89tu+Nr1Rmk+18K0o4qxt1qMWUNffyAqJ12aEPVuH4Zh5y2Yh1Ko7VALYbVAwhW2XZfQIDAQAB', //RSA公钥
+        'RSA_PRIVATE_KEY' => 'MIIEpAIBAAKCAQEA6BPyYcB8VR82H2kZr6FwYDxhGdEJGSdlFD25fplxqFPkrdjfeWi1u1rPJ0nYMl5ElNwehV6nx3TfBsjDtaSGV0qRUXwYUi22VYr6eHQ+i3ANrq8zYHOMnzT38FDI8MvJfhgFeOIdGeX/QKsaMJ0azChDnh1VPtVeOssNVfp9uP81tZe0JRSgSOQbrwXiXSQ5bFB5LzYpPnOBrnXq/zDHLGMV//OJ7EOUUcOq1JECSjeOZsdis8NjxAFRG7m790YyjMVC1BhpjoppRnJ+EP89tu+Nr1Rmk+18K0o4qxt1qMWUNffyAqJ12aEPVuH4Zh5y2Yh1Ko7VALYbVAwhW2XZfQIDAQABAoIBAH26uLiOoI05IIg510mYK5pne6+R2N0Aw7kIi6LznGi2MpCgislqmfILi2jcj70R5xPCgOJ+WmUrgtxZDfYtUP6fjkTX9xEmZL7JUVLKn0vJhBAcKLhbQVbLSnuuOH6D2QBwIR7RWTS7ruKpD8JAitEKCz/w4krtK2SstufakhwTVy3oT6xKwYxrr92+R48jsGEqtByLKRE7XMqRpxg6VQpWJOSn0eQJkFPafo5BKXINqw6h6EZY5dbGW0Oh4P+mqI1ViHDWwfORVnl/A0NJMCzK07wBmIjPxT/dUIDT6udkFOSS1k7LRc9FpY2sYIZ00AzFQi4Ymre40YgTE9Tkc+ECgYEA+F2n9HYeTy+Y7lWhhxeDWdVZ4Ov5wPyfAG0THNtV668dIzGmnUyhm2RKh2Z9taIZEZVggHFb0oj0t+0/jT7gcCMG6VuMcZPc6JSVnK/Vg2ZEU7aTiF0HxvxxWb2pbuX8wCJwPCJkWnH0qj8F+gRfo1PCniKHu2dzzq1F55BiiTkCgYEA7zYfxaYxAI8bg+tpudphnw8Zkdf+9QNK4B0uGcie2grfwYLEmJxZSH849tYdORCd0AeCBESwYAXmqjoG7eV08zDCpCbpLVcGShmWAzcQ+L+zExo4k3Dx4NJzbzBwprQj/E/eEYkLesGyhIU3viHpGjHmo8dAnD0mv0m8bX2hZmUCgYEAzgfzcioiTpIvjVbf3k81GWqRWrKmxt9Jj3Lsbf3NsuvbgfyIOOj/DwcNhHETS3+iyCFgomxnPal7SLC5DZThXmTQMPlO8lE06oOH8Sk0OAK4H7HPhUmXUAzOgyGA0oxbNY/cByaIlTb/PdN2Q8cpBzZOthvy+RWCziqTWNs/wpECgYALIBFKN/h/dihpckFwi1+O7jzaM5l/+683zSOfv1zj9y2A6nwKPPtKC+CyWjLxvHwaeL7rQ+aQELYxpJE97zYJOXNT/xtJKIr6V0ZKz/zSFNhXQxjugoo9Uoxb13zlw+sIiQ5i8mS+SNPspeV5ykn1Fe0MIPA4U//BVcSVswoWoQKBgQC3mlTymjCNdj+mD+W4jy0Esdt0rWtE64mMFvYOB78ZTmTFzfuKm95YhZZHdVcBRxTHDeEN0fkh15yfauSTcGMl8MGpyPdhqaEYaCam0ZudSgg5KAk7suj0wCz7/RhE2CRzM94/4em64WzqlhXm8LQDdnNEfmrthKWvwlXCIuuXyQ==', //RSA私钥
+        'ALIPAY_RSA_PUBLIC_KEY' => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6/9EsrX0i/ufrVRnyI1soa/ZllQqb0QGIu4eh9eUdjYulQNtwo+GypFjqdj88KAMo6dkO7uCbfS4c5QtB1yHaoFdPcsmC/Oei0kcHyfIMGAm+lFqaWv+PhaD527kNqGQWuw2L3MJfzw9Y89WdBDckn24+k/2LXcmoFNqRjT67OPjDieCBxkVqPC55ivVkIBvtuUzQs6MfFcAvWf5Zoj+dsJ3tcsfyK6Ve+h9g8zq/k145fNBWiKmzeCFMDvh96vjX8OcFZCjC7DXUz/ei3f24CTTFIoyfD3PLdqr5J676beOK7W2xflkhRHE5DFbyrV/yadGCGUuXF19bGlahOFuIQIDAQAB', //支付宝RSA公钥
+    ),
 ];

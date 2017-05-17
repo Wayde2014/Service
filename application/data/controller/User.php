@@ -5,12 +5,13 @@ use base\Base;
 use \app\data\model\UserModel;
 use \app\data\model\AccountModel;
 use third\Sms;
+use third\Alipay;
 
 class User extends Base
 {
-    private $paytype_config = array(1001,1002); //1001-充值余额,1002-充值押金
-    private $paychannel_config = array(1001,1002); //1001-支付宝充值,1002-微信充值
-    private $drawtype_config = array(200); //100-余额提款,200-押金退款
+    private $paytype_config = array(1001,1002,1003); //1001-充值余额,1002-充值押金,1003-订单充值
+    private $paychannel_config = array(1001); //1001-支付宝充值,1002-微信充值
+    private $drawtype_config = array(200,300); //100-余额提款,200-押金退款,300-订单退款
     private $drawchannel_config = array(1001,1002); //1001-支付宝提款,1002-微信提款
 
     /**
@@ -60,14 +61,13 @@ class User extends Base
     {
         $mobile = input('mobile');
         $vcode = input('vcode');
-        $deviceid = input('deviceid');
+        $deviceid = trim(input('deviceid'));
         $platform = input('platform');
         $ip = input('ip');
         $remark = input('remark');
 
         //设备号不能为空
-        $last_deviceid = trim($deviceid);
-        if (empty($last_deviceid)) {
+        if (empty($deviceid)) {
             return json(self::erres("设备号不能为空"));
         }
 
@@ -286,60 +286,6 @@ class User extends Base
     }
 
     /**
-     * 用户充值接口
-     * @return \think\response\Json
-     */
-    public function recharge(){
-        //获取参数
-        $ck = input('ck');
-        $uid = input('uid');
-        $paytype = intval(input('paytype',0));
-        $paymoney = floatval(input('paymoney',0));
-        $paychannel = intval(input('channel',0));
-
-        //检查用户是否登录
-        if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
-        }
-
-        if(!in_array($paytype,$this->paytype_config)){
-            return json(self::erres("充值类型错误"));
-        }
-        if(!in_array($paychannel,$this->paychannel_config)){
-            return json(self::erres("充值渠道错误"));
-        }
-        if($paymoney <= 0){
-            return json(self::erres("充值金额不能小于0"));
-        }
-
-        //必须实名认证后方可充值
-        $UserModel = new UserModel();
-        if(!$UserModel->checkUserStatus($uid,'charge')){
-            return json(self::erres("实名认证后方可充值"));
-        }
-
-        $AccountModel = new AccountModel();
-        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
-        if($orderid === false){
-            return json(self::erres("充值下单失败"));
-        }
-
-        //测试--暂时直接入账成功
-        $bankorderid = 9999;
-        $bankmoney = $paymoney;
-        $account = 'test';
-        $paynote = 'test';
-        $ret = $AccountModel->rechargeSuc($orderid, $bankorderid, $bankmoney, $account, $paynote);
-        if($ret){
-            return json(self::sucres());
-        }else{
-            return json(self::erres("充值入账失败"));
-        }
-
-        return json(self::sucres());
-    }
-
-    /**
      * 用户提款接口
      * @return \think\response\Json
      */
@@ -528,4 +474,123 @@ class User extends Base
         return json(self::sucres());
     }
 
+    /**
+     * 创建充值订单
+     * @return \think\response\Json
+     */
+    public function createRechargeOrder(){
+        //获取参数
+        $ck = input('ck');
+        $uid = input('uid');
+        $paytype = intval(input('paytype',0));
+        $paymoney = floatval(input('paymoney',0));
+        $paychannel = intval(input('channel',0));
+        $subject = input('subject');
+        $describle = input('describle');
+
+        //检查用户是否登录
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
+        }
+
+        if(!in_array($paytype,$this->paytype_config)){
+            return json(self::erres("充值类型错误"));
+        }
+        if(!in_array($paychannel,$this->paychannel_config)){
+            return json(self::erres("充值渠道错误"));
+        }
+        if($paymoney <= 0){
+            return json(self::erres("充值金额不能小于0"));
+        }
+        if(empty($subject)){
+            return json(self::erres("商品标题不能为空"));
+        }
+
+        //必须实名认证后方可充值
+        $UserModel = new UserModel();
+        if(!$UserModel->checkUserStatus($uid,'charge')){
+            return json(self::erres("实名认证后方可充值"));
+        }
+
+        $AccountModel = new AccountModel();
+        $paymoney = number_format($paymoney,2,'.','');
+        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
+        if($orderid === false){
+            return json(self::erres("创建充值订单失败"));
+        }
+
+        //返回支付宝APP支付所需参数
+        $Alipay = new Alipay();
+        $retinfo = $Alipay->AlipayTradeAppPayRequest($subject,$describle,$orderid,$paymoney);
+
+        return json(self::sucjson($retinfo));
+    }
+
+    /**
+     * 充值订单完成处理接口
+     * @return \think\response\Json
+     */
+    public function finishRechargeOrder(){
+        //获取参数
+        $ck = input('ck');
+        $uid = input('uid');
+        $paytype = intval(input('paytype',0));
+        $paymoney = floatval(input('paymoney',0));
+        $paychannel = intval(input('channel',0));
+
+        //检查用户是否登录
+        if(!self::checkLogin($uid,$ck)){
+            return json(self::erres("用户未登录，请先登录"));
+        }
+
+        if(!in_array($paytype,$this->paytype_config)){
+            return json(self::erres("充值类型错误"));
+        }
+        if(!in_array($paychannel,$this->paychannel_config)){
+            return json(self::erres("充值渠道错误"));
+        }
+        if($paymoney <= 0){
+            return json(self::erres("充值金额不能小于0"));
+        }
+
+        //必须实名认证后方可充值
+        $UserModel = new UserModel();
+        if(!$UserModel->checkUserStatus($uid,'charge')){
+            return json(self::erres("实名认证后方可充值"));
+        }
+
+        $AccountModel = new AccountModel();
+        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
+        if($orderid === false){
+            return json(self::erres("充值下单失败"));
+        }
+
+        //测试--暂时直接入账成功
+        $bankorderid = 9999;
+        $bankmoney = $paymoney;
+        $account = 'test';
+        $paynote = 'test';
+        $ret = $AccountModel->rechargeSuc($orderid, $bankorderid, $bankmoney, $account, $paynote);
+        if($ret){
+            return json(self::sucres());
+        }else{
+            return json(self::erres("充值入账失败"));
+        }
+
+        return json(self::sucres());
+    }
+
+    /**
+     * 获取用户充值记录
+     */
+    public function getUserRechargeList(){
+        //需要时再添加
+    }
+
+    /**
+     * 获取用户提款记录
+     */
+    public function getUserDrawList(){
+        //需要时再添加
+    }
 }
