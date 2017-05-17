@@ -75,9 +75,9 @@ class Shop extends Base
         return json($this->sucjson($info, $list));
     }
     /**
-     * 修改、删除折扣时间段
+     * 新增折扣时间段
      */
-    public function modDiscountTimeslot(){
+    public function addDiscountTimeslot(){
         $info = array();
         $list = array();
         $timeslot = input('timeslot'); //时间段
@@ -96,13 +96,35 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $res = $DineshopModel->modDiscountTimeslot($data);
+        $res = $DineshopModel->addDiscountTimeslot($data);
         if($res){
             return json($this->sucjson());
         }else{
             return json($this->errjson(-1)); 
         }
     }
+    /**
+     * 删除折扣时间段
+     */
+    public function delDiscountTimeslot(){
+        $info = array();
+        $list = array();
+        $slotid = input('slotid'); //时间段id
+        if(empty($slotid)){
+            return json($this->errjson(-20001));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->delDiscountTimeslot($slotid);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1)); 
+        }
+    }
+    
     /**
      * 获取折扣时间段
      */

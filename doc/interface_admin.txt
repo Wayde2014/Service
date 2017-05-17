@@ -228,7 +228,9 @@
     8、店铺相关
         1)店铺折扣时间表
             获取店铺折扣时间表  http://119.23.73.39/admin/shop/getDiscountTimeslot
-            修改店铺折扣时间表  http://boss.yee.website/admin/shop/modDiscountTimeslot?timeslot=05:00-06:00,06:00-07:00
+            新增店铺折扣时间表  http://boss.yee.website/admin/shop/addDiscountTimeslot?timeslot=05:00-06:00,06:00-07:00
+            删除店铺折扣时间表
+            http://boss.yee.website/admin/shop/delDiscountTimeslot?slotid=80,81
         2)获取店铺折扣信息
             获取店铺折扣信息 http://119.23.73.39/admin/shop/getDineshopDiscount?shopid=1
             添加店铺折扣信息 http://boss.yee.website/admin/shop/addDineshopDiscount?shopid=1&date=2017-05-17&timeslot=6&discount=4|1@0.6$3|2@50

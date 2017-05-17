@@ -95,27 +95,21 @@ class DineshopModel extends Model
     /**
      * 添加店铺折扣时间段
      */
-    public function modDiscountTimeslot($data){
-        $insertdata = array();
-        foreach($data as $key => $val){
-            array_push($insertdata, array(
-                'f_starttime' => $val['startime'],
-                'f_endtime' => $val['endtime'],
-                'f_addtime' => date('Y-m-d H:i:s')
-            ));
-        }
-        // 启动事务
-        Db::startTrans();
+    public function addDiscountTimeslot($data){
         try{
-            Db::table('t_dineshop_discount_timeslot')->where("1=1")->delete();
+            $insertdata = array();
+            foreach($data as $key => $val){
+                array_push($insertdata, array(
+                    'f_starttime' => $val['startime'],
+                    'f_endtime' => $val['endtime'],
+                    'f_addtime' => date('Y-m-d H:i:s')
+                ));
+            }
             Db::table('t_dineshop_discount_timeslot')->insertAll($insertdata);
             // 提交事务
-            Db::commit();
             return true;
         } catch (\Exception $e) {
-            // 回滚事务
-            Db::rollback();
-            return false;
+            return true;
         }
     }
     /**
