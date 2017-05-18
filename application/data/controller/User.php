@@ -295,6 +295,7 @@ class User extends Base
         $uid = input('uid');
         $drawtype = intval(input('drawtype',200));
         $drawmoney = floatval(input('drawmoney',0));
+        $suborder = intval(input('suborder',0));
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
@@ -307,6 +308,20 @@ class User extends Base
         }
         if($drawmoney <= 0){
             return json(self::erres("提款金额不能小于0"));
+        }
+        if($drawtype == 300){
+            if($suborder <= 0){
+                return json(self::erres("订单退款子订单号不能为空"));
+            }else{
+                //TODO 查询该笔订单充值信息
+            }
+        }
+        if($drawtype == 200){
+            $tradetype = 2001;
+        }else if($drawtype == 300){
+            $tradetype = 2003;
+        }else{
+            return json(self::erres("提款冻结类型不存在"));
         }
 
         //获取用户信息
@@ -338,12 +353,12 @@ class User extends Base
         //冻结
         $AccountModel = new AccountModel();
         $tradenote = '用户提款冻结';
-        $freeze = $AccountModel->freeze($uid,$drawmoney,2001,$tradenote);
+        $freeze = $AccountModel->freeze($uid,$drawmoney,$tradetype,$tradenote);
         if(!$freeze){
             return json(self::erres("用户提款冻结失败"));
         }
 
-        $orderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype);
+        $orderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype,$suborder);
         if($orderid === false){
             return json(self::erres("提款发起失败"));
         }
@@ -487,6 +502,7 @@ class User extends Base
         $paychannel = intval(input('channel',0));
         $subject = input('subject');
         $describle = input('describle');
+        $suborder = intval(input('suborder',0));
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
@@ -505,6 +521,13 @@ class User extends Base
         if(empty($subject)){
             return json(self::erres("商品标题不能为空"));
         }
+        if($paytype == 1003){
+            if($suborder <= 0){
+                return json(self::erres("订单充值子订单号不能为空"));
+            }else{
+                //TODO 查询该笔订单信息，检查是否存在，是否已充值成功
+            }
+        }
 
         //必须实名认证后方可充值
         $UserModel = new UserModel();
@@ -514,7 +537,7 @@ class User extends Base
 
         $AccountModel = new AccountModel();
         $paymoney = number_format($paymoney,2,'.','');
-        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
+        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel,$suborder);
         if($orderid === false){
             return json(self::erres("创建充值订单失败"));
         }
