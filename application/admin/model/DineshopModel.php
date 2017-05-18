@@ -39,13 +39,25 @@ class DineshopModel extends Model
         return $dineshopinfo;
     }
     /**
+     * 查询店铺折扣记录 根据时间段和日期
+     */
+    public function getDiscount($shopid, $date, $slotid){
+        $discount = Db::table('t_dineshop_discount')
+            ->field('f_id id, f_discount discount') 
+            ->where('f_sid', $shopid)
+            ->where('f_date', $date)
+            ->where('f_timeslot', $slotid)
+            ->find();
+        return $discount;
+    }
+    /**
      * 新增店铺折扣信息
      */
-    public function addDineshopDiscount($shopid, $date, $timeslot, $discount){
+    public function addDineshopDiscount($shopid, $date, $slotid, $discount){
         $data = array(
             'f_sid' => $shopid,
             'f_date' => $date,
-            'f_timeslot' => $timeslot,
+            'f_timeslot' => $slotid,
             'f_discount' => $discount,
             'f_addtime' => date('Y-m-d H:i:s'),
         );
@@ -95,29 +107,37 @@ class DineshopModel extends Model
     /**
      * 添加店铺折扣时间段
      */
-    public function addDiscountTimeslot($data){
-        try{
-            $insertdata = array();
-            foreach($data as $key => $val){
-                array_push($insertdata, array(
-                    'f_starttime' => $val['startime'],
-                    'f_endtime' => $val['endtime'],
-                    'f_addtime' => date('Y-m-d H:i:s')
-                ));
-            }
-            Db::table('t_dineshop_discount_timeslot')->insertAll($insertdata);
-            // 提交事务
-            return true;
-        } catch (\Exception $e) {
-            return true;
+    public function addDiscountTimeslot($startime, $endtime){
+        $timeslot = Db::table('t_dineshop_discount_timeslot')->field('f_id slotid')->where('f_starttime', $startime)->where('f_endtime', $endtime)->find();
+        if($timeslot){
+            return $timeslot['slotid'];
+        }else{
+            $data = array(
+                'f_starttime' => $startime,
+                'f_endtime' => $endtime,
+                'f_addtime' => date('Y-m-d H:i:s')
+            );
+            $slotid = intval(Db::table('t_dineshop_discount_timeslot')->insertGetId($data));
+            return $slotid?$slotid:false;
         }
     }
     /**
      * 删除店铺折扣时间段
      */
     public function delDiscountTimeslot($slotid){
-        $ret = Db::table('t_dineshop_discount_timeslot')->whereIn('f_id', explode(',',$slotid))->delete();
-        return $ret<0?false:true;
+        // 启动事务
+        Db::startTrans();
+        try{
+            Db::table('t_dineshop_discount_timeslot')->whereIn('f_id', explode(',',$slotid))->delete(); //删除折扣时间段
+            Db::table('t_dineshop_discount')->whereIn('f_timeslot', explode(',',$slotid))->delete(); //删除时间段内的所有折扣信息
+            // 提交事务
+            Db::commit();
+            return true;
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            return false;
+        }
     }
     /**
      * 获取店铺折扣时间段

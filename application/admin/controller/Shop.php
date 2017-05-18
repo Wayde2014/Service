@@ -81,24 +81,19 @@ class Shop extends Base
         $info = array();
         $list = array();
         $timeslot = input('timeslot'); //时间段
-        $timeslotarr = explode(',', $timeslot);
-        $data = array();
-        foreach($timeslotarr as $key=>$val){
-            $arr = explode('-', $val);
-            $startime = $arr[0];
-            $endtime = $arr[1];
-            if(!check_datetime($startime, 'hh:ii') || !check_datetime($endtime, 'hh:ii')) {
-                return json($this->errjson(-20002)); exit;
-            }
-            array_push($data, array("startime" => $startime,"endtime" => $endtime));
+        $arr = explode('-', $timeslot);
+        $startime = $arr[0];
+        $endtime = $arr[1];
+        if(!check_datetime($startime, 'hh:ii') || !check_datetime($endtime, 'hh:ii')) {
+            return json($this->errjson(-20002)); exit;
         }
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $res = $DineshopModel->addDiscountTimeslot($data);
-        if($res){
-            return json($this->sucjson());
+        $slotid = $DineshopModel->addDiscountTimeslot($startime,$endtime);
+        if($slotid){
+            return json($this->sucjson(array("slotid" => $slotid)));
         }else{
             return json($this->errjson(-1)); 
         }
@@ -172,6 +167,7 @@ class Shop extends Base
         $discountlist = $DineshopModel->getDineshopDiscount($shopid, $startdate, $endate);
         $discountimeslot = $DineshopModel->getDiscountTimeslot();
         foreach($discountimeslot as $key=>$val){
+            $slotid = $val['id'];
             $timeslot = $val['timeslot'];
             $discid_list = array();
             $discount_list = array();
@@ -185,7 +181,7 @@ class Shop extends Base
                             $discount[$_k]['dishid'] = $match[1];
                             $discount[$_k]['dishname'] = isset($dishinfo[$match[1]])?$dishinfo[$match[1]]:'';
                             $discount[$_k]['type'] = $match[2];
-                            $discount[$_k]['num'] = $match[3];
+                            $discount[$_k]['num'] = $match[3]*10;
                         }
                     }
                     $discount_list[$v['date']] = $discount;
@@ -200,6 +196,7 @@ class Shop extends Base
                     'discount' => isset($discount_list[$date])?$discount_list[$date]:array()
                 );
             }
+            $list[$key]['slotid'] = $slotid;
             $list[$key]['timeslot'] = $timeslot;
             $list[$key]['discountdata'] = $discountdata;
         }
@@ -219,8 +216,8 @@ class Shop extends Base
         if(empty($date)){
             return json($this->errjson(-80001));
         }
-        $timeslot = input('timeslot'); //折扣时间段
-        if(empty($timeslot)){
+        $slotid = input('slotid'); //折扣时间段
+        if(empty($slotid)){
             return json($this->errjson(-80002));
         }
         $discount = input('discount'); //折扣信息
@@ -240,7 +237,19 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $res = $DineshopModel->addDineshopDiscount($shopid, $date, $timeslot, $discount);
+        $discountinfo = $DineshopModel->getDiscount($shopid, $date, $slotid);
+        //已有数据则修改
+        if($discountinfo){
+            $id = $discountinfo['id'];
+            if(strstr($discountinfo['discount'], $discount)){
+                $discount = $discountinfo['discount'];
+            }else{
+                $discount = $discountinfo['discount']."$".$discount;
+            }
+            $res = $DineshopModel->modDineshopDiscount($id, $discount);
+        }else{
+            $res = $DineshopModel->addDineshopDiscount($shopid, $date, $slotid, $discount);
+        }
         if($res){
             return json($this->sucjson());
         }else{
@@ -256,20 +265,23 @@ class Shop extends Base
             return json($this->errjson(-20001));
         }
         $discount = input('discount'); //折扣信息
-        if(empty($discount)){
-            return json($this->errjson(-80003));
-        }
-        foreach(explode('$', $discount) as $key=>$val){
-            if(!preg_match( '/^\d+\|\d+\@([1-9]\d*|0)(\.\d{1,2})?$/i' , $val)){
-                return json($this->errjson(-80004)); exit;
-            }
-            preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $val, $match);
-            if($match[2]==1 && floatval($match[3]) > 1) {
-                return json($this->errjson(-80004)); exit;
+        if(!empty($discount)){
+            foreach(explode('$', $discount) as $key=>$val){
+                if(!preg_match( '/^\d+\|\d+\@([1-9]\d*|0)(\.\d{1,2})?$/i' , $val)){
+                    return json($this->errjson(-80004)); exit;
+                }
+                preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $val, $match);
+                if($match[2]==1 && floatval($match[3]) > 1) {
+                    return json($this->errjson(-80004)); exit;
+                }
             }
         }
         $DineshopModel = new DineshopModel();
-        $res = $DineshopModel->modDineshopDiscount($id, $discount);
+        if(!empty($discount)){
+            $res = $DineshopModel->modDineshopDiscount($id, $discount);
+        }else{
+            $res = $DineshopModel->delDineshopDiscount($id);
+        }
         if($res){
             return json($this->sucjson());
         }else{
