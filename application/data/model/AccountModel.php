@@ -19,12 +19,16 @@ class AccountModel extends Model
     public $tradetype_config = array(
         1001 => '余额充值',
         1002 => '押金充值',
+        1003 => '订单充值',
         1101 => '押金退款解冻',
         1102 => '订单支付解冻',
+        1103 => '订单退款解冻',
         2001 => '押金退款冻结',
         2002 => '订单支付冻结',
+        2003 => '订单退款冻结',
         2101 => '押金退款(解冻扣款)',
         2102 => '订单支付(解冻扣款)',
+        2103 => '订单退款(解冻扣款)',
     );
     private $paysuc = 100;
     private $payfail = -100;
@@ -169,9 +173,13 @@ class AccountModel extends Model
             $depositmoney = $ori_depositmoney;
             switch($tradetype){
                 case 1001:
+                case 1003:
                 case 1102:
+                case 1103:
                     //余额充值
+                    //订单充值
                     //订单支付解冻
+                    //订单退款解冻
                     $usermoney += $money;
                     break;
                 case 1002:
@@ -250,9 +258,13 @@ class AccountModel extends Model
                     $depositmoney -= $money;
                     break;
                 case 2002:
+                case 2003:
                 case 2102:
+                case 2103:
                     //订单支付冻结
+                    //订单退款冻结
                     //订单支付(解冻扣款)
+                    //订单退款(解冻扣款)
                     $usermoney -= $money;
                     break;
             }
@@ -412,6 +424,8 @@ class AccountModel extends Model
         $tradetype = -1;
         if($drawtype == 200){
             $tradetype = 2101;
+        }else if($drawtype == 300){
+            $tradetype = 2103;
         }
         $retup = self::updateDrawOrderStatus($orderid,$this->drawsuc,$channel,$bankorderid,$bankmoney,$account,$drawnote);
         if($retup){
@@ -498,7 +512,13 @@ class AccountModel extends Model
             return false;
         }
         //解冻
-        $new_tradetype = 1101;
+        if($tradetype == 2101){
+            $new_tradetype = 1101;
+        }else if($tradetype == 2103){
+            $new_tradetype = 1103;
+        }else{
+            return false;
+        }
         $unfreeze = self::deposit($uid,$money,$new_tradetype,$orderid);
         if(!$unfreeze){
             //解冻失败

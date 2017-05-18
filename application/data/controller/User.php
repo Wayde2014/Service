@@ -316,6 +316,13 @@ class User extends Base
                 //TODO 查询该笔订单充值信息
             }
         }
+        if($drawtype == 200){
+            $tradetype = 2001;
+        }else if($drawtype == 300){
+            $tradetype = 2003;
+        }else{
+            return json(self::erres("提款冻结类型不存在"));
+        }
 
         //获取用户信息
         $UserModel = new UserModel();
@@ -346,7 +353,7 @@ class User extends Base
         //冻结
         $AccountModel = new AccountModel();
         $tradenote = '用户提款冻结';
-        $freeze = $AccountModel->freeze($uid,$drawmoney,2001,$tradenote);
+        $freeze = $AccountModel->freeze($uid,$drawmoney,$tradetype,$tradenote);
         if(!$freeze){
             return json(self::erres("用户提款冻结失败"));
         }
