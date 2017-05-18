@@ -58,10 +58,12 @@ CREATE TABLE `t_user_recharge_order` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
   `f_paymoney` decimal(19,4) unsigned NOT NULL COMMENT '充值金额',
-  `f_paytype` smallint NOT NULL COMMENT '充值类型(1001-充值余额,1002-充值押金)',
+  `f_paytype` smallint NOT NULL COMMENT '充值类型(1001-充值余额,1002-充值押金,1003-订单充值)',
   `f_channel` smallint not NULL COMMENT '充值渠道(1001-支付宝充值,1002-微信充值)',
+  `f_suborder` int default 0 comment '子订单号(订单充值时,不能为空)',
   `f_account` varchar(200) default NULL COMMENT '充值账号',
   `f_bankorderid` varchar(100) default null comment '第三方订单号',
+  `f_suctime` timestamp default null comment '成功时间',
   `f_bankmoney` decimal(19,4) unsigned default '0.0000'null comment '第三方订单金额',
   `f_status` smallint default 0 COMMENT '订单状态(0-默认,100-充值成功,-100-充值失败)',
   `f_paynote` varchar(1000) default null comment '充值备注',
@@ -77,17 +79,19 @@ CREATE TABLE `t_user_draw_order` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
   `f_drawmoney` decimal(19,4) unsigned NOT NULL COMMENT '提款金额',
-  `f_drawtype` smallint NOT NULL default 200 COMMENT '充值类型(100-余额提款,200-押金退款)',
+  `f_drawtype` smallint NOT NULL default 200 COMMENT '充值类型(100-余额提款,200-押金退款,300-订单退款)',
   `f_channel` smallint default 0 COMMENT '提款渠道(1001-支付宝提款,1002-微信提款)',
+  `f_suborder` int default 0 comment '子订单号(订单退款时,不能为空)',
   `f_account` varchar(200) not NULL COMMENT '提款账号',
   `f_bankorderid` varchar(100) default null comment '第三方订单号',
+  `f_suctime` timestamp default null comment '成功时间',
   `f_bankmoney` decimal(19,4) unsigned default '0.0000'null comment '第三方订单金额',
   `f_status` smallint default 0 COMMENT '订单状态(0-默认,100-提款成功,-100-提款失败)',
   `f_drawnote` varchar(1000) default null comment '提款备注',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-提款订单表';
+) ENGINE=InnoDB AUTO_INCREMENT=100001 DEFAULT CHARSET=utf8 COMMENT='用户管理-提款订单表';
 
 
 /*用户管理-登录信息表*/

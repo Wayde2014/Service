@@ -37,15 +37,17 @@ class AccountModel extends Model
      * @param $paymoney
      * @param $paytype
      * @param $channel
+     * @param $suborder
      * @return bool|int
      */
-    public function addRechargeOrderInfo($uid, $paymoney, $paytype, $channel){
+    public function addRechargeOrderInfo($uid, $paymoney, $paytype, $channel, $suborder){
         $table_name = 'user_recharge_order';
         $data = array(
             'f_uid' => $uid,
             'f_paymoney' => $paymoney,
             'f_paytype' => $paytype,
             'f_channel' => $channel,
+            'f_suborder' => $suborder,
             'f_addtime' => date("Y-m-d H:i:s"),
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
@@ -89,14 +91,16 @@ class AccountModel extends Model
      * @param $uid
      * @param $drawmoney
      * @param $drawtype
+     * @param $suborder
      * @return bool|int
      */
-    public function addDrawOrderInfo($uid, $drawmoney, $drawtype){
+    public function addDrawOrderInfo($uid, $drawmoney, $drawtype, $suborder){
         $table_name = 'user_draw_order';
         $data = array(
             'f_uid' => $uid,
             'f_drawmoney' => $drawmoney,
             'f_drawtype' => $drawtype,
+            'f_suborder' => $suborder,
             'f_addtime' => date("Y-m-d H:i:s"),
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
