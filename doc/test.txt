@@ -79,4 +79,4 @@ http://www.shanwei.com/index.php/admin/User/getModuleInfo?uid=10001&ck=ck_NZY1M2
 http://www.shanwei.com/index.php/admin/User/getModuleList?uid=10001&ck=ck_NZY1M2ZMOGQWOTU0MJE2M2JLZGVIMZGXZJBLMJG0ZJI=
 
 29、创建充值订单
-http://www.shanwei.com/index.php/data/User/createRechargeOrder?uid=10001&ck=ck_YZI2ZTYZYZE2ODE4MDUYYTAWM2RMMMI5MMNIYMIZZJG=&paytype=1001&paymoney=120&channel=1001&subject=吾折充值&describle=充值
+http://www.shanwei.com/index.php/data/User/createRechargeOrder?uid=10002&ck=ck_YZI2ZTYZYZE2ODE4MDUYYTAWM2RMMMI5MMNIYMIZZJG=&paytype=1001&paymoney=120&channel=1001&subject=吾折充值&describle=充值

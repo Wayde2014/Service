@@ -1,4 +1,5 @@
 /*用户管理-用户信息表*/
+DROP TABLE IF EXISTS `t_user_info`;
 CREATE TABLE `t_user_info` (
   `f_uid` int NOT NULL AUTO_INCREMENT COMMENT '用户uid(自增)',
   `f_nickname` varchar(50) DEFAULT NULL COMMENT '用户昵称',
@@ -19,6 +20,7 @@ CREATE TABLE `t_user_info` (
 
 
 /*用户管理-地址信息表*/
+DROP TABLE IF EXISTS `t_user_address_info`;
 CREATE TABLE `t_user_address_info` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
@@ -35,6 +37,7 @@ CREATE TABLE `t_user_address_info` (
 
 
 /*用户管理-账户流水表*/
+DROP TABLE IF EXISTS `t_user_paylog`;
 CREATE TABLE `t_user_paylog` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
@@ -50,6 +53,7 @@ CREATE TABLE `t_user_paylog` (
 
 
 /*用户管理-充值订单表*/
+DROP TABLE IF EXISTS `t_user_recharge_order`;
 CREATE TABLE `t_user_recharge_order` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
@@ -68,6 +72,7 @@ CREATE TABLE `t_user_recharge_order` (
 
 
 /*用户管理-提款订单表*/
+DROP TABLE IF EXISTS `t_user_draw_order`;
 CREATE TABLE `t_user_draw_order` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
@@ -86,6 +91,7 @@ CREATE TABLE `t_user_draw_order` (
 
 
 /*用户管理-登录信息表*/
+DROP TABLE IF EXISTS `t_user_login`;
 CREATE TABLE `t_user_login` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增长ID',
   `f_usercheck` varchar(200) NOT NULL COMMENT '登录ck',
@@ -102,6 +108,7 @@ CREATE TABLE `t_user_login` (
 
 
 /*门店管理-门店信息表*/
+DROP TABLE IF EXISTS `t_store_info`;
 CREATE TABLE `t_store_info` (
   `f_sid` int NOT NULL AUTO_INCREMENT COMMENT '门店uid(自增)',
   `f_name` varchar(1000) not NULL COMMENT '门店名称',
@@ -122,6 +129,7 @@ CREATE TABLE `t_store_info` (
 
 
 /*门店管理-门店桌型信息表*/
+DROP TABLE IF EXISTS `t_store_tableinfo`;
 CREATE TABLE `t_store_tableinfo` (
   `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_sid` int NOT NULL COMMENT '门店id',
@@ -138,6 +146,7 @@ CREATE TABLE `t_store_tableinfo` (
 
 
 /*门店管理-放号信息表*/
+DROP TABLE IF EXISTS `t_store_sellinfo`;
 CREATE TABLE `t_store_sellinfo` (
   `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_sid` int NOT NULL COMMENT '门店id',
@@ -156,6 +165,7 @@ CREATE TABLE `t_store_sellinfo` (
 
 
 /*门店管理-折扣信息表*/
+DROP TABLE IF EXISTS `t_store_discount`;
 CREATE TABLE `t_store_discount` (
   `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_sid` int NOT NULL COMMENT '门店id',
@@ -174,6 +184,7 @@ CREATE TABLE `t_store_discount` (
 
 
 /*门店管理-资金信息表*/
+DROP TABLE IF EXISTS `t_store_account`;
 CREATE TABLE `t_store_account` (
   `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_sid` int NOT NULL COMMENT '门店id',
@@ -187,6 +198,7 @@ CREATE TABLE `t_store_account` (
 
 
 /*门店管理-配送员信息表*/
+DROP TABLE IF EXISTS `t_store_distripersion`;
 CREATE TABLE `t_store_distripersion` (
   `f_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '配送人员ID',
   `f_username` varchar(200) DEFAULT NULL COMMENT '配送人员名字',
@@ -286,6 +298,7 @@ INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`) VALUE(10001,10003);
 INSERT INTO `t_admin_role_module`(`f_rid`,`f_mid`) VALUE(10001,10004);
 
 /*菜肴管理-口味信息表*/
+DROP TABLE IF EXISTS `t_food_tastes`;
 CREATE TABLE `t_food_tastes` (
   `f_tid` int NOT NULL AUTO_INCREMENT COMMENT '口味ID(自增)',
   `f_tname` varchar(200) NOT NULL COMMENT '口味名称',
@@ -295,6 +308,7 @@ CREATE TABLE `t_food_tastes` (
 
 
 /*菜肴管理-菜系信息表*/
+DROP TABLE IF EXISTS `t_food_cuisine`;
 CREATE TABLE `t_food_cuisine` (
   `f_cid` int NOT NULL AUTO_INCREMENT COMMENT '菜系ID(自增)',
   `f_cname` varchar(200) NOT NULL COMMENT '菜系名称',
@@ -304,6 +318,7 @@ CREATE TABLE `t_food_cuisine` (
 
 
 /*菜肴管理-菜品信息表*/
+DROP TABLE IF EXISTS `t_food_dishes`;
 CREATE TABLE `t_food_dishes` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '菜肴ID(自增)',
   `f_name` varchar(200) NOT NULL COMMENT '菜品名称',
@@ -317,6 +332,7 @@ CREATE TABLE `t_food_dishes` (
 
 
 /*菜肴管理-菜单信息表*/
+DROP TABLE IF EXISTS `t_food_menu`;
 CREATE TABLE `t_food_menu` (
   `f_id` int NOT NULL AUTO_INCREMENT comment '菜单ID(自增)',
   `f_oid` int NOT NULL comment 'unknow',
@@ -331,6 +347,7 @@ CREATE TABLE `t_food_menu` (
 
 
 /*订单管理-订单信息表*/
+DROP TABLE IF EXISTS `t_order_info`;
 CREATE TABLE `t_order_info` (
   `f_oid` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '订单ID,唯一标识',
   `f_shopid` smallint NOT NULL COMMENT '店铺ID',
@@ -350,6 +367,7 @@ CREATE TABLE `t_order_info` (
 ) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 COMMENT='订单管理-订单信息表';
 
 /*用户管理-短信发送记录表*/
+DROP TABLE IF EXISTS `t_user_smslog`;
 CREATE TABLE `t_user_smslog` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
@@ -361,6 +379,7 @@ CREATE TABLE `t_user_smslog` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户管理-短信发送记录表';
 
 /*用户管理-冻结解冻表*/
+DROP TABLE IF EXISTS `t_user_freezelog`;
 CREATE TABLE `t_user_freezelog` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',

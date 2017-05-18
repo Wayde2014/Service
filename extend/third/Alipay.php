@@ -55,7 +55,6 @@ class Alipay
         } else {
             openssl_sign($data, $sign, $res);
         }
-        openssl_free_key($res);
         $sign = base64_encode($sign);
         return $sign;
     }
