@@ -49,11 +49,7 @@ class Alipay
             Log::record("私钥内容为空，请检查RSA私钥配置");
             return false;
         }
-        $res = openssl_pkey_get_private($this->rsa_private_key);
-        if ($res === false) {
-            Log::record("私钥格式错误，请检查RSA私钥配置");
-            return false;
-        }
+        $res = "-----BEGIN RSA PRIVATE KEY-----\n" . wordwrap($this->rsa_private_key, 64, "\n", true) . "\n-----END RSA PRIVATE KEY-----";
         if ("RSA2" == $signType) {
             openssl_sign($data, $sign, $res, OPENSSL_ALGO_SHA256);
         } else {
