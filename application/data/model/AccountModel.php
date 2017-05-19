@@ -377,10 +377,13 @@ class AccountModel extends Model
         if($retup){
             //存款
             $deposit = self::deposit($uid,$bankmoney,$paytype,$orderid);
-            //押金充值成功后,更新用户状态为200
             if($deposit && $paytype == 1002){
+                //押金充值成功后,更新用户状态为200
                 $UserModel = new UserModel();
                 return $UserModel->updateUserInfo($uid,array('user_status'=>200));
+            }else if($deposit && $paytype == 1003){
+                //订单充值成功后,需要更新订单状态
+                //TODO
             }else{
                 return $deposit;
             }

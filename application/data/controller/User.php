@@ -9,10 +9,10 @@ use third\Alipay;
 
 class User extends Base
 {
-    private $paytype_config = array(1001,1002,1003); //1001-充值余额,1002-充值押金,1003-订单充值
-    private $paychannel_config = array(1001); //1001-支付宝充值,1002-微信充值
-    private $drawtype_config = array(200,300); //100-余额提款,200-押金退款,300-订单退款
-    private $drawchannel_config = array(1001,1002); //1001-支付宝提款,1002-微信提款
+    public $paytype_config = array(1001,1002,1003); //1001-充值余额,1002-充值押金,1003-订单充值
+    public $paychannel_config = array(1001); //1001-支付宝充值,1002-微信充值
+    public $drawtype_config = array(200,300); //100-余额提款,200-押金退款,300-订单退款
+    public $drawchannel_config = array(1001); //1001-支付宝提款,1002-微信提款
 
     /**
      * 发生短信验证码接口
@@ -313,7 +313,8 @@ class User extends Base
             if($suborder <= 0){
                 return json(self::erres("订单退款子订单号不能为空"));
             }else{
-                //TODO 查询该笔订单充值信息
+                //检查该笔订单状态及对应充值订单状态
+                //TODO
             }
         }
         if($drawtype == 200){
@@ -525,7 +526,8 @@ class User extends Base
             if($suborder <= 0){
                 return json(self::erres("订单充值子订单号不能为空"));
             }else{
-                //TODO 查询该笔订单信息，检查是否存在，是否已充值成功
+                //查询该笔订单信息，检查是否存在，是否已交易成功
+                //TODO
             }
         }
 
@@ -544,63 +546,55 @@ class User extends Base
 
         //返回支付宝APP支付所需参数
         $Alipay = new Alipay();
-        $retinfo = $Alipay->AlipayTradeAppPayRequest($subject,$describle,$orderid,$paymoney);
+        $retinfo['orderid'] = $orderid;
+        $retinfo['paymoney'] = $paymoney;
+        $retinfo['request'] = $Alipay->AlipayTradeAppPayRequest($subject,$describle,$orderid,$paymoney);;
 
         return json(self::sucjson($retinfo));
     }
 
     /**
-     * 充值订单完成处理接口
+     * 充值订单同步通知处理接口
      * @return \think\response\Json
      */
     public function finishRechargeOrder(){
         //获取参数
         $ck = input('ck');
         $uid = input('uid');
-        $paytype = intval(input('paytype',0));
-        $paymoney = floatval(input('paymoney',0));
-        $paychannel = intval(input('channel',0));
+        $orderid = intval(input('orderid'));
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
             return json(self::erres("用户未登录，请先登录"));
         }
 
-        if(!in_array($paytype,$this->paytype_config)){
-            return json(self::erres("充值类型错误"));
-        }
-        if(!in_array($paychannel,$this->paychannel_config)){
-            return json(self::erres("充值渠道错误"));
-        }
-        if($paymoney <= 0){
-            return json(self::erres("充值金额不能小于0"));
-        }
-
-        //必须实名认证后方可充值
-        $UserModel = new UserModel();
-        if(!$UserModel->checkUserStatus($uid,'charge')){
-            return json(self::erres("实名认证后方可充值"));
-        }
-
+        //检查该笔充值订单是否存在以及当前状态
         $AccountModel = new AccountModel();
-        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel);
-        if($orderid === false){
-            return json(self::erres("充值下单失败"));
+        $orderinfo = $AccountModel->getRechargeOrderInfo($orderid);
+        if(empty($orderinfo)){
+            return json(self::erres("充值订单不存在"));
+        }
+        if($orderinfo['status'] != 0){
+            return json(self::erres("该充值订单已处理"));
         }
 
-        //测试--暂时直接入账成功
-        $bankorderid = 9999;
-        $bankmoney = $paymoney;
-        $account = 'test';
-        $paynote = 'test';
-        $ret = $AccountModel->rechargeSuc($orderid, $bankorderid, $bankmoney, $account, $paynote);
-        if($ret){
-            return json(self::sucres());
-        }else{
-            return json(self::erres("充值入账失败"));
+        $paychannel = $orderinfo['paychannel'];
+        if(!in_array($paychannel,$this->paychannel_config)){
+            return json(self::erres("该充值渠道暂不支持"));
         }
 
-        return json(self::sucres());
+        if($paychannel == 1001){
+            //支付宝充值结束，开始订单状态反查
+            $Alipay = new Alipay();
+            $result = $Alipay->handlerRechargeOrder($orderid,$orderinfo);
+            if($result['code'] > 0 && $result['status'] == 'success'){
+                //充值成功且充值订单处理成功
+                return json(self::sucjson());
+            }else{
+                return json(self::erres("充值状态未知,请稍后查看订单"));
+            }
+        }
+
     }
 
     /**

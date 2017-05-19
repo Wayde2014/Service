@@ -2,7 +2,7 @@
 /**
  * 支付宝充值退款处理
  * 说明:
- *  1、APP支付成功后，同步通知只处理明确的支付成功状态
+ *  1、APP支付成功后，同步通知只用来做支付结束的通知，支付状态依赖于充值交易查询
  *  2、服务端异步通知也只处理明确的支付成功状态
  *  3、支付失败状态依赖于充值交易查询
  *  4、退款成功or失败依赖于退款交易查询
@@ -10,8 +10,10 @@
 
 namespace third;
 
+use app\data\model\AccountModel;
 use think\Config;
 use think\Log;
+use third\Curl;
 
 class Alipay
 {
@@ -187,7 +189,7 @@ class Alipay
      * @param $bankorderid
      * @return array
      */
-    public function AlipayTradeQueryRequest($orderid, $bankorderid)
+    public function AlipayTradeQueryRequest($orderid, $bankorderid='')
     {
         $request_data = self::getCommonParam();
         //业务参数
@@ -315,6 +317,34 @@ class Alipay
         }
 
         return $result;
+    }
+
+    /**
+     * 充值订单反查并处理
+     */
+    public function handlerRechargeOrder($orderid, $orderinfo){
+        $code = -1;
+        $status = "fail";
+        $request = self::AlipayTradeQueryRequest($orderid);
+        $Curl = new Curl();
+        $response = $Curl->post($this->gateway,$request);
+        if(!empty($response)){
+
+        }
+
+        //充值成功，入账处理
+        $Account = new AccountModel();
+        $result = $Account->rechargeSuc($orderid,$trade_no,$bankmoney,$buyer_logon_id,$describle);
+        if(!$result){
+            Log::record("充值订单[".$orderid."]入账处理失败",'error');
+        }else{
+            $code = 100;
+            Log::record("充值订单[".$orderid."]入账处理成功",'info');
+        }
+        return array(
+            "code" => $code,
+            "status" => $status,
+        );
     }
 
 }
