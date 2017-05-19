@@ -13,7 +13,6 @@ namespace third;
 use app\data\model\AccountModel;
 use think\Config;
 use think\Log;
-use third\Curl;
 
 class Alipay
 {
@@ -323,28 +322,93 @@ class Alipay
      * 充值订单反查并处理
      */
     public function handlerRechargeOrder($orderid, $orderinfo){
-        $code = -1;
-        $status = "fail";
+        $result = array(
+            "code" => -1,
+            "status" => "inprocess",
+        );
         $request = self::AlipayTradeQueryRequest($orderid);
         $Curl = new Curl();
-        $response = $Curl->post($this->gateway,$request);
-        if(!empty($response)){
+        $ret = $Curl->post($this->gateway,$request);
+        Log::record($ret,'debug');
+        if(!empty($ret)){
+            //公共响应参数
+            $code = intval($ret['code']);
+            if($code == 10000){
+                $response = $ret['alipay_trade_query_response'];
+                $Account = new AccountModel();
+                /**
+                 * 交易状态：
+                 * WAIT_BUYER_PAY（交易创建，等待买家付款）
+                 * TRADE_CLOSED（未付款交易超时关闭，或支付完成后全额退款）
+                 * TRADE_SUCCESS（交易支付成功）
+                 * TRADE_FINISHED（交易结束，不可退款）
+                 */
+                $trade_status = $response['trade_status'];
+                $out_trade_no = $response['out_trade_no'];
+                $trade_no = $response['trade_no'];
+                $buyer_logon_id = $response['buyer_logon_id'];
+                $total_amount = $response['total_amount'];
+                $describle = '';
+                $order_money = number_format($orderinfo['paymoney'],2,'.','');
+                $bankmoney = number_format($total_amount,2,'.','');
 
-        }
+                if($order_money != $bankmoney){
+                    Log::record("充值订单[".$orderid."]网站金额[".$order_money."]与支付宝金额[".$bankmoney."]不一致",'error');
+                    return $result;
+                }
+                if($orderid != $out_trade_no){
+                    Log::record("网站充值订单号[".$orderid."]与支付宝商户订单号[".$out_trade_no."]不一致",'error');
+                    return $result;
+                }
 
-        //充值成功，入账处理
-        $Account = new AccountModel();
-        $result = $Account->rechargeSuc($orderid,$trade_no,$bankmoney,$buyer_logon_id,$describle);
-        if(!$result){
-            Log::record("充值订单[".$orderid."]入账处理失败",'error');
-        }else{
-            $code = 100;
-            Log::record("充值订单[".$orderid."]入账处理成功",'info');
+                if($trade_status == 'TRADE_SUCCESS' || $trade_status == 'TRADE_FINISHED'){
+                    //充值成功，入账处理
+                    $result['status'] = "success";
+                    $result = $Account->rechargeSuc($orderid,$trade_no,$bankmoney,$buyer_logon_id,$describle);
+                    if(!$result){
+                        $result['code'] = -100;
+                        Log::record("充值订单[".$orderid."]入账处理失败",'error');
+                    }else{
+                        $result['code'] = 100;
+                        Log::record("充值订单[".$orderid."]入账处理成功",'info');
+                    }
+                }else if($trade_status == 'TRADE_CLOSED'){
+                    //充值失败处理
+                    $result['status'] = "fail";
+                    $result = $Account->rechargeFail($orderid,$buyer_logon_id,$describle);
+                    if(!$result){
+                        $result['code'] = -100;
+                        Log::record("充值订单[".$orderid."]失败状态处理失败",'error');
+                    }else{
+                        $result['code'] = 100;
+                        Log::record("充值订单[".$orderid."]失败状态处理成功",'info');
+                    }
+                }
+            }
         }
-        return array(
-            "code" => $code,
-            "status" => $status,
+        return $result;
+    }
+
+    /**
+     * 退款订单反查并处理
+     */
+    public function handlerRefundOrder($orderid, $orderinfo){
+        $result = array(
+            "code" => -1,
+            "status" => "inprocess",
         );
+        return $result;
+    }
+
+    /**
+     * 发起支付宝退款
+     */
+    public function toRefund(){
+        $result = array(
+            "code" => -1,
+            "status" => "inprocess",
+        );
+        return $result;
     }
 
 }
