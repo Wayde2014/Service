@@ -315,11 +315,15 @@ class AccountModel extends Model
             ->where('f_id',$orderid)
             ->field('f_uid as uid')
             ->field('f_paymoney as paymoney')
+            ->field('f_suborder as suborder')
+            ->field('f_suctime as suctime')
             ->field('f_paytype as paytype')
             ->field('f_channel as channel')
             ->field('f_bankmoney as bankmoney')
+            ->field('f_bankorderid as bankorderid')
             ->field('f_account as account')
             ->field('f_status as status')
+            ->field('f_paynote as paynote')
             ->find();
         return $orderinfo;
     }
@@ -338,6 +342,12 @@ class AccountModel extends Model
             ->field('f_drawtype as drawtype')
             ->field('f_channel as channel')
             ->field('f_status as status')
+            ->field('f_suborder as suborder')
+            ->field('f_suctime as suctime')
+            ->field('f_bankmoney as bankmoney')
+            ->field('f_bankorderid as bankorderid')
+            ->field('f_account as account')
+            ->field('f_paynote as paynote')
             ->find();
         return $orderinfo;
     }
