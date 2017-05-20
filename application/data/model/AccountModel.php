@@ -315,11 +315,15 @@ class AccountModel extends Model
             ->where('f_id',$orderid)
             ->field('f_uid as uid')
             ->field('f_paymoney as paymoney')
+            ->field('f_suborder as suborder')
+            ->field('f_suctime as suctime')
             ->field('f_paytype as paytype')
             ->field('f_channel as channel')
             ->field('f_bankmoney as bankmoney')
+            ->field('f_bankorderid as bankorderid')
             ->field('f_account as account')
             ->field('f_status as status')
+            ->field('f_paynote as paynote')
             ->find();
         return $orderinfo;
     }
@@ -338,6 +342,12 @@ class AccountModel extends Model
             ->field('f_drawtype as drawtype')
             ->field('f_channel as channel')
             ->field('f_status as status')
+            ->field('f_suborder as suborder')
+            ->field('f_suctime as suctime')
+            ->field('f_bankmoney as bankmoney')
+            ->field('f_bankorderid as bankorderid')
+            ->field('f_account as account')
+            ->field('f_paynote as paynote')
             ->find();
         return $orderinfo;
     }
@@ -367,10 +377,13 @@ class AccountModel extends Model
         if($retup){
             //存款
             $deposit = self::deposit($uid,$bankmoney,$paytype,$orderid);
-            //押金充值成功后,更新用户状态为200
             if($deposit && $paytype == 1002){
+                //押金充值成功后,更新用户状态为200
                 $UserModel = new UserModel();
                 return $UserModel->updateUserInfo($uid,array('user_status'=>200));
+            }else if($deposit && $paytype == 1003){
+                //订单充值成功后,需要更新订单状态
+                //TODO
             }else{
                 return $deposit;
             }

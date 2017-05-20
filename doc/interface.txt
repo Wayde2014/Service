@@ -118,7 +118,10 @@
         suborder    子订单号(可选,1003-订单充值时,不能为空)
     结果说明：
         {"code":1,"msg":"success","info":[],"list":[]}
-        code > 0，即创建充值订单成功,info中包含第三方支付接口所需参数
+        code > 0，即创建充值订单成功,info中字段说明:
+            orderid 充值订单ID
+            paymoney 充值的订单金额
+            request 包含第三方支付接口所需参数
 
     11、发起提款
     http://119.23.73.39/data/User/draw?ck=ck_xxx&uid=xxx&drawtype=200&drawmoney=99
@@ -155,6 +158,16 @@
     结果说明：
         {"code":1,"msg":"success","info":[],"list":[]}
         code > 0，即认证成功
+
+    14、充值订单同步通知处理接口
+    http://119.23.73.39/data/User/finishRechargeOrder?ck=ck_xxx&uid=xxx&orderid=xxx
+    入参：
+        ck          唯一标示用户登录态信息
+        uid         用户ID
+        orderid     充值订单ID
+    结果说明：
+        {"code":1,"msg":"success","info":[],"list":[]}
+        code > 0，即充值入账成功，否则为充值状态未决，引导用户稍后查看订单状态
         
 订单相关
     1，创建订单
