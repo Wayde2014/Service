@@ -76,7 +76,7 @@ class Alipay
                 exception('该笔充值订单不存在');
             }
             $channel = intval($orderinfo['channel']);
-            if($channel != 1001){
+            if($channel != config("paychannel.alipay")){
                 exception('该笔充值订单非支付宝渠道');
             }
             $order_status = intval($orderinfo['status']);

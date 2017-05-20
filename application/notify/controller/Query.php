@@ -35,11 +35,11 @@ class Query extends Base
 
         $paychannel = $orderinfo['paychannel'];
         $User = new User();
-        if(!in_array($paychannel,$User->paychannel_config)){
+        if(!in_array($paychannel,$User->allow_paychannel)){
             return json(self::erres("该充值渠道暂不支持"));
         }
 
-        if($paychannel == 1001){
+        if($paychannel == config("paychannel.alipay")){
             //支付宝充值结束，开始订单状态反查
             $Alipay = new Alipay();
             $result = $Alipay->handlerRechargeOrder($orderid,$orderinfo);
@@ -82,11 +82,11 @@ class Query extends Base
 
         $paychannel = $orderinfo['drawchannel'];
         $User = new User();
-        if(!in_array($paychannel,$User->drawchannel_config)){
+        if(!in_array($paychannel,$User->allow_drawchannel)){
             return json(self::erres("该提款渠道暂不支持"));
         }
 
-        if($paychannel == 1001){
+        if($paychannel == config("paychannel.alipay")){
             //支付宝提款结束，开始订单状态反查
             $Alipay = new Alipay();
             $result = $Alipay->handlerRechargeOrder($orderid,$orderinfo);

@@ -9,10 +9,28 @@ use third\Alipay;
 
 class User extends Base
 {
-    public $paytype_config = array(1001,1002,1003); //1001-充值余额,1002-充值押金,1003-订单充值
-    public $paychannel_config = array(1001); //1001-支付宝充值,1002-微信充值
-    public $drawtype_config = array(200,300); //100-余额提款,200-押金退款,300-订单退款
-    public $drawchannel_config = array(1001); //1001-支付宝提款,1002-微信提款
+    public $allow_paytype = array();        //目前支持的充值类型
+    public $allow_paychannel = array();     //目前支持的充值渠道
+    public $allow_drawtype = array();       //目前支持的提款类型
+    public $allow_drawchannel =array();     //目前支持的提款渠道
+
+    /**
+     * 控制器初始化
+     */
+    public function __construct(){
+        parent::__construct();
+        //初始化目前支持的充值类型
+        array_push($this->allow_paytype,config("paytype.balance"));
+        array_push($this->allow_paytype,config("paytype.deposit"));
+        array_push($this->allow_paytype,config("paytype.order"));
+        //初始化目前支持的充值渠道
+        array_push($this->allow_paychannel,config("paychannel.alipay"));
+        //初始化目前支持的提款类型
+        array_push($this->allow_drawtype,config("drawtype.deposit"));
+        array_push($this->allow_drawtype,config("drawtype.order"));
+        //初始化目前支持的提款渠道
+        array_push($this->allow_drawchannel,config("drawchannel.alipay"));
+    }
 
     /**
      * 发生短信验证码接口
@@ -293,8 +311,9 @@ class User extends Base
         //获取参数
         $ck = input('ck');
         $uid = input('uid');
-        $drawtype = intval(input('drawtype',200));
+        $drawtype = intval(input('drawtype',0));
         $drawmoney = floatval(input('drawmoney',0));
+        $describle = input('describle');
         $suborder = intval(input('suborder',0));
 
         //检查用户是否登录
@@ -303,13 +322,13 @@ class User extends Base
         }
 
         //校验参数
-        if(!in_array($drawtype,$this->drawtype_config)){
+        if(!in_array($drawtype,$this->allow_drawtype)){
             return json(self::erres("提款类型错误"));
         }
         if($drawmoney <= 0){
             return json(self::erres("提款金额不能小于0"));
         }
-        if($drawtype == 300){
+        if($drawtype == config("drawtype.order")){
             if($suborder <= 0){
                 return json(self::erres("订单退款子订单号不能为空"));
             }else{
@@ -317,10 +336,10 @@ class User extends Base
                 //TODO
             }
         }
-        if($drawtype == 200){
-            $tradetype = 2001;
-        }else if($drawtype == 300){
-            $tradetype = 2003;
+        if($drawtype == config("drawtype.deposit")){
+            $tradetype = 2001;  //押金退款冻结
+        }else if($drawtype == config("drawtype.order")){
+            $tradetype = 2003;  //订单退款冻结
         }else{
             return json(self::erres("提款冻结类型不存在"));
         }
@@ -333,7 +352,7 @@ class User extends Base
         $freezemoney = $userinfo['freezemoney'];
 
         //清户(退押金)时,检查用户状态
-        if($drawtype == 200){
+        if($drawtype == config("drawtype.deposit")){
             if(!$UserModel->checkUserStatus($uid,'draw')){
                 return json(self::erres("用户状态异常,当前不能退押金"));
             }
@@ -347,7 +366,7 @@ class User extends Base
                 return json(self::erres("押金余额不足"));
             }
         }
-        if($drawtype == 100 && $usermoney < $drawmoney){
+        if($drawtype == config("drawtype.balance") && $usermoney < $drawmoney){
             return json(self::erres("账户余额不足"));
         }
 
@@ -369,7 +388,7 @@ class User extends Base
         $bankmoney = $drawmoney;
         $account = 'test';
         $drawnote = 'test';
-        $channel = $this->drawchannel_config[0];
+        $channel = config("drawchannel.alipay");
         $ret = $AccountModel->drawSuc($orderid, $channel, $bankorderid, $bankmoney, $account, $drawnote);
         if($ret){
             return json(self::sucres());
@@ -510,10 +529,10 @@ class User extends Base
             return json(self::erres("用户未登录，请先登录"));
         }
 
-        if(!in_array($paytype,$this->paytype_config)){
+        if(!in_array($paytype,$this->allow_paytype)){
             return json(self::erres("充值类型错误"));
         }
-        if(!in_array($paychannel,$this->paychannel_config)){
+        if(!in_array($paychannel,$this->allow_paychannel)){
             return json(self::erres("充值渠道错误"));
         }
         if($paymoney <= 0){
@@ -522,7 +541,7 @@ class User extends Base
         if(empty($subject)){
             return json(self::erres("商品标题不能为空"));
         }
-        if($paytype == 1003){
+        if($paytype == config("drawtype.order")){
             if($suborder <= 0){
                 return json(self::erres("订单充值子订单号不能为空"));
             }else{
@@ -578,12 +597,12 @@ class User extends Base
             return json(self::erres("该充值订单已处理"));
         }
 
-        $paychannel = $orderinfo['paychannel'];
-        if(!in_array($paychannel,$this->paychannel_config)){
+        $paychannel = $orderinfo['channel'];
+        if(!in_array($paychannel,$this->allow_paychannel)){
             return json(self::erres("该充值渠道暂不支持"));
         }
 
-        if($paychannel == 1001){
+        if($paychannel == config("paychannel.alipay")){
             //支付宝充值结束，开始订单状态反查
             $Alipay = new Alipay();
             $result = $Alipay->handlerRechargeOrder($orderid,$orderinfo);
@@ -601,13 +620,13 @@ class User extends Base
      * 获取用户充值记录
      */
     public function getUserRechargeList(){
-        //需要时再添加
+        //TODO
     }
 
     /**
      * 获取用户提款记录
      */
     public function getUserDrawList(){
-        //需要时再添加
+        //TODO
     }
 }
