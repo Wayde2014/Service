@@ -82,3 +82,9 @@ http://www.shanwei.com/index.php/data/User/createRechargeOrder?uid=10001&ck=ck_O
 
 30、充值订单结束通知
 http://www.shanwei.com/index.php/data/User/finishRechargeOrder?uid=10001&ck=ck_OGQ5NTE4NGE2NTLJMGMYNZZJYZMYNDNLNTY2M2NLMZE=&orderid=100001
+
+31、充值订单自动反查接口
+http://www.shanwei.com/index.php/notify/query/recharge?orderid=100001
+
+32、提款订单自动反查接口
+http://www.shanwei.com/index.php/notify/query/draw?orderid=100001

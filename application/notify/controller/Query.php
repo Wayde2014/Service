@@ -33,7 +33,7 @@ class Query extends Base
             return json(self::erres("该充值订单已处理"));
         }
 
-        $paychannel = $orderinfo['paychannel'];
+        $paychannel = $orderinfo['channel'];
         $User = new User();
         if(!in_array($paychannel,$User->allow_paychannel)){
             return json(self::erres("该充值渠道暂不支持"));
@@ -80,7 +80,7 @@ class Query extends Base
             return json(self::erres("该提款订单已处理"));
         }
 
-        $paychannel = $orderinfo['drawchannel'];
+        $paychannel = $orderinfo['channel'];
         $User = new User();
         if(!in_array($paychannel,$User->allow_drawchannel)){
             return json(self::erres("该提款渠道暂不支持"));

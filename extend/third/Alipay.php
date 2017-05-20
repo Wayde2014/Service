@@ -333,10 +333,15 @@ class Alipay
         Log::record("response=".$curl_ret,'debug');
         $resp = json_decode($curl_ret,true);
         $response = $resp['alipay_trade_query_response'];
+        $sign = $resp['sign'];
         Log::record($response,'debug');
         if(!empty($response)){
             if(intval($response['code']) == 10000){
-                $Account = new AccountModel();
+                //验签
+                if(!self::verify($response,$sign)){
+                    Log::record("签名验证失败",'error');
+                    return $result;
+                }
                 /**
                  * 交易状态：
                  * WAIT_BUYER_PAY（交易创建，等待买家付款）
@@ -362,6 +367,7 @@ class Alipay
                     return $result;
                 }
 
+                $Account = new AccountModel();
                 if($trade_status == 'TRADE_SUCCESS' || $trade_status == 'TRADE_FINISHED'){
                     //充值成功，入账处理
                     $result['status'] = "success";
@@ -396,24 +402,98 @@ class Alipay
     /**
      * 退款订单反查并处理
      */
-    public function handlerRefundOrder($orderid, $orderinfo){
+    public function handlerRefundOrder($refundid, $orderinfo){
         $result = array(
             "code" => -1,
             "status" => "inprocess",
         );
+        $payorderid = $orderinfo['payorderid'];
+        $paybankorderid = $orderinfo['bankorderid'];
+        $request = self::AlipayTradeRefundQueryRequest($payorderid,$paybankorderid,$refundid);
+        $Curl = new Curl();
+        Log::record($request,'debug');
+        $curl_ret = $Curl->post($this->gateway,$request);
+        Log::record("response=".$curl_ret,'debug');
+        $resp = json_decode($curl_ret,true);
+        $response = $resp['alipay_trade_fastpay_refund_response'];
+        $sign = $resp['sign'];
+        Log::record($response,'debug');
+        if(!empty($response)){
+            if(intval($response['code']) == 10000){
+                //验签
+                if(!self::verify($response,$sign)){
+                    Log::record("签名验证失败",'error');
+                    return $result;
+                }
+
+                $out_trade_no = $response['out_trade_no'];
+                $trade_no = $response['trade_no'];
+                $out_request_no = $response['out_request_no'];
+                $total_amount = $response['total_amount'];
+                $refund_amount = $response['refund_amount'];;
+                $order_money = number_format($orderinfo['drawmoney'],2,'.','');
+                $bankmoney = number_format($refund_amount,2,'.','');
+
+                if($order_money != $bankmoney){
+                    Log::record("退款订单[".$refundid."]网站金额[".$order_money."]与支付宝金额[".$bankmoney."]不一致",'error');
+                    return $result;
+                }
+                if($refundid != $out_request_no){
+                    Log::record("网站充值订单号[".$refundid."]与支付宝退款请求号[".$out_request_no."]不一致",'error');
+                    return $result;
+                }
+
+                $Account = new AccountModel();
+                //退款成功
+                $result['status'] = "success";
+                $account = '';
+                $drawnote = '支付宝退款成功';
+                $result = $Account->drawSuc($refundid,$orderinfo['channel'],$trade_no,$bankmoney,$Account,$drawnote);
+                if(!$result){
+                    $result['code'] = -100;
+                    Log::record("退款订单[".$refundid."]处理失败",'error');
+                }else{
+                    $result['code'] = 100;
+                    Log::record("退款订单[".$refundid."]处理成功",'info');
+                }
+            }else{
+                Log::record("退款订单[".$refundid."]反查失败",'error');
+                Log::record($resp,'error');
+            }
+        }
         return $result;
     }
 
     /**
      * 发起支付宝退款
      */
-    public function toRefund(){
+    public function toRefund($refundid,$refundmoney,$orderinfo,$describle=''){
         $result = array(
             "code" => -1,
-            "status" => "inprocess",
+            "status" => "fail",
         );
         //获取请求参数
-        $request = self::AlipayTradeRefundRequest($orderid,$bandorderid,$refundmoney,$refundid,$describle);
+        $orderid = $orderinfo['orderid']; //充值商户订单ID
+        $bankorderid = $orderinfo['bankorderid']; //支付宝充值订单ID
+        $refundmoney = number_format($refundmoney,2,'.','');
+        $request = self::AlipayTradeRefundRequest($orderid,$bankorderid,$refundmoney,$refundid,$describle);
+        $Curl = new Curl();
+        Log::record($request,'debug');
+        $curl_ret = $Curl->post($this->gateway,$request);
+        Log::record("response=".$curl_ret,'debug');
+        $resp = json_decode($curl_ret,true);
+        $response = $resp['alipay_trade_refund_response'];
+        Log::record($response,'debug');
+        if(!empty($response)){
+            if(intval($response['code']) == 10000){
+                $result['code'] = 100;
+                $result['status'] = "success";
+                Log::record("退款订单[".$orderid."]调用支付宝退款接口成功",'info');
+            }else{
+                Log::record("退款订单[".$orderid."]调用支付宝退款接口失败",'error');
+                Log::record($resp,'error');
+            }
+        }
         return $result;
     }
 

@@ -5,11 +5,11 @@ class Curl{
     public function get($url, $params = array(), $httpheader = array()){
         return $this->curl($url, $params, $httpheader, 0);
     }
-    
+
     function post($url, $params = array(), $httpheader = array()){
         return $this->curl($url, $params, $httpheader, 1);
     }
-    
+
     function curl($url, $params = array(), $httpheader = array(), $type = 0){
         if($type == 0){
             if(strpos($url, '?')){
@@ -19,11 +19,11 @@ class Curl{
             }
         }
         $ua = isset($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:"";
-        $ch = curl_init(); 
-        curl_setopt($ch, CURLOPT_URL, $url); 
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
         if($type == 1){
-            curl_setopt($ch, CURLOPT_POST, 1);//∆Ù”√POSTÃ·Ωª
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params)); //…Ë÷√POSTÃ·Ωªµƒ◊÷∑˚¥Æ
+            curl_setopt($ch, CURLOPT_POST, 1);//ÂêØÁî®POSTÊèê‰∫§
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params)); //ËÆæÁΩÆPOSTÊèê‰∫§ÁöÑÂ≠óÁ¨¶‰∏≤
         }else{
             curl_setopt($ch,CURLOPT_CUSTOMREQUEST, 'GET');
         }
@@ -33,15 +33,15 @@ class Curl{
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $arr_httpheader);
         curl_setopt($ch, CURLOPT_USERAGENT, $ua);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
-        curl_setopt($ch, CURLOPT_HEADER, false); 
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);  // ˝æ›≥¨ ±
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); //¡¨Ω”≥¨ ±
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);  //Êï∞ÊçÆË∂ÖÊó∂
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); //ËøûÊé•Ë∂ÖÊó∂
         curl_setopt($ch, CURLOPT_SSLVERSION, 1);
-        curl_setopt($ch, CURLOPT_VERBOSE, false); 
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        $ret = curl_exec($ch);#?µ√µΩµƒ∑µªÿ÷µ 
+        $ret = curl_exec($ch);#?ÂæóÂà∞ÁöÑËøîÂõûÂÄº 
         curl_close($ch);
         unset($ch);
         return $ret;

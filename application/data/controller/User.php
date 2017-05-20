@@ -4,6 +4,7 @@ namespace app\data\controller;
 use base\Base;
 use \app\data\model\UserModel;
 use \app\data\model\AccountModel;
+use think\Log;
 use third\Sms;
 use third\Alipay;
 
@@ -19,17 +20,23 @@ class User extends Base
      */
     public function __construct(){
         parent::__construct();
+
         //初始化目前支持的充值类型
         array_push($this->allow_paytype,config("paytype.balance"));
         array_push($this->allow_paytype,config("paytype.deposit"));
-        array_push($this->allow_paytype,config("paytype.order"));
+        //array_push($this->allow_paytype,config("paytype.order"));
+
         //初始化目前支持的充值渠道
         array_push($this->allow_paychannel,config("paychannel.alipay"));
+        //array_push($this->allow_paychannel,config("paychannel.wechat"));
+
         //初始化目前支持的提款类型
         array_push($this->allow_drawtype,config("drawtype.deposit"));
-        array_push($this->allow_drawtype,config("drawtype.order"));
+        //array_push($this->allow_drawtype,config("drawtype.order"));
+
         //初始化目前支持的提款渠道
         array_push($this->allow_drawchannel,config("drawchannel.alipay"));
+        //array_push($this->allow_drawchannel,config("drawchannel.wechat"));
     }
 
     /**
@@ -328,21 +335,6 @@ class User extends Base
         if($drawmoney <= 0){
             return json(self::erres("提款金额不能小于0"));
         }
-        if($drawtype == config("drawtype.order")){
-            if($suborder <= 0){
-                return json(self::erres("订单退款子订单号不能为空"));
-            }else{
-                //检查该笔订单状态及对应充值订单状态
-                //TODO
-            }
-        }
-        if($drawtype == config("drawtype.deposit")){
-            $tradetype = 2001;  //押金退款冻结
-        }else if($drawtype == config("drawtype.order")){
-            $tradetype = 2003;  //订单退款冻结
-        }else{
-            return json(self::erres("提款冻结类型不存在"));
-        }
 
         //获取用户信息
         $UserModel = new UserModel();
@@ -351,8 +343,10 @@ class User extends Base
         $depositmoney = $userinfo['depositmoney'];
         $freezemoney = $userinfo['freezemoney'];
 
-        //清户(退押金)时,检查用户状态
+        //押金退款(清户)
         if($drawtype == config("drawtype.deposit")){
+            $tradetype = 2001;
+            $tradenote = "押金退款冻结";
             if(!$UserModel->checkUserStatus($uid,'draw')){
                 return json(self::erres("用户状态异常,当前不能退押金"));
             }
@@ -365,38 +359,59 @@ class User extends Base
             if($depositmoney < $drawmoney){
                 return json(self::erres("押金余额不足"));
             }
-        }
-        if($drawtype == config("drawtype.balance") && $usermoney < $drawmoney){
+            //获取该用户最近一笔押金的充值信息,核对充值金额是否与押金退款金额一致
+            $AccountModel = new AccountModel();
+            $rechargeinfo = $AccountModel->getUserLatestDepositInfo($uid);
+            if(empty($rechargeinfo)){
+                return json(self::erres("查无用户押金充值信息,无法退款"));
+            }
+            if($drawmoney != $rechargeinfo['paymoney']){
+                Log::record("退款金额[".$drawmoney."]与押金充值金额[".$rechargeinfo['paymoney']."]不一致,无法退款","error");
+                return json(self::erres("退款金额与押金充值金额不一致,无法退款"));
+            }
+
+        }else if($drawtype == config("drawtype.order")){
+            $tradetype = 2003;
+            $tradenote = "订单退款冻结";
+            if($suborder <= 0){
+                return json(self::erres("订单退款子订单号不能为空"));
+            }
+            //检查该笔订单状态及查询对应充值订单信息
+            //TODO
+            $rechargeinfo = array();
+
+        }else if($drawtype == config("drawtype.balance") && $usermoney < $drawmoney){
             return json(self::erres("账户余额不足"));
+        }else{
+            return json(self::errjson());
         }
 
         //冻结
         $AccountModel = new AccountModel();
-        $tradenote = '用户提款冻结';
         $freeze = $AccountModel->freeze($uid,$drawmoney,$tradetype,$tradenote);
         if(!$freeze){
             return json(self::erres("用户提款冻结失败"));
         }
 
-        $orderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype,$suborder);
-        if($orderid === false){
-            return json(self::erres("提款发起失败"));
+        $payorderid = $rechargeinfo['orderid'];
+        $paybankorderid = $rechargeinfo['bankorderid'];
+        $draworderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype,$suborder,$payorderid,$paybankorderid);
+        if($draworderid === false){
+            return json(self::erres("创建提款订单失败"));
         }
 
-        //测试--暂时直接提款成功
-        $bankorderid = 9999;
-        $bankmoney = $drawmoney;
-        $account = 'test';
-        $drawnote = 'test';
-        $channel = config("drawchannel.alipay");
-        $ret = $AccountModel->drawSuc($orderid, $channel, $bankorderid, $bankmoney, $account, $drawnote);
-        if($ret){
-            return json(self::sucres());
-        }else{
-            return json(self::erres("提款扣款失败"));
+        $drawchannel = $rechargeinfo['channel'];
+        if($drawchannel == config("drawchannel.alipay")){
+            $Alipay = new Alipay();
+            $ret = $Alipay->toRefund($draworderid,$drawmoney,$rechargeinfo,$describle);
+            if($ret['code'] > 0){
+                return json(self::sucjson());
+            }else{
+                return json(self::errjson());
+            }
         }
 
-        return json(self::sucres());
+        return json(self::errjson());
     }
 
     /**

@@ -89,6 +89,8 @@ CREATE TABLE `t_user_draw_order` (
   `f_bankmoney` decimal(19,4) unsigned default '0.0000'null comment '第三方订单金额',
   `f_status` smallint default 0 COMMENT '订单状态(0-默认,100-提款成功,-100-提款失败)',
   `f_drawnote` varchar(1000) default null comment '提款备注',
+  `f_payorderid` int default null comment '退款对应网站充值订单号',
+  `f_paybankorderid` int default null comment '退款对应银行充值订单号',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
