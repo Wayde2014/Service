@@ -80,6 +80,9 @@ class AccountModel extends Model
             'f_paynote' => $paynote,
             'f_status' => $status,
         );
+        if($status == $this->paysuc){
+            $data['f_suctime'] = date("Y-m-d H:i:s");
+        }
         $retup = Db::name($table_name)
             ->where('f_id',$orderid)
             ->update($data);
@@ -96,15 +99,19 @@ class AccountModel extends Model
      * @param $drawmoney
      * @param $drawtype
      * @param $suborder
+     * @param int $payorderid
+     * @param int $paybankorderid
      * @return bool|int
      */
-    public function addDrawOrderInfo($uid, $drawmoney, $drawtype, $suborder){
+    public function addDrawOrderInfo($uid, $drawmoney, $drawtype, $suborder, $payorderid=0,$paybankorderid=0){
         $table_name = 'user_draw_order';
         $data = array(
             'f_uid' => $uid,
             'f_drawmoney' => $drawmoney,
             'f_drawtype' => $drawtype,
             'f_suborder' => $suborder,
+            'f_payorderid' => $payorderid,
+            'f_paybankorderid' => $paybankorderid,
             'f_addtime' => date("Y-m-d H:i:s"),
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
@@ -135,6 +142,9 @@ class AccountModel extends Model
             'f_drawnote' => $drawnote,
             'f_status' => $status,
         );
+        if($status == $this->drawsuc){
+            $data['f_suctime'] = date("Y-m-d H:i:s");
+        }
         $retup = Db::name($table_name)
             ->where('f_id',$orderid)
             ->update($data);
@@ -346,8 +356,10 @@ class AccountModel extends Model
             ->field('f_suctime as suctime')
             ->field('f_bankmoney as bankmoney')
             ->field('f_bankorderid as bankorderid')
+            ->field('f_payorderid as payorderid')
+            ->field('f_paybankorderid as paybankorderid')
             ->field('f_account as account')
-            ->field('f_paynote as paynote')
+            ->field('f_drawnote as drawnote')
             ->find();
         return $orderinfo;
     }
@@ -435,9 +447,9 @@ class AccountModel extends Model
             return false;
         }
         $tradetype = -1;
-        if($drawtype == 200){
+        if($drawtype == config("drawtype.deposit")){
             $tradetype = 2101;
-        }else if($drawtype == 300){
+        }else if($drawtype == config("drawtype.order")){
             $tradetype = 2103;
         }
         $retup = self::updateDrawOrderStatus($orderid,$this->drawsuc,$channel,$bankorderid,$bankmoney,$account,$drawnote);
@@ -445,9 +457,12 @@ class AccountModel extends Model
             //解冻扣款
             $unfreeze = self::unfreeze($uid,$bankmoney,$tradetype,$drawnote,$orderid);
             //押金退款成功后,更新用户状态为-200
-            if($unfreeze && $tradetype == 2101){
+            if($unfreeze && $drawtype == config("drawtype.deposit")){
                 $UserModel = new UserModel();
                 return $UserModel->updateUserInfo($uid,array('user_status'=>-200));
+            }else if($drawtype == config("drawtype.order")){
+                //订单退款成功，更新订单信息
+                //TODO
             }else{
                 return $unfreeze;
             }
@@ -542,4 +557,32 @@ class AccountModel extends Model
 
     }
 
+    /**
+     * 获取用户押金充值信息
+     * @param $uid
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getUserLatestDepositInfo($uid){
+        $table_name = 'user_recharge_order';
+        $orderinfo = Db::name($table_name)
+            ->where('f_uid',$uid)
+            ->where('f_paytype',config("paytype.deposit"))
+            ->where('f_status',100)
+            ->field('f_id as orderid')
+            ->field('f_uid as uid')
+            ->field('f_paymoney as paymoney')
+            ->field('f_suborder as suborder')
+            ->field('f_suctime as suctime')
+            ->field('f_paytype as paytype')
+            ->field('f_channel as channel')
+            ->field('f_bankmoney as bankmoney')
+            ->field('f_bankorderid as bankorderid')
+            ->field('f_account as account')
+            ->field('f_status as status')
+            ->field('f_paynote as paynote')
+            ->limit(1)
+            ->order('f_suctime desc')
+            ->find();
+        return $orderinfo;
+    }
 }
