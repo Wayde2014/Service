@@ -328,13 +328,14 @@ class Alipay
         );
         $request = self::AlipayTradeQueryRequest($orderid);
         $Curl = new Curl();
-        $ret = $Curl->post($this->gateway,$request);
-        Log::record($ret,'debug');
-        if(!empty($ret)){
-            //公共响应参数
-            $code = intval($ret['code']);
-            if($code == 10000){
-                $response = $ret['alipay_trade_query_response'];
+        Log::record($request,'debug');
+        $curl_ret = $Curl->post($this->gateway,$request);
+        Log::record("response=".$curl_ret,'debug');
+        $resp = json_decode($curl_ret,true);
+        $response = $resp['alipay_trade_query_response'];
+        Log::record($response,'debug');
+        if(!empty($response)){
+            if(intval($response['code']) == 10000){
                 $Account = new AccountModel();
                 /**
                  * 交易状态：
@@ -384,6 +385,9 @@ class Alipay
                         Log::record("充值订单[".$orderid."]失败状态处理成功",'info');
                     }
                 }
+            }else{
+                Log::record("充值订单[".$orderid."]反查失败",'error');
+                Log::record($resp,'error');
             }
         }
         return $result;
