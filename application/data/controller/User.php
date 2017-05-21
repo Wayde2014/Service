@@ -32,7 +32,7 @@ class User extends Base
         //array_push($this->allow_paychannel,config("paychannel.wechat"));
 
         //初始化目前支持的提款类型
-        array_push($this->allow_drawtype,config("drawtype.deposit"));
+        //array_push($this->allow_drawtype,config("drawtype.deposit"));
         array_push($this->allow_drawtype,config("drawtype.order"));
 
         //初始化目前支持的提款渠道
