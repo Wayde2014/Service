@@ -445,6 +445,7 @@ class AccountModel extends Model
         $drawmoney = $orderinfo['drawmoney'];
         $drawtype = $orderinfo['drawtype'];
         $ori_status = $orderinfo['status'];
+        $tradeorderid = $orderinfo['suborder'];
         if($drawmoney != $bankmoney || $ori_status != 0){
             return false;
         }
@@ -464,7 +465,8 @@ class AccountModel extends Model
                 return $UserModel->updateUserInfo($uid,array('user_status'=>-200));
             }else if($drawtype == config("drawtype.order")){
                 //订单退款成功，更新订单信息
-                //TODO
+                $OrderModel = new OrderModel();
+                return $OrderModel->updateTradeOrderInfo($uid,$tradeorderid,$OrderModel->status_refund_suc);
             }else{
                 return $unfreeze;
             }
@@ -599,7 +601,6 @@ class AccountModel extends Model
         $orderinfo = Db::name($table_name)
             ->where('f_uid',$uid)
             ->where('f_suborder',$suborder)
-            ->field('f_uid as uid')
             ->field('f_paymoney as paymoney')
             ->field('f_suborder as suborder')
             ->field('f_suctime as suctime')
@@ -610,6 +611,33 @@ class AccountModel extends Model
             ->field('f_account as account')
             ->field('f_status as status')
             ->field('f_paynote as paynote')
+            ->find();
+        return $orderinfo;
+    }
+
+    /**
+     * 获取交易订单退款信息
+     * @param $uid
+     * @param $suborder
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getTradeOrderDrawInfo($uid, $suborder){
+        $table_name = 'user_draw_order';
+        $orderinfo = Db::name($table_name)
+            ->where('f_uid',$uid)
+            ->where('f_suborder',$suborder)
+            ->field('f_drawmoney as drawmoney')
+            ->field('f_drawtype as drawtype')
+            ->field('f_channel as channel')
+            ->field('f_status as status')
+            ->field('f_suborder as suborder')
+            ->field('f_suctime as suctime')
+            ->field('f_bankmoney as bankmoney')
+            ->field('f_bankorderid as bankorderid')
+            ->field('f_payorderid as payorderid')
+            ->field('f_paybankorderid as paybankorderid')
+            ->field('f_account as account')
+            ->field('f_drawnote as drawnote')
             ->find();
         return $orderinfo;
     }

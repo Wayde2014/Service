@@ -194,7 +194,7 @@ class OrderModel extends Model
      * @param $paymoney
      * @return bool
      */
-    public function updateTradeOrderInfo($uid, $orderid, $status, $paymoney){
+    public function updateTradeOrderInfo($uid, $orderid, $status, $paymoney=0){
         $sql = "update t_orders set f_status = :status, f_paymoney = f_paymoney + :paymoney where f_userid = :uid and f_oid = :orderid";
         $args = array(
             "uid" => $uid,
