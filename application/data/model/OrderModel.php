@@ -12,6 +12,11 @@ use think\Db;
 
 class OrderModel extends Model
 {
+    public $status_waiting_pay = 1;
+    public $status_waiting_refund = -200;
+    public $status_pay_suc = 2;
+    public $status_refund_suc = -300;
+
     /**
      * 新增外卖订单
      * @params $userid 用户ID
@@ -161,5 +166,47 @@ class OrderModel extends Model
             ->where($where)
             ->find();
         return $orderinfo?$orderinfo:false;
+    }
+
+    /**
+     * 获取交易订单信息(订单支付退款用)
+     * @param $uid
+     * @param $orderid
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getTradeOrderInfo($uid, $orderid){
+        $table_name = 'orders';
+        $orderinfo = Db::name($table_name)
+            ->where('f_userid',$uid)
+            ->where('f_oid',$orderid)
+            ->field('f_status as status')
+            ->field('f_allmoney as allmoney')
+            ->field('f_paymoney as paymoney')
+            ->find();
+        return $orderinfo;
+    }
+
+    /**
+     * 更新交易订单信息(订单支付退款用)
+     * @param $uid
+     * @param $orderid
+     * @param $status
+     * @param $paymoney
+     * @return bool
+     */
+    public function updateTradeOrderInfo($uid, $orderid, $status, $paymoney){
+        $sql = "update t_orders set f_status = :status, f_paymoney = f_paymoney + :paymoney where f_userid = :uid and f_oid = :orderid";
+        $args = array(
+            "uid" => $uid,
+            "orderid" => $orderid,
+            "status" => $status,
+            "paymoney" => $paymoney
+        );
+        $ret = Db::execute($sql,$args);
+        if($ret !== false){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

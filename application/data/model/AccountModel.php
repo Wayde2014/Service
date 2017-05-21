@@ -30,10 +30,10 @@ class AccountModel extends Model
         2102 => '订单支付(解冻扣款)',
         2103 => '订单退款(解冻扣款)',
     );
-    private $paysuc = 100;
-    private $payfail = -100;
-    private $drawsuc = 100;
-    private $drawfail = -100;
+    public $paysuc = 100;
+    public $payfail = -100;
+    public $drawsuc = 100;
+    public $drawfail = -100;
 
     /**
      * 新增充值订单信息
@@ -382,6 +382,7 @@ class AccountModel extends Model
         $paymoney = $orderinfo['paymoney'];
         $paytype = $orderinfo['paytype'];
         $ori_status = $orderinfo['status'];
+        $tradeorderid = $orderinfo['suborder'];
         if($paymoney != $bankmoney || $ori_status != 0){
             return false;
         }
@@ -393,9 +394,10 @@ class AccountModel extends Model
                 //押金充值成功后,更新用户状态为200
                 $UserModel = new UserModel();
                 return $UserModel->updateUserInfo($uid,array('user_status'=>200));
-            }else if($deposit && $paytype == config("drawtype.order")){
+            }else if($deposit && $paytype == config("paytype.order")){
                 //订单充值成功后,需要更新订单状态
-                //TODO
+                $OrderModel = new OrderModel();
+                return $OrderModel->updateTradeOrderInfo($uid,$tradeorderid,$OrderModel->status_pay_suc,$bankmoney);
             }else{
                 return $deposit;
             }
@@ -582,6 +584,32 @@ class AccountModel extends Model
             ->field('f_paynote as paynote')
             ->limit(1)
             ->order('f_suctime desc')
+            ->find();
+        return $orderinfo;
+    }
+
+    /**
+     * 获取交易订单充值信息
+     * @param $uid
+     * @param $suborder
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getTradeOrderRechargeInfo($uid, $suborder){
+        $table_name = 'user_recharge_order';
+        $orderinfo = Db::name($table_name)
+            ->where('f_uid',$uid)
+            ->where('f_suborder',$suborder)
+            ->field('f_uid as uid')
+            ->field('f_paymoney as paymoney')
+            ->field('f_suborder as suborder')
+            ->field('f_suctime as suctime')
+            ->field('f_paytype as paytype')
+            ->field('f_channel as channel')
+            ->field('f_bankmoney as bankmoney')
+            ->field('f_bankorderid as bankorderid')
+            ->field('f_account as account')
+            ->field('f_status as status')
+            ->field('f_paynote as paynote')
             ->find();
         return $orderinfo;
     }
