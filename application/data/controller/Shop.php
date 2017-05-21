@@ -76,4 +76,55 @@ class Shop extends Base
         }
         return json($this->sucres($info,$list));
     }
+    /**
+     * 获取折扣时间段
+     */
+    public function getDiscountTimeslot(){
+        $info = array();
+        $list = array();
+        $DineshopModel = new DineshopModel();
+        $list = $DineshopModel->getDiscountTimeslot();
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 获取店铺折扣信息
+     */
+    public function getDineshopDiscount(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        if(empty($shopid)){
+            return json($this->errjson(-20003));
+        }
+        $slotid = input('slotid'); //折扣信息ID
+        if(empty($slotid)){
+            return json($this->errjson(-20001));
+        }
+        $discount = array();
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->getDineshopDiscount($shopid, $slotid);
+        if($res){
+            if($res['discount']){
+                preg_match_all('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $res['discount'], $match);
+                $discount = array_combine($match[1], $match[0]);
+            }
+            $DishesModel = new DishesModel();
+            $reslist = $DishesModel->getDishesList($res['dishid']);
+            foreach($reslist as $key => $val){
+                if(isset($discount[$val['id']])){
+                    preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $discount[$val['id']], $match);
+                    if($match[2] == 1){
+                        $reslist[$key]['discountprice'] = floor($val['price']) * $match[3];
+                    }elseif($match[2] == 2){
+                        $reslist[$key]['discountprice'] = floatval($val['price']) - $match[3];
+                    }
+                }
+                if(isset($reslist[$key]['discountprice'])){
+                    $reslist[$key]['discountprice'] = number_format($reslist[$key]['discountprice'] , 2, ".", "");
+                }
+            }
+            $list = $reslist;
+        }
+        return json($this->sucjson($info, $list));
+    }
 }

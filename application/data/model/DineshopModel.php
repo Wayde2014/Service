@@ -121,4 +121,28 @@ class DineshopModel extends Model
             return false;
         }
     }
+    /**
+     * 获取店铺折扣时间段
+     */
+    public function getDiscountTimeslot(){
+        $discountimeslot = Db::table('t_dineshop_discount_timeslot')
+            ->field('f_id id, concat(f_starttime, \'-\', f_endtime) timeslot, f_addtime addtime')
+            ->order('f_starttime asc')
+            ->select();
+        return $discountimeslot;
+    }
+    /**
+     * 获取店铺折扣信息
+     */
+    public function getDineshopDiscount($shopid, $slotid){
+        $subQuery = Db::table('t_dineshop_discount')->where('f_sid',$shopid)->where('f_timeslot',$slotid)->where('f_date',date("Y-m-d"))->buildSql();
+        $info = Db::table('t_dineshop')
+            ->alias('a')
+            ->field('a.f_menulist dishid, b.f_discount discount')
+            ->join($subQuery.' b','a.f_sid = b.f_sid','left')
+            ->where('a.f_sid',$shopid)
+            ->find();
+        return $info;
+    }
+    
 }

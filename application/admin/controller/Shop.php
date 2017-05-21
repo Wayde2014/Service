@@ -18,33 +18,11 @@ class Shop extends Base
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
-        $menulist = array();
         $DineshopModel = new DineshopModel();
         $res = $DineshopModel->getDineshopList($page, $pagesize);
         $info['allnum'] = $res['allnum'];
         if($res['dineshoplist']) {
             $list = $res['dineshoplist'];
-            foreach($list as $key => $val){
-                $menulist = array_merge($menulist, explode(',',$val['menulist']));
-            }
-            $menulist = array_unique($menulist);
-            $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesList($menulist);
-            $dishinfo = array();
-            if($dishlist){
-                foreach($dishlist as $key => $val){
-                    $dishinfo[$val['id']] = $val;
-                }
-            }
-            foreach($list as $key => $val){
-                $disheslist = array();
-                foreach(explode(',',$val['menulist']) as $k => $v){
-                    if(isset($dishinfo[$v])){
-                        array_push($disheslist, $dishinfo[$v]);
-                    }
-                }
-                $list[$key]['disheslist'] = $disheslist;
-            }
         }
         return json($this->sucjson($info, $list));
     }
@@ -322,7 +300,11 @@ class Shop extends Base
         }
         $DineshopModel = new DineshopModel();
         $deskid = $DineshopModel->addDesk($shopid, $seatnum, $desknum);
-        return json($this->sucjson(array('deskid' => $deskid)));
+        if($deskid){
+            return json($this->sucjson(array('deskid' => $deskid)));
+        }else{
+            return json($this->errjson(-1)); 
+        }
     }
     /**
      * 修改店铺桌型
