@@ -11,7 +11,7 @@ CREATE TABLE `t_user_info` (
   `f_usermoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '用户余额',
   `f_freezemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '冻结金额',
   `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '押金金额',
-  `f_user_status` smallint default 100 COMMENT '用户状态(0-默认,100-已实名认证,200-已充值押金,-100-黑名单,-200-已清户(余额为0,押金退回))',
+  `f_user_status` smallint default 200 COMMENT '用户状态(0-默认,100-已实名认证,200-已充值押金,-100-黑名单,-200-已清户(余额为0,押金退回))',
   `f_regtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '注册时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_uid`),
