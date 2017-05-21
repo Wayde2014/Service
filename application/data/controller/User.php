@@ -4,6 +4,7 @@ namespace app\data\controller;
 use base\Base;
 use \app\data\model\UserModel;
 use \app\data\model\AccountModel;
+use app\data\model\OrderModel;
 use think\Log;
 use third\Sms;
 use third\Alipay;
@@ -24,7 +25,7 @@ class User extends Base
         //初始化目前支持的充值类型
         array_push($this->allow_paytype,config("paytype.balance"));
         array_push($this->allow_paytype,config("paytype.deposit"));
-        //array_push($this->allow_paytype,config("paytype.order"));
+        array_push($this->allow_paytype,config("paytype.order"));
 
         //初始化目前支持的充值渠道
         array_push($this->allow_paychannel,config("paychannel.alipay"));
@@ -32,7 +33,7 @@ class User extends Base
 
         //初始化目前支持的提款类型
         array_push($this->allow_drawtype,config("drawtype.deposit"));
-        //array_push($this->allow_drawtype,config("drawtype.order"));
+        array_push($this->allow_drawtype,config("drawtype.order"));
 
         //初始化目前支持的提款渠道
         array_push($this->allow_drawchannel,config("drawchannel.alipay"));
@@ -377,8 +378,28 @@ class User extends Base
                 return json(self::erres("订单退款子订单号不能为空"));
             }
             //检查该笔订单状态及查询对应充值订单信息
-            //TODO
-            $rechargeinfo = array();
+            $OrderModel = new OrderModel();
+            $trade_orderinfo = $OrderModel->getTradeOrderInfo($uid,$suborder);
+            if(empty($trade_orderinfo)){
+                return json(self::erres("待退款交易订单不存在"));
+            }
+            $order_status = $trade_orderinfo['status'];
+            if($order_status != $OrderModel->status_waiting_refund){
+                return json(self::erres("该交易订单状态非未待退款状态"));
+            }
+            $AccountModel = new AccountModel();
+            $rechargeinfo = $AccountModel->getTradeOrderRechargeInfo($uid,$suborder);
+            if(empty($rechargeinfo)){
+                return json(self::erres("查不到该交易订单对应充值信息"));
+            }
+            $paystatus = $rechargeinfo['status'];
+            $paymoney = $rechargeinfo['paymoney'];
+            if($paystatus != $AccountModel->paysuc){
+                return json(self::erres("该交易订单未充值成功"));
+            }
+            if($drawmoney > $paymoney){
+                return json(self::erres("退款金额不能超过该订单充值金额"));
+            }
 
         }else if($drawtype == config("drawtype.balance") && $usermoney < $drawmoney){
             return json(self::erres("账户余额不足"));
@@ -556,12 +577,26 @@ class User extends Base
         if(empty($subject)){
             return json(self::erres("商品标题不能为空"));
         }
+
         if($paytype == config("drawtype.order")){
             if($suborder <= 0){
                 return json(self::erres("订单充值子订单号不能为空"));
             }else{
                 //查询该笔订单信息，检查是否存在，是否已交易成功
-                //TODO
+                $OrderModel = new OrderModel();
+                $orderinfo = $OrderModel->getTradeOrderInfo($uid,$suborder);
+                if(empty($orderinfo)){
+                    return json(self::erres("待支付交易订单信息不存在"));
+                }
+                $order_status = $orderinfo['status'];
+                $order_allmoney = $orderinfo['allmoney'];
+                $order_paymoney = $orderinfo['paymoney'];
+                if($order_status != $OrderModel->status_waiting_pay){
+                    return json(self::erres("该交易订单非待付款状态"));
+                }
+                if($order_allmoney - $order_paymoney < $paymoney){
+                    return json(self::erres("充值金额超过该交易订单未付款金额"));
+                }
             }
         }
 
