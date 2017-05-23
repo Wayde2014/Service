@@ -9,7 +9,7 @@ class Base
 {
     // 配置参数
     private $sign_key = 'x$sfxF%Qu4';
-    public $res = ["code" => "-1", "msg" => "", "info" => [], "list" => []];
+    public $res = ["code" => "-1", "msg" => "", "info" => "{}", "list" => []];
 
     /**
      * 构造函数
@@ -34,7 +34,7 @@ class Base
         $Errcode = new Errcode();
         $this->res['code'] = $code;
         $this->res['msg'] = isset($Errcode->errcode[$code])?$Errcode->errcode[$code]:'';
-        $this->res['info'] = $info;
+        $this->res['info'] = empty($info) ? "{}" : $info;
         $this->res['list'] = $list;
         return $this->res;
     }
@@ -45,7 +45,7 @@ class Base
     public function sucjson($info = array(), $list = array()){
         $this->res['code'] = 1;
         $this->res['msg'] = 'success';
-        $this->res['info'] = $info;
+        $this->res['info'] = empty($info) ? "{}" : $info;
         $this->res['list'] = $list;
         return $this->res;
     }
@@ -65,7 +65,7 @@ class Base
     public function sucres($info = array(), $list = array()){
         $this->res['code'] = 1;
         $this->res['msg'] = 'success';
-        $this->res['info'] = $info;
+        $this->res['info'] = empty($info) ? "{}" : $info;
         $this->res['list'] = $list;
         return $this->res;
     }
