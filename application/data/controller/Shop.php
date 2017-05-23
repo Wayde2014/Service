@@ -127,8 +127,8 @@ class Shop extends Base
                 if(isset($reslist[$key]['discountprice'])){
                     $reslist[$key]['discountprice'] = number_format($reslist[$key]['discountprice'] , 2, ".", "");
                 }
-                if(!isset($list[$classifyname])) $list[$classifyname] = array();
-                array_push($list[$classifyname], $reslist[$key]);
+                if(!isset($info[$classifyname])) $info[$classifyname] = array();
+                array_push($info[$classifyname], $reslist[$key]);
             }
         }
         return json($this->sucjson($info, $list));
