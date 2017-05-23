@@ -221,4 +221,13 @@ class DineshopModel extends Model
             ->find();
         return $deskinfo;
     }
+    /**
+     * 获取菜系列表
+     */
+    public function getCuisineList(){
+        $list = Db::table('t_food_cuisine')
+            ->field('f_cid id, f_cname cuisinename, f_lasttime addtime')
+            ->select();
+        return $list;
+    }
 }

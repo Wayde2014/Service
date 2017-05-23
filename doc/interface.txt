@@ -34,7 +34,7 @@
     timeslot: "13:00-14:00",  折扣时间段
     addtime: "2017-05-17 21:43:40"  添加时间
     3，获取店铺折扣信息
-    http://119.23.73.39/data/shop/getDineshopDiscount?shopid=1&slotid=3  
+    http://119.23.73.39/data/shop/getDineshopDiscount?shopid=1&slotid=3&date=2017-05-23  
     入参说明：
     shopid 店铺ID， slotid 时间段ID（接口2获取）
     结果说明：
