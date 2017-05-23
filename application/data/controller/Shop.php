@@ -97,12 +97,16 @@ class Shop extends Base
             return json($this->errjson(-20003));
         }
         $slotid = input('slotid'); //折扣信息ID
-        if(empty($slotid)){
+        $date = input('date'); //折扣时间
+        if(empty($slotid) || empty($date)){
             return json($this->errjson(-20001));
         }
+        if(!check_datetime($date, 'yyyy-mm-dd')){
+            return json($this->errjson(-20002));
+        } 
         $discount = array();
         $DineshopModel = new DineshopModel();
-        $res = $DineshopModel->getDineshopDiscount($shopid, $slotid);
+        $res = $DineshopModel->getDineshopDiscount($shopid, $slotid, $date);
         if($res){
             if($res['discount']){
                 preg_match_all('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $res['discount'], $match);
@@ -111,6 +115,7 @@ class Shop extends Base
             $DishesModel = new DishesModel();
             $reslist = $DishesModel->getDishesList($res['dishid']);
             foreach($reslist as $key => $val){
+                $classifyname = $val['classifyname'];
                 if(isset($discount[$val['id']])){
                     preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $discount[$val['id']], $match);
                     if($match[2] == 1){
@@ -122,8 +127,9 @@ class Shop extends Base
                 if(isset($reslist[$key]['discountprice'])){
                     $reslist[$key]['discountprice'] = number_format($reslist[$key]['discountprice'] , 2, ".", "");
                 }
+                if(!isset($info[$classifyname])) $info[$classifyname] = array();
+                array_push($info[$classifyname], $reslist[$key]);
             }
-            $list = $reslist;
         }
         return json($this->sucjson($info, $list));
     }

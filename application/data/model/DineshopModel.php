@@ -134,8 +134,8 @@ class DineshopModel extends Model
     /**
      * 获取店铺折扣信息
      */
-    public function getDineshopDiscount($shopid, $slotid){
-        $subQuery = Db::table('t_dineshop_discount')->where('f_sid',$shopid)->where('f_timeslot',$slotid)->where('f_date',date("Y-m-d"))->buildSql();
+    public function getDineshopDiscount($shopid, $slotid, $date){
+        $subQuery = Db::table('t_dineshop_discount')->where('f_sid',$shopid)->where('f_timeslot',$slotid)->where('f_date',$date)->buildSql();
         $info = Db::table('t_dineshop')
             ->alias('a')
             ->field('a.f_menulist dishid, b.f_discount discount')

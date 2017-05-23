@@ -399,11 +399,24 @@ class Shop extends Base
         $list = array();
         $shopid = input('shopid');
         if(!$this->checkAdminLogin()){
-            return json($this->erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
         $list = $DineshopModel->getDistripList($shopid);
         
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 获取菜系列表
+     */
+    public function getCuisineList(){
+        $info = array();
+        $list = array();
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $list = $DineshopModel->getCuisineList();
         return json($this->sucjson($info, $list));
     }
 }
