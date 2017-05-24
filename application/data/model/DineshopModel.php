@@ -131,6 +131,7 @@ class DineshopModel extends Model
             ->select();
         return $discountimeslot;
     }
+
     /**
      * 获取店铺折扣信息
      */
@@ -144,5 +145,46 @@ class DineshopModel extends Model
             ->find();
         return $info;
     }
-    
+
+    /**
+     * 获取某店铺某日期某时间段桌型放号信息
+     * @param $shopid
+     * @param $date
+     * @param $slotid
+     * @return $this
+     */
+    public function getDeskSellIinfo($shopid, $date, $slotid){
+        $table_name = "dineshop_sellinfo";
+        $sellinfo = Db::name($table_name)
+            ->where('f_sid',$shopid)
+            ->where('f_date',$date)
+            ->where('f_timeslot',$slotid)
+            ->where('f_status',1)
+            ->field('f_sellinfo as sellinfo')
+            ->select();
+
+        return $sellinfo;
+    }
+
+    /**
+     * 获取桌型信息
+     * @param $shopid
+     * @param $deskid_list
+     * @return $this
+     */
+    public function getDeskInfo($shopid, $deskid_list){
+        $table_name = "dineshop_deskinfo";
+        $deskinfo = Db::name($table_name)
+            ->where('f_sid',$shopid)
+            ->where('f_id','in',$deskid_list)
+            ->where('f_status',1)
+            ->field('f_id as deskid')
+            ->field('f_sid as shopid')
+            ->field('f_seatnum as seatnum')
+            ->field('f_amount as amount')
+            ->field('f_orderamount as orderamount')
+            ->select();
+
+        return $deskinfo;
+    }
 }
