@@ -9,7 +9,7 @@ class Base
 {
     // 配置参数
     private $sign_key = 'x$sfxF%Qu4';
-    public $res = ["code" => "-1", "msg" => "", "info" => (object)array(), "list" => []];
+    public $res = ["code" => "-1", "msg" => "", "info" => array(), "list" => []];
 
     /**
      * 构造函数
@@ -19,7 +19,11 @@ class Base
     {
         if ($res && count($res) > 0) {
             foreach ($res as $key => $val) {
-                $this->res[$key] = $val;
+                if($key == 'info'){
+                    $this->res[$key] = (object)$val;
+                }else{
+                    $this->res[$key] = $val;
+                }
             }
         }
         if(!self::checkToken()){
