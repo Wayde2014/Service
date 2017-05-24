@@ -133,4 +133,56 @@ class Shop extends Base
         }
         return json($this->sucjson($info, $list));
     }
+
+    /**
+     * 获取桌型放号信息
+     */
+    public function getDeskSellInfo(){
+        $shopid = input('shopid'); //店铺ID
+        if(empty($shopid)){
+            return json($this->errjson(-20003));
+        }
+        $slotid = input('slotid'); //折扣信息ID
+        $date = input('date'); //折扣时间
+        if(empty($slotid) || empty($date)){
+            return json($this->errjson(-20001));
+        }
+        if(!check_datetime($date, 'yyyy-mm-dd')){
+            return json($this->errjson(-20002));
+        }
+
+        $list = array();
+        $DineshopModel = new DineshopModel();
+
+        //取某店铺某日期某时间段放号的桌型信息
+        $sellinfo = $DineshopModel->getDeskSellIinfo($shopid,$date,$slotid);
+        if(!empty($sellinfo)){
+            $desk_num_arr = array();
+            foreach($sellinfo as $row){
+                $desk_num_str = explode('$',$row['sellinfo']);
+                if(!empty($desk_num_str)){
+                    foreach($desk_num_str as $v){
+                        $temp = explode('@',$v);
+                        $desk_num_arr[$temp[0]] = $temp[1];
+                    }
+                }
+            }
+            //根据放号桌型ID获取桌型详细信息
+            $deskinfo = $DineshopModel->getDeskInfo($shopid,array_keys($desk_num_arr));
+            if(!empty($deskinfo)){
+                foreach($deskinfo as $row){
+                    $sellnum = $desk_num_arr[$row['deskid']];
+                    $orderamount = $row["orderamount"];
+                    $list[$row['deskid']] = array(
+                        "shopid" => $row["shopid"],
+                        "deskid" => $row["deskid"],
+                        "seatnum" => $row["seatnum"],
+                        "usable" => ($sellnum - $orderamount > 0) ? true : false,
+                    );
+                }
+            }
+        }
+        $info = array();
+        return json($this->sucjson($info, $list));
+    }
 }

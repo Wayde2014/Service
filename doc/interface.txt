@@ -46,6 +46,17 @@
     classifyname: "招牌推荐",
     cuisinename: "鲁菜",
     discountprice: "52.80" 菜品折扣价格
+
+    4、获取桌型放号信息
+    http://119.23.73.39/data/shop/getDeskSellInfo?shopid=1&slotid=3&date=2017-05-23
+    入参说明：
+    shopid 店铺ID， slotid 时间段ID（接口2获取）data 日期
+    结果说明：
+        list:
+            shopid : 店铺ID
+            deskid : 桌型ID
+            seatnum : 可坐人数
+            usable : 是否可预订(true-可预订，false-不可预订)
     
 
 账户模块
