@@ -8,6 +8,107 @@ use \app\admin\model\DishesModel;
 class Shop extends Base
 {
     /**
+     * 添加店铺
+     */
+    public function addDineshop(){
+        $info = array();
+        $list = array();
+        //获取添加店铺信息
+        $shopid = input('shopid');
+        $adduser = input('adduser');
+        if(empty($adduser)){
+            return json($this->errjson(-20001));
+        }
+        $shopname = input('shopname');
+        if(empty($shopname)){
+            return json($this->errjson(-80007));
+        }
+        $shopdesc = input('shopdesc');
+        $shopicon = input('shopicon');
+        if(empty($shopicon)){
+            return json($this->errjson(-80008));
+        }
+        $shopiconurl = str_replace("upload","public/static/images", $shopicon);
+        if(is_file(ROOT_PATH.$shopicon)){
+            try{
+                copy(ROOT_PATH.$shopicon, ROOT_PATH.$shopiconurl); //拷贝到新目录
+            }catch (\Exception $e) {
+                return json($this->errjson("文件传输错误"));
+            }
+        }
+        $cuisineid = input('cuisineid');
+        if(empty($cuisineid)){
+            return json($this->errjson(-80009));
+        }
+        $maplon = input('maplon');
+        $maplat = input('maplat');
+        $sales = input('sales');
+        $deliveryfee = input('deliveryfee');
+        $minprice = input('minprice');
+        $preconsume = input('preconsume');
+        $isbooking = input('isbooking');
+        $isaway = input('isaway');
+        $opentime = input('opentime');
+        $shophone = input('shophone');
+        if(empty($shophone)){
+            return json($this->errjson(-80010));
+        }
+        $address = input('address');
+        if(empty($address)){
+            return json($this->errjson(-80011));
+        }
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        if($shopid){
+            $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address);
+        }else{
+            $res = $DineshopModel->addDineshop($shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser);
+        }
+        if($res){
+            return json($this->sucjson($info, $list));
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
+    /**
+     * 修改店铺状态
+     */
+    public function modDineshopStatus(){
+        //获取添加店铺信息
+        $shopid = input('shopid');
+        $key = input('key');
+        if(empty($shopid) || empty($key)){
+            return json($this->erres('参数错误'));
+        }
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $status = '';
+        if($key == '审核'){
+            $status = 1;
+        }else if($key == '通过审核'){
+            $status = 100;
+        }else if($key == '审核不通过'){
+            $status = -100;
+        }else if($key == '删除'){
+            $status = -300;
+        }
+        $res = false;
+        $DineshopModel = new DineshopModel();
+        if($status != ''){
+            $res = $DineshopModel->modDineshopStatus($shopid, $status);
+        }
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
+    /**
      * 获取店铺信息列表
      */
     public function getDineshopList(){
@@ -254,6 +355,9 @@ class Shop extends Base
                 }
             }
         }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
         $DineshopModel = new DineshopModel();
         if(!empty($discount)){
             $res = $DineshopModel->modDineshopDiscount($id, $discount);
@@ -274,8 +378,179 @@ class Shop extends Base
         if(empty($id)){
             return json($this->errjson(-20001));
         }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
         $DineshopModel = new DineshopModel();
         $res = $DineshopModel->delDineshopDiscount($id);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1)); 
+        }
+    }
+    /**
+     * 获取店铺放号信息
+     */
+    public function getDineshopSell(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid',1); //店铺ID
+        if(empty($shopid)){
+            return json($this->errjson(-20003));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $startdate = Date('Y-m-d');
+        $endate = Date('Y-m-d', strtotime('+7 days'));
+        $DineshopModel = new DineshopModel();
+        $deskinfo = array();
+        $desklist = $DineshopModel->getDesklist($shopid);
+        foreach($desklist as $key=>$val){
+            $deskinfo[$val['id']] = $val;
+        }
+        $sellist = $DineshopModel->getDineshopSell($shopid, $startdate, $endate);
+        $timeslotlist = $DineshopModel->getDiscountTimeslot();
+        foreach($timeslotlist as $key=>$val){
+            $slotid = $val['id'];
+            $timeslot = $val['timeslot'];
+            $sellid_list = array();
+            $sellinfo_list = array();
+            foreach($sellist as $k=>$v){
+                if($v['timeslot'] == $timeslot){
+                    $sellid_list[$v['date']] = $v['id'];
+                    $sellinfo = array();
+                    foreach(explode('$', $v['sellinfo']) as $_k=>$_v){
+                        preg_match('/(\d+)\@(\d+)/i', $_v, $match);
+                        if($match[1]){
+                            $sellinfo[$_k]['tableid'] = $match[1];
+                            $desknum = 0;
+                            $ordernum = 0;
+                            $deskname = '';
+                            if(isset($deskinfo[$match[1]])){
+                                $deskname = isset($deskinfo[$match[1]]['seatnum'])?$deskinfo[$match[1]]['seatnum'].'人桌':'';
+                                $desknum = isset($deskinfo[$match[1]]['desknum'])?$deskinfo[$match[1]]['desknum']:0;
+                                $ordernum = isset($deskinfo[$match[1]]['ordernum'])?$deskinfo[$match[1]]['ordernum']:0;
+                            }
+                            $sellinfo[$_k]['deskname'] = $deskname;
+                            $sellinfo[$_k]['desknum'] = $desknum;
+                             $sellinfo[$_k]['ordernum'] = $ordernum;
+                            $sellinfo[$_k]['openum'] = $match[2];
+                        }
+                    }
+                    $sellinfo_list[$v['date']] = $sellinfo;
+                }
+            }
+            $selldata = array();
+            for($i=0;$i<7;$i++){
+                $date = Date('Y-m-d', strtotime('+'.$i.' days'));
+                $selldata[] = array(
+                    'date' => $date,
+                    'sellid' => isset($sellid_list[$date])?$sellid_list[$date]:'',
+                    'sellinfo' => isset($sellinfo_list[$date])?$sellinfo_list[$date]:array()
+                );
+            }
+            $list[$key]['slotid'] = $slotid;
+            $list[$key]['timeslot'] = $timeslot;
+            $list[$key]['selldata'] = $selldata;
+        }
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 添加店铺放号信息
+     */
+    public function addDineshopSell(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //折扣信息
+        if(empty($shopid)){
+            return json($this->errjson(-20003));
+        }
+        $date = input('date'); //折扣日期
+        if(empty($date)){
+            return json($this->errjson(-80001));
+        }
+        $slotid = input('slotid'); //折扣时间段
+        if(empty($slotid)){
+            return json($this->errjson(-80002));
+        }
+        $sellinfo = input('sellinfo'); //折扣信息
+        if(empty($sellinfo)){
+            return json($this->errjson(-80003));
+        }
+        foreach(explode('$', $sellinfo) as $key=>$val){
+            if(!preg_match( '/^\d+\@\d+$/i' , $val, $result)){
+                return json($this->errjson(-80004)); exit;
+            }
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $info = $DineshopModel->getSellinfo($shopid, $date, $slotid);
+        //已有数据则修改
+        if($info){
+            $id = $info['id'];
+            if(strstr($info['sellinfo'], $sellinfo)){
+                $sellinfo = $info['sellinfo'];
+            }else{
+                $sellinfo = $info['sellinfo']."$".$sellinfo;
+            }
+            $res = $DineshopModel->modDineshopSell($id, $sellinfo);
+        }else{
+            $res = $DineshopModel->addDineshopSell($shopid, $date, $slotid, $sellinfo);
+        }
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1)); 
+        }
+    }
+    /**
+     * 修改店铺折扣信息
+     */
+    public function modDineshopSell(){
+        $id = input('id'); //折扣信息ID
+        if(empty($id)){
+            return json($this->errjson(-20001));
+        }
+        $sellinfo = input('sellinfo'); //折扣信息
+        if(!empty($sellinfo)){
+            foreach(explode('$', $sellinfo) as $key=>$val){
+                if(!preg_match( '/^\d+\@\d+$/i' , $val)){
+                    return json($this->errjson(-80004)); exit;
+                }
+            }
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        if(!empty($sellinfo)){
+            $res = $DineshopModel->modDineshopSell($id, $sellinfo);
+        }else{
+            $res = $DineshopModel->delDineshopSell($id);
+        }
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1)); 
+        }
+    }
+    /**
+     * 删除店铺折扣信息
+     */
+    public function delDineshopSell(){
+        $id = input('id'); //折扣信息ID
+        if(empty($id)){
+            return json($this->errjson(-20001));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->delDineshopSell($id);
         if($res){
             return json($this->sucjson());
         }else{

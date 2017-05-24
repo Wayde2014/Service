@@ -17,7 +17,7 @@ class Base
      */
     public function __construct($res = array())
     {
-        if(!empty($this->res)){
+	if(!empty($this->res)){
             $this->res['info'] = (object)$this->res['info'];
         }
         if ($res && count($res) > 0) {
