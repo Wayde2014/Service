@@ -10,6 +10,86 @@ use think\Db;
 class DineshopModel extends Model
 {
     /**
+     * 添加店铺信息
+     */
+    public function addDineshop($shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser){
+        try{
+            $data = array(
+                'f_adduser' => $adduser,
+                'f_shopname' => $shopname,
+                'f_shopdesc' => $shopdesc,
+                'f_shopicon' => $shopicon,
+                'f_shophone' => $shophone,
+                'f_address' => $address,
+                'f_cuisineid' => $cuisineid,
+                'f_maplon' => $maplon,
+                'f_maplat' => $maplat,
+                'f_sales' => $sales,
+                'f_deliveryfee' => $deliveryfee,
+                'f_minprice' => $minprice,
+                'f_preconsume' => $preconsume,
+                'f_isbooking' => $isbooking,
+                'f_opentime' => $opentime,
+                'f_isaway' => $isaway,
+                'f_addtime' => date('Y-m-d H:i:s')
+            );
+            $shopid = intval(Db::table('t_admin_dineshop')->insertGetId($data));
+            return $shopid;
+        }catch (\Exception $e) {
+            return false;
+        }
+    }
+    /**
+     * 修改店铺信息
+     */
+    public function modDineshop($shopid, $shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address){
+        $data = array(
+            'f_shopname' => $shopname,
+            'f_shopdesc' => $shopdesc,
+            'f_shopicon' => $shopicon,
+            'f_shophone' => $shophone,
+            'f_address' => $address,
+            'f_cuisineid' => $cuisineid,
+            'f_maplon' => $maplon,
+            'f_maplat' => $maplat,
+            'f_sales' => $sales,
+            'f_deliveryfee' => $deliveryfee,
+            'f_minprice' => $minprice,
+            'f_preconsume' => $preconsume,
+            'f_isbooking' => $isbooking,
+            'f_opentime' => $opentime,
+            'f_isaway' => $isaway
+        );
+        return Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update($data);
+    }
+    /**
+     * 修改店铺信息
+     */
+    public function modDineshopStatus($shopid, $status){
+        // 启动事务
+        Db::startTrans();
+        try{
+            Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update(array('f_status' => $status)); //更新管理后台表
+            if($status == 100){
+                //审核通过则同步到前端表
+                $shopinfo = Db::table('t_admin_dineshop')->field('f_shopname,f_shopdesc,f_shopicon,f_shophone,f_address,f_cuisineid,f_maplon,f_maplat,f_sales,f_deliveryfee,f_minprice,f_preconsume,f_isbooking,f_opentime,f_isaway')->where('f_sid', $shopid)->find();
+                $shopinfo['f_addtime'] = date('Y-m-d H:i:s');
+                Db::table('t_dineshop')->insertGetId($shopinfo);
+            }else if($status == -300){
+                //删除则从前端表下架
+                $shopinfo = Db::table('t_admin_dineshop')->field('f_shopname shopname')->where('f_sid', $shopid)->find();
+                Db::table('t_dineshop')->where('f_shopname', $shopinfo['shopname'])->delete();
+            }
+            // 提交事务
+            Db::commit();
+            return true;
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            return false;
+        }
+    }
+    /**
      * 获取店铺信息列表
      */
     public function getDineshopList($page = 1, $pagesize = 20){
@@ -103,6 +183,73 @@ class DineshopModel extends Model
             ->select();
             
         return $discountlist;
+    }
+    /**
+     * 获取店铺放号信息
+     */
+    public function getDineshopSell($shopid, $startdate, $endate){
+        $discountlist = Db::table('t_dineshop_sellinfo')
+            ->alias('a')
+            ->field('a.f_id id, a.f_sid shopid, a.f_date date, a.f_timeslot timeslotid, concat(b.f_starttime, \'-\', b.f_endtime) timeslot, a.f_sellinfo sellinfo, a.f_addtime addtime') 
+            ->join('t_dineshop_discount_timeslot b','a.f_timeslot = b.f_id','left')
+            ->where('a.f_sid', $shopid)
+            ->where('a.f_status', 1)
+            ->where('a.f_date',['>=',$startdate],['<',$endate])
+            ->order('a.f_date asc')
+            ->select();   
+        return $discountlist;
+    }
+    
+    /**
+     * 查询店铺放号记录 根据时间段和日期
+     */
+    public function getSellinfo($shopid, $date, $slotid){
+        $sellinfo = Db::table('t_dineshop_sellinfo')
+            ->field('f_id id, f_sellinfo sellinfo') 
+            ->where('f_sid', $shopid)
+            ->where('f_date', $date)
+            ->where('f_timeslot', $slotid)
+            ->find();
+        return $sellinfo;
+    }
+    
+    /**
+     * 新增店铺折扣信息
+     */
+    public function addDineshopSell($shopid, $date, $slotid, $sellinfo){
+        $data = array(
+            'f_sid' => $shopid,
+            'f_date' => $date,
+            'f_timeslot' => $slotid,
+            'f_sellinfo' => $sellinfo,
+            'f_addtime' => date('Y-m-d H:i:s'),
+        );
+        $sellid = intval(Db::table('t_dineshop_sellinfo')->insertGetId($data));
+        return $sellid;
+    }
+    /**
+     * 修改店铺折扣信息
+     */
+    public function modDineshopSell($id, $sellinfo){
+        $data = array("f_sellinfo" => $sellinfo);
+        $ret = Db::table('t_dineshop_sellinfo')->where('f_id', $id)->update($data);
+        if($ret !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 删除店铺折扣信息
+     */
+    public function delDineshopSell($id){
+        $data = array("f_status" => 0);
+        $ret = Db::table('t_dineshop_sellinfo')->where('f_id', $id)->update($data);
+        if($ret !== false){
+            return true;
+        }else{
+            return false;
+        }
     }
     /**
      * 添加店铺折扣时间段
@@ -201,7 +348,7 @@ class DineshopModel extends Model
      */
     public function getDesklist($shopid){
         $desklist = Db::table('t_dineshop_deskinfo')
-            ->field('f_id id, f_sid shopid, f_seatnum seatnum, f_amount desknum, f_addtime addtime')
+            ->field('f_id id, f_sid shopid, f_seatnum seatnum, f_amount desknum, f_orderamount ordernum, f_addtime addtime')
             ->where('f_sid', $shopid)
             ->where('f_status', 1)
             ->order('f_seatnum asc')
