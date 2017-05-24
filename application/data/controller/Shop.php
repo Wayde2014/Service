@@ -173,16 +173,18 @@ class Shop extends Base
                 foreach($deskinfo as $row){
                     $sellnum = $desk_num_arr[$row['deskid']];
                     $orderamount = $row["orderamount"];
+                    $new_sellnum = $sellnum - $orderamount;
                     $list[$row['deskid']] = array(
                         "shopid" => $row["shopid"],
                         "deskid" => $row["deskid"],
                         "seatnum" => $row["seatnum"],
-                        "usable" => ($sellnum - $orderamount > 0) ? true : false,
+                        "sellnum" => $new_sellnum >= 0 ? $new_sellnum : 0,
+                        "usable" => $new_sellnum > 0 ? true : false,
                     );
                 }
             }
         }
         $info = array();
-        return json($this->sucjson($info, $list));
+        return json($this->sucjson($info, array_values($list)));
     }
 }
