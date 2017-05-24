@@ -364,6 +364,7 @@ CREATE TABLE `t_dineshop` (
   `f_deliveryfee` int(10) DEFAULT '0' COMMENT '配送费',
   `f_minprice` int(10) DEFAULT '0' COMMENT '起送价',
   `f_preconsume` int(10) DEFAULT '0' COMMENT '人均消费',
+  `f_servicecharge` smallint default 0 comment '服务费(每就餐人数)',
   `f_isbooking` int(1) DEFAULT '0' COMMENT '是否可预订 0不可预订， 1可预订',
   `f_opentime` varchar(200) DEFAULT NULL COMMENT '营业时间',
   `f_isaway` int(1) DEFAULT '0' COMMENT '是否支持外卖 0无外卖 1可外卖配送',
