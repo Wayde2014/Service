@@ -56,6 +56,7 @@
             shopid : 店铺ID
             deskid : 桌型ID
             seatnum : 可坐人数
+            sellnum : 该桌型剩余可预订数量
             usable : 是否可预订(true-可预订，false-不可预订)
     
 
