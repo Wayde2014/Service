@@ -24,7 +24,7 @@ class User extends Base
 
         //初始化目前支持的充值类型
         array_push($this->allow_paytype,config("paytype.balance"));
-        array_push($this->allow_paytype,config("paytype.deposit"));
+        //array_push($this->allow_paytype,config("paytype.deposit"));
         array_push($this->allow_paytype,config("paytype.order"));
 
         //初始化目前支持的充值渠道

@@ -17,13 +17,12 @@ class Base
      */
     public function __construct($res = array())
     {
+        if(!empty($this->res)){
+            $this->res['info'] = (object)$this->res['info'];
+        }
         if ($res && count($res) > 0) {
             foreach ($res as $key => $val) {
-                if($key == 'info'){
-                    $this->res[$key] = (object)$val;
-                }else{
-                    $this->res[$key] = $val;
-                }
+                $this->res[$key] = $val;
             }
         }
         if(!self::checkToken()){
