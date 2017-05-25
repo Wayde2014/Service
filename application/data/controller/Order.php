@@ -113,7 +113,7 @@ class Order extends Base
         if($this->checkLogin() === false) return json($this->errjson(-10001));
         //获取订单信息
         $OrderModel = new OrderModel();
-        $orderinfo = $OrderModel->getOrderinfo($orderid, $uid);
+        $orderinfo = $OrderModel->getOrderinfo($uid, $orderid);
         if(!$orderinfo)  return json($this->errjson(-30020));
         $status = $orderinfo['status'];
         $allmoney = floatval($orderinfo['allmoney']);
