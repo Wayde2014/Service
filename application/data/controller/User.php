@@ -134,7 +134,7 @@ class User extends Base
         $ck = input('ck');
         $uid = input('uid');
         if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
         $UserModel = new UserModel();
         if ($UserModel->setCkExpired($ck)) {
@@ -154,7 +154,7 @@ class User extends Base
         if(empty($uid)) return json($this->erres('参数错误'));
 
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
@@ -173,10 +173,10 @@ class User extends Base
     public function getAddressInfo()
     {
         $addressid = input('addressid');
-        if(empty($addressid)) return json($this->erres('参数错误'));
+        if(empty($addressid)) return json($this->errjson(-20002));
 
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
@@ -198,7 +198,7 @@ class User extends Base
         if(empty($addressid)) return json($this->erres('参数错误'));
 
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
@@ -222,7 +222,7 @@ class User extends Base
         if(empty($addressid)) return json($this->erres('参数错误'));
 
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
@@ -254,7 +254,7 @@ class User extends Base
         if(empty($mobile)) return json($this->erres('请传入用户手机号'));
     
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
@@ -292,7 +292,7 @@ class User extends Base
         }
         
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->erres('用户未登录，请先登录'));
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
         
         $params = array(
             "province" => $province,
@@ -326,7 +326,7 @@ class User extends Base
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
 
         //校验参数
@@ -445,7 +445,7 @@ class User extends Base
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
 
         //获取用户信息
@@ -488,7 +488,7 @@ class User extends Base
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
 
         $UserModel = new UserModel();
@@ -529,7 +529,7 @@ class User extends Base
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
 
         //进行实名认证
@@ -562,7 +562,7 @@ class User extends Base
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
 
         if(!in_array($paytype,$this->allow_paytype)){
@@ -634,7 +634,7 @@ class User extends Base
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
-            return json(self::erres("用户未登录，请先登录"));
+            return json($this->errjson(-10001));
         }
 
         //检查该笔充值订单是否存在以及当前状态
