@@ -151,10 +151,9 @@ class User extends Base
     public function getAddressList()
     {
         $uid = input('uid');
-        if(empty($uid)) return json($this->erres('参数错误'));
 
         //判断用户登录
-        if($this->checkLogin() === false) return json($this->errjson(-10001));
+        if($this->checkLogin($uid) === false) return json($this->errjson(-10001));
         
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
