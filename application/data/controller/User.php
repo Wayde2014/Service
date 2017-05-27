@@ -600,10 +600,10 @@ class User extends Base
         }
 
         //必须实名认证后方可充值
-        $UserModel = new UserModel();
+        /*$UserModel = new UserModel();
         if(!$UserModel->checkUserStatus($uid,'charge')){
             return json(self::erres("实名认证后方可充值"));
-        }
+        }*/
 
         $AccountModel = new AccountModel();
         $paymoney = number_format($paymoney,2,'.','');
