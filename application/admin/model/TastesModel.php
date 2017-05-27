@@ -12,11 +12,13 @@ class TastesModel extends Model
     /**
      * 获取口味信息
      */
-    public function getDishesList($tasteslist){
-        $tasteslist = Db::name('food_tastes')
-            ->field('f_tid tid,f_tname tastes')
-            ->whereIn('f_tid', explode(',',$tasteslist))
-            ->select();
-        return $tasteslist?$tasteslist:false;
+    public function getTastesList($tasteslist){
+        $field = 'f_tid id, f_tname tastes, f_lasttime lastime';
+        if($tasteslist){
+            $tasteslist = Db::table('t_food_tastes')->field($field)->whereIn('f_tid', explode(',',$tasteslist))->select();
+        }else{
+            $tasteslist = Db::table('t_food_tastes')->field($field)->select();
+        }
+        return $tasteslist?$tasteslist:array();
     }
 }

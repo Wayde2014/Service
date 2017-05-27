@@ -30,6 +30,8 @@ class Order extends Base
         $mealsnum = input('mealsnum'); //食堂就餐 就餐人数
         $startime = input('startime'); //食堂订餐 开始时间
         $endtime = input('endtime'); //食堂订餐 结束时间
+        $date = input('date'); //折扣日期
+        $slotid = input('slotid'); //折扣时间段
         //判断用户登录
         if($this->checkLogin() === false) return json($this->errjson(-10001));
         //判断参数
@@ -67,10 +69,40 @@ class Order extends Base
             preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
             $_orderinfo[$match[1]] = $match[3];
         }
+        //获取折扣信息
+        $_discount = array();
+        $res = $DineshopModel->getDineshopDiscount($shopid, $slotid, $date);
+        if($res && $res['discount']){
+            foreach(explode('$', $res['discount']) as $key=>$val){
+                preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $val, $match);
+                $_discount[$match[1]] = array(
+                    "type" => $match[2],
+                    "discount" => $match[3]
+                );
+            }
+        }
         $list = $DishesModel->getDishesList(implode(',', array_keys($_orderinfo)));
+        $priceinfo = array();
+        if(count($list) > 0){
+            for($i = 0; $i < count($list); $i++){
+                $_dishid = $list[$i]['id'];
+                $_price = floatval($list[$i]['price']);
+                if(isset($_discount[$_dishid])){
+                    if($_discount[$_dishid]['type'] == 1){
+                        $_price = $_price * $_discount[$_dishid]['discount'];
+                    }else if($_discount[$_dishid]['type'] == 2){
+                        $_price = $_price - $_discount[$_dishid]['discount'];
+                    }
+                }
+                $priceinfo[$_dishid] = $_price;
+            }
+        }
         $_ordermoney = 0;
-        foreach($list as $val){
-            $_ordermoney += floatval($val['price']) * $_orderinfo[$val['id']];
+        foreach(explode(',', $orderdetail) as $key=>$val){
+            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
+            $_dishid = $match[1];
+            $_dishnum = $match[3];
+            $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
         }
         if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
         //验证外卖配送地址

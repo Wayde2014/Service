@@ -65,11 +65,11 @@ class Order extends Base
                 }
             }
             $TastesModel = new TastesModel();
-            $tasteslist = $TastesModel->getDishesList(implode(',', array_unique($tastid)));
+            $tasteslist = $TastesModel->getTastesList(implode(',', array_unique($tastid)));
             $tastesinfo = array();
             if($tasteslist){
                 foreach($tasteslist as $key => $val){
-                    $tastesinfo[$val['tid']] = $val['tastes'];
+                    $tastesinfo[$val['id']] = $val['tastes'];
                 }
             }
             foreach($list as $key => $val){
@@ -87,7 +87,7 @@ class Order extends Base
             }
             
         }
-        return json($this->sucres($info, $list));
+        return json($this->sucjson($info, $list));
     }
     /**
      * 订单处理
@@ -112,6 +112,6 @@ class Order extends Base
         $OrderModel = new OrderModel();
         $info = $OrderModel->processOrder($orderid, $data);
         if(!$info) return json($this->erres("更新失败"));
-        return json($this->sucres($info));
+        return json($this->sucjson($info));
     }
 }
