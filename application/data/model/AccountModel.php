@@ -383,6 +383,9 @@ class AccountModel extends Model
         $paytype = $orderinfo['paytype'];
         $ori_status = $orderinfo['status'];
         $tradeorderid = $orderinfo['suborder'];
+        if($ori_status == $this->paysuc){
+            return true;
+        }
         if($paymoney != $bankmoney || $ori_status != 0){
             return false;
         }

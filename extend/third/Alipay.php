@@ -48,6 +48,7 @@ class Alipay
      */
     protected function sign($data, $signType = "RSA2")
     {
+        Log::record('signdata='.$data,'debug');
         if (empty($this->rsa_private_key)) {
             Log::record("私钥内容为空，请检查RSA私钥配置");
             return false;
@@ -166,7 +167,7 @@ class Alipay
     {
         $request_data = self::getCommonParam();
         //业务参数
-        $params = array(
+        /*$params = array(
             "body" => $desc, //商品描述
             "subject" => $title, //商品标题
             "out_trade_no" => $orderno, //商户网站唯一订单号
@@ -174,11 +175,22 @@ class Alipay
             "total_amount" => $totalmount, //订单总金额
             "seller_id" => $this->uuid, //收款支付宝用户ID
             "product_code" => "QUICK_MSECURITY_PAY", //销售产品码-固定值
-            "goods_type" => "1", //商品主类型：0—虚拟类商品，1—实物类商品
+            //"goods_type" => "1", //商品主类型：0—虚拟类商品，1—实物类商品
+        );*/
+        $params = array(
+            "timeout_express" => "24h", //超时时间,此处默认24小时
+            "seller_id" => $this->uuid, //收款支付宝用户ID
+            "product_code" => "QUICK_MSECURITY_PAY", //销售产品码-固定值
+            "total_amount" => $totalmount, //订单总金额
+            "subject" => $title, //商品标题
+            "body" => $desc, //商品描述
+            "out_trade_no" => $orderno, //商户网站唯一订单号
+            //"goods_type" => "1", //商品主类型：0—虚拟类商品，1—实物类商品
         );
         $request_data["biz_content"] = self::getBizContent($params);
         $request_data["method"] = "alipay.trade.app.pay";
         $request_data["sign"] = self::sign(self::getSignContent($request_data));
+        $request_data["sign"] = urlencode($request_data["sign"]);
         return $request_data;
     }
 
@@ -275,21 +287,15 @@ class Alipay
      */
     protected function getBizContent($params)
     {
-        $bizContent = "";
+        $bizDict = array();
         if (!empty($params)) {
-            $allnum = count($params);
             foreach ($params as $k => $v) {
                 if (false === $this->checkEmpty($v)) {
-                    if ($allnum == 1) {
-                        $bizContent .= "\"" . $k . "\"" . ":" . "\"" . $v . "\"";
-                    } else {
-                        $bizContent .= "\"" . $k . "\"" . ":" . "\"" . $v . "\",";
-                    }
+                    array_push($bizDict,"\"" . $k . "\"" . ":" . "\"" . $v . "\"");
                 }
-                $allnum--;
             }
         }
-        $bizContent = "{" . $bizContent . "}";
+        $bizContent = "{" . implode(",",$bizDict) . "}";
         return $bizContent;
     }
 
@@ -308,6 +314,7 @@ class Alipay
         //调用openssl内置方法验签，返回bool值
         $sign = base64_decode($sign);
         $data = self::getSignContent($params);
+        Log::record("data=".$data,"debug");
 
         if ("RSA2" == $signType) {
             $result = (bool)openssl_verify($data, $sign, $res, OPENSSL_ALGO_SHA256);
@@ -322,7 +329,7 @@ class Alipay
      * 充值订单反查并处理
      */
     public function handlerRechargeOrder($orderid, $orderinfo){
-        $result = array(
+        $resp_result = array(
             "code" => -1,
             "status" => "inprocess",
         );
@@ -333,15 +340,15 @@ class Alipay
         Log::record("response=".$curl_ret,'debug');
         $resp = json_decode($curl_ret,true);
         $response = $resp['alipay_trade_query_response'];
-        $sign = $resp['sign'];
+        //$sign = $resp['sign'];
         Log::record($response,'debug');
         if(!empty($response)){
             if(intval($response['code']) == 10000){
                 //验签
-                if(!self::verify($response,$sign)){
+                /*if(!self::verify($response,$sign)){
                     Log::record("签名验证失败",'error');
                     return $result;
-                }
+                }*/
                 /**
                  * 交易状态：
                  * WAIT_BUYER_PAY（交易创建，等待买家付款）
@@ -360,34 +367,34 @@ class Alipay
 
                 if($order_money != $bankmoney){
                     Log::record("充值订单[".$orderid."]网站金额[".$order_money."]与支付宝金额[".$bankmoney."]不一致",'error');
-                    return $result;
+                    return $resp_result;
                 }
                 if($orderid != $out_trade_no){
                     Log::record("网站充值订单号[".$orderid."]与支付宝商户订单号[".$out_trade_no."]不一致",'error');
-                    return $result;
+                    return $resp_result;
                 }
 
                 $Account = new AccountModel();
                 if($trade_status == 'TRADE_SUCCESS' || $trade_status == 'TRADE_FINISHED'){
                     //充值成功，入账处理
-                    $result['status'] = "success";
+                    $resp_result['status'] = "success";
                     $result = $Account->rechargeSuc($orderid,$trade_no,$bankmoney,$buyer_logon_id,$describle);
                     if(!$result){
-                        $result['code'] = -100;
+                        $resp_result['code'] = -100;
                         Log::record("充值订单[".$orderid."]入账处理失败",'error');
                     }else{
-                        $result['code'] = 100;
+                        $resp_result['code'] = 100;
                         Log::record("充值订单[".$orderid."]入账处理成功",'info');
                     }
                 }else if($trade_status == 'TRADE_CLOSED'){
                     //充值失败处理
-                    $result['status'] = "fail";
+                    $resp_result['status'] = "fail";
                     $result = $Account->rechargeFail($orderid,$buyer_logon_id,$describle);
                     if(!$result){
-                        $result['code'] = -100;
+                        $resp_result['code'] = -100;
                         Log::record("充值订单[".$orderid."]失败状态处理失败",'error');
                     }else{
-                        $result['code'] = 100;
+                        $resp_result['code'] = 100;
                         Log::record("充值订单[".$orderid."]失败状态处理成功",'info');
                     }
                 }
@@ -396,7 +403,7 @@ class Alipay
                 Log::record($resp,'error');
             }
         }
-        return $result;
+        return $resp_result;
     }
 
     /**

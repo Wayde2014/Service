@@ -9,6 +9,8 @@ class Upload extends Base
      */
     public function images(){
         //判断临时文件存放路径是否包含用户上传的文件
+        $filetype = '';
+        if(isset($_POST['filetype'])) $filetype = $_POST['filetype'];
         if(isset($_FILES["file"]) && is_uploaded_file($_FILES["file"]["tmp_name"])){
             //为了更高效，将信息存放在变量中
             $upfile = $_FILES["file"];//用一个数组类型的字符串存放上传文件的信息
@@ -26,11 +28,13 @@ class Upload extends Base
                 return json($this->erres("上传图片格式错误"));
             }
             $filename = $this->random().$name;
+            $dirurl = 'shopicon/';
+            if($filetype == 'dishicon') $dirurl = 'dishicon/';
             //调用move_uploaded_file（）函数，进行文件转移
-            move_uploaded_file($tmp_name, UPLOAD_PATH.'shopicon/'.$filename);
+            move_uploaded_file($tmp_name, UPLOAD_PATH.$dirurl.$filename);
             //$this->compressed_image(UPLOAD_PATH.'shopicon/'.$filename, UPLOAD_PATH.'shopicon/min_'.$filename);
             //操作成功后，提示成功
-            return json($this->sucjson(array("imgpath" => "/upload/shopicon/".$filename)));
+            return json($this->sucjson(array("imgpath" => "/upload/".$dirurl.$filename)));
         }
     }
     

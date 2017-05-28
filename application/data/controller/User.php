@@ -618,6 +618,7 @@ class User extends Base
         $retinfo['paymoney'] = $paymoney;
         $retinfo['request'] = $Alipay->AlipayTradeAppPayRequest($subject,$describle,$orderid,$paymoney);;
 
+        Log::record(self::sucjson($retinfo),'debug');
         return json(self::sucjson($retinfo));
     }
 
@@ -642,8 +643,10 @@ class User extends Base
         if(empty($orderinfo)){
             return json(self::erres("充值订单不存在"));
         }
-        if($orderinfo['status'] != 0){
-            return json(self::erres("该充值订单已处理"));
+        if($orderinfo['status'] == $AccountModel->paysuc){
+            return json(self::sucjson());
+        }elseif($orderinfo['status'] == $AccountModel->payfail){
+            return json(self::erres("充值失败,订单已处理"));
         }
 
         $paychannel = $orderinfo['channel'];

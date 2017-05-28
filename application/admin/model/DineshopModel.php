@@ -36,30 +36,53 @@ class DineshopModel extends Model
             $shopid = intval(Db::table('t_admin_dineshop')->insertGetId($data));
             return $shopid;
         }catch (\Exception $e) {
-            return false;
+            $shopinfo = Db::table('t_admin_dineshop')->field('f_sid shopid')->where('f_shopname', $shopname)->where('f_adduser', $adduser)->find();
+            if($shopinfo && isset($shopinfo['shopid'])){
+                return $shopinfo['shopid'];
+            }else{
+                return false;
+            }
         }
     }
     /**
      * 修改店铺信息
      */
     public function modDineshop($shopid, $shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address){
-        $data = array(
-            'f_shopname' => $shopname,
-            'f_shopdesc' => $shopdesc,
-            'f_shopicon' => $shopicon,
-            'f_shophone' => $shophone,
-            'f_address' => $address,
-            'f_cuisineid' => $cuisineid,
-            'f_maplon' => $maplon,
-            'f_maplat' => $maplat,
-            'f_sales' => $sales,
-            'f_deliveryfee' => $deliveryfee,
-            'f_minprice' => $minprice,
-            'f_preconsume' => $preconsume,
-            'f_isbooking' => $isbooking,
-            'f_opentime' => $opentime,
-            'f_isaway' => $isaway
-        );
+        // 启动事务
+        Db::startTrans();
+        try{
+            $data = array(
+                'f_shopname' => $shopname,
+                'f_shopdesc' => $shopdesc,
+                'f_shopicon' => $shopicon,
+                'f_shophone' => $shophone,
+                'f_address' => $address,
+                'f_cuisineid' => $cuisineid,
+                'f_maplon' => $maplon,
+                'f_maplat' => $maplat,
+                'f_sales' => $sales,
+                'f_deliveryfee' => $deliveryfee,
+                'f_minprice' => $minprice,
+                'f_preconsume' => $preconsume,
+                'f_isbooking' => $isbooking,
+                'f_opentime' => $opentime,
+                'f_isaway' => $isaway
+            );
+            Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update($data); //更新管理后台表
+            $shopinfo = Db::table('t_admin_dineshop')->field('f_status status, f_fontshopid fontshopid')->where('f_sid', $shopid)->find();
+            if($shopinfo['status'] == 100){
+                //审核通过则同步到前端表
+                Db::table('t_dineshop')->where('f_sid', $shopinfo['fontshopid'])->update($data);
+            }
+            // 提交事务
+            Db::commit();
+            return true;
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            return false;
+        }
+        
         return Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update($data);
     }
     /**
@@ -74,11 +97,13 @@ class DineshopModel extends Model
                 //审核通过则同步到前端表
                 $shopinfo = Db::table('t_admin_dineshop')->field('f_shopname,f_shopdesc,f_shopicon,f_shophone,f_address,f_cuisineid,f_maplon,f_maplat,f_sales,f_deliveryfee,f_minprice,f_preconsume,f_isbooking,f_opentime,f_isaway')->where('f_sid', $shopid)->find();
                 $shopinfo['f_addtime'] = date('Y-m-d H:i:s');
-                Db::table('t_dineshop')->insertGetId($shopinfo);
+                $fontshopid = Db::table('t_dineshop')->insertGetId($shopinfo);
+                Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update(array('f_fontshopid' => $fontshopid)); 
             }else if($status == -300){
                 //删除则从前端表下架
                 $shopinfo = Db::table('t_admin_dineshop')->field('f_shopname shopname')->where('f_sid', $shopid)->find();
                 Db::table('t_dineshop')->where('f_shopname', $shopinfo['shopname'])->delete();
+                Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update(array('f_fontshopid' => 0)); 
             }
             // 提交事务
             Db::commit();

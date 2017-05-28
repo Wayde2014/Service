@@ -578,7 +578,7 @@ class Shop extends Base
         if($deskid){
             return json($this->sucjson(array('deskid' => $deskid)));
         }else{
-            return json($this->errjson(-1)); 
+            return json($this->erres('添加桌型信息失败！')); 
         }
     }
     /**
@@ -601,7 +601,7 @@ class Shop extends Base
         if($info){
            return json($this->sucjson()); 
         }else{
-           return json($this->errjson()); 
+           return json($this->errjson($this->erres('修改桌型信息失败！'))); 
         }
     }
     /**
@@ -673,6 +673,9 @@ class Shop extends Base
         $info = array();
         $list = array();
         $shopid = input('shopid');
+        if(empty($shopid)){
+            return json($this->errjson(-20001));
+        }
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
@@ -692,6 +695,29 @@ class Shop extends Base
         }
         $DineshopModel = new DineshopModel();
         $list = $DineshopModel->getCuisineList();
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 根据店铺信息获取菜肴列表
+     */
+    public function getDishesList(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid');
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        if(empty($shopid)){
+            return json($this->errjson(-20001));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DishesModel = new DishesModel();
+        $res = $DishesModel->getDishesListBysid($shopid, $page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['disheslist']) {
+            $list = $res['disheslist'];
+        }
         return json($this->sucjson($info, $list));
     }
 }
