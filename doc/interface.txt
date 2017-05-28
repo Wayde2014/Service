@@ -161,9 +161,9 @@
     入参：
         ck          唯一标示用户登录态信息
         uid         用户ID
-        drawtype    提款类型(200-押金退款)
+        drawtype    提款类型(300-订单退款)
         drawmoney   提款金额
-        describle   提款说明(eg.押金退款)
+        describle   提款说明(eg.订单退款)
     结果说明：
         {"code":1,"msg":"success","info":[],"list":[]}
         code > 0，即提款发起成功
