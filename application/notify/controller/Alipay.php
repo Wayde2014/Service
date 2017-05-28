@@ -25,7 +25,7 @@ class Alipay
             Log::record($notify_args,'debug');
 
             //剔除sign、sign_type参数，开始验签
-            if(empty($ori_post)){
+            if(empty($notify_args)){
                 exception("异步通知获取post参数为空");
             }
             $sign_type = $notify_args['sign_type'];
