@@ -98,17 +98,19 @@ class AccountModel extends Model
      * @param $uid
      * @param $drawmoney
      * @param $drawtype
+     * @param $channel
      * @param $suborder
      * @param int $payorderid
      * @param int $paybankorderid
      * @return bool|int
      */
-    public function addDrawOrderInfo($uid, $drawmoney, $drawtype, $suborder, $payorderid=0,$paybankorderid=0){
+    public function addDrawOrderInfo($uid, $drawmoney, $drawtype, $channel, $suborder, $payorderid=0,$paybankorderid=0){
         $table_name = 'user_draw_order';
         $data = array(
             'f_uid' => $uid,
             'f_drawmoney' => $drawmoney,
             'f_drawtype' => $drawtype,
+            'f_channel' => $channel,
             'f_suborder' => $suborder,
             'f_payorderid' => $payorderid,
             'f_paybankorderid' => $paybankorderid,
@@ -449,6 +451,9 @@ class AccountModel extends Model
         $drawtype = $orderinfo['drawtype'];
         $ori_status = $orderinfo['status'];
         $tradeorderid = $orderinfo['suborder'];
+        if($ori_status == $this->drawsuc){
+            return true;
+        }
         if($drawmoney != $bankmoney || $ori_status != 0){
             return false;
         }
