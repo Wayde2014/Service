@@ -253,3 +253,29 @@
     结果说明：
         {"code":1,"msg":"success","info":[],"list":[]}
         code > 0，即取消订单成功
+
+更新内容：
+    2017-05-29 modify by zhangw
+    1) 梳理修改订单支付流程
+        a.余额支付，创建订单后，直接调用完成订单接口(finishOrder)，完成扣款
+        b.第三方支付，创建订单后
+            i) 首先调用创建充值订单接口(createRechargeOrder)
+            ii) 待支付返回后，调用充值订单同步通知处理接口(finishRechargeOrder)
+            iii) 根据finishRechargeOrder返回结果，提示用户是否成功，不论是否成功，都跳转至订单详情页面
+    2) 梳理取消订单/退款流程
+        a.用户申请退款，直接调用取消订单接口(cancelOrder)即可
+        b.实现如下：
+            i) 检查该订单是否可退，外卖订单与堂食订单退款条件不一样
+            ii) 将订单更新为退款待审核状态，等待管理后台人工审核
+            iii) 人工审核通过后，区分余额支付和第三方支付处理
+                *.余额支付，直接撤单返款，资金退至用户账户余额
+                *.第三方支付，调用第三方支付接口原路退回
+    3) 废除发起提款(draw)接口
+    4）新增取消订单接口(cancelOrder)
+    5）修改订单表(t_orders)，新增f_servicemoney服务费字段，f_status字段新增-110退款待审核 -120退款审核通过 -130退款审核不通过状态
+    6）修改创建订单接口(createOrder)，新增入参，servicemoney即该订单餐位服务费
+    7) 修改订单详情接口(getOrderinfo),新增出参，servicemoney即该订单餐位服务费
+    8) 管理后台新增退款审核接口(checkupCancelOrder)
+
+
+
