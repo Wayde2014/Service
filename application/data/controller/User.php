@@ -158,11 +158,10 @@ class User extends Base
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
         $res = $UserModel->getAddressList($uid);
-        if($res) {
-            return json($this->sucres(array("num"=>count($res)), $res));
-        }else{
-            return json($this->erres('获取用户地址列表失败'));
+        if(empty($res)) {
+            return json(self::sucjson());
         }
+        return json(self::sucres(array("num"=>count($res)), $res));
     }
 
     /**
@@ -415,12 +414,12 @@ class User extends Base
 
         $payorderid = $rechargeinfo['orderid'];
         $paybankorderid = $rechargeinfo['bankorderid'];
-        $draworderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype,$suborder,$payorderid,$paybankorderid);
+        $drawchannel = $rechargeinfo['channel'];
+        $draworderid = $AccountModel->addDrawOrderInfo($uid,$drawmoney,$drawtype,$drawchannel,$suborder,$payorderid,$paybankorderid);
         if($draworderid === false){
             return json(self::erres("创建提款订单失败"));
         }
 
-        $drawchannel = $rechargeinfo['channel'];
         if($drawchannel == config("drawchannel.alipay")){
             $Alipay = new Alipay();
             $ret = $Alipay->toRefund($draworderid,$drawmoney,$rechargeinfo,$describle);

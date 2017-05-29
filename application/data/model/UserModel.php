@@ -325,10 +325,6 @@ class UserModel extends Model
             ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_mobile mobile,f_isactive isactive')
             ->order('f_addtime', 'desc')
             ->select();
-        //var_dump(Db::name($table_name)->getLastSql());
-        if(empty($address)){
-            return false;
-        }
         return $address;
     }
 
@@ -425,5 +421,4 @@ class UserModel extends Model
             return true;
         }
     }
-
 }

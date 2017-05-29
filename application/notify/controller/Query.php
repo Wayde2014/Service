@@ -89,7 +89,7 @@ class Query extends Base
         if($paychannel == config("paychannel.alipay")){
             //支付宝提款结束，开始订单状态反查
             $Alipay = new Alipay();
-            $result = $Alipay->handlerRechargeOrder($orderid,$orderinfo);
+            $result = $Alipay->handlerRefundOrder($orderid,$orderinfo);
             if($result['code'] > 0 && $result['status'] == 'success'){
                 //提款成功，且提款订单处理成功
                 return json(self::sucjson());
