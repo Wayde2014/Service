@@ -382,8 +382,8 @@ class User extends Base
                 return json(self::erres("待退款交易订单不存在"));
             }
             $order_status = $trade_orderinfo['status'];
-            if($order_status != $OrderModel->status_waiting_refund){
-                return json(self::erres("该交易订单状态非未待退款状态"));
+            if($order_status != $OrderModel->status_checkup_suc_refund){
+                return json(self::erres("该交易订单状态非未退款审核通过状态"));
             }
             $AccountModel = new AccountModel();
             $rechargeinfo = $AccountModel->getTradeOrderRechargeInfo($uid,$suborder);

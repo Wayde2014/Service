@@ -16,6 +16,9 @@ class OrderModel extends Model
     public $status_waiting_refund = -200;
     public $status_pay_suc = 2;
     public $status_refund_suc = -300;
+    public $status_waiting_checkup_refund = -110;
+    public $status_checkup_suc_refund = -120;
+    public $status_checkup_fail_refund = -130;
 
     /**
      * 新增外卖订单
@@ -66,7 +69,7 @@ class OrderModel extends Model
      * @params $endtime 就餐结束时间
      * @return \think\response\Json
      */
-    public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime)
+    public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney)
     {
         $table_name = 'orders';
         $data = array(
@@ -82,6 +85,7 @@ class OrderModel extends Model
             'f_startime' => $startime,
             'f_endtime' => $endtime,
             'f_addtime' => date("Y-m-d H:i:s"),
+            'f_servicemoney' => $servicemoney,
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
         if ($orderid <= 0) {
@@ -93,21 +97,26 @@ class OrderModel extends Model
     /**
      * 完成订单
      */
-    public function finishOrder($userid, $orderid, $allmoney)
+    public function finishOrder($userid, $orderid, $paymoney)
     {
-        // 启动事务
-        Db::startTrans();
-        try{
-            Db::table('t_user_info')->where('f_uid', $userid)->setDec('f_usermoney', $allmoney);
-            Db::table('t_orders')->where('f_oid', $orderid)->update(array('f_status' => 2));
-            // 提交事务
-            Db::commit();
-            return true;
-        } catch (\Exception $e) {
-            // 回滚事务
-            Db::rollback();
-            return false;
+        $Account = new AccountModel();
+        //冻结
+        $tradetype = 2002;  //订单支付冻结
+        $tradenote = $Account->tradetype_config[$tradetype];
+        $freeze = $Account->freeze($userid,$paymoney,$tradetype,$tradenote);
+        if($freeze){
+            //更新订单状态
+            $uporder = self::updateTradeOrderInfo($userid,$orderid,$this->status_pay_suc,$paymoney);
+            if($uporder){
+                //解冻扣款
+                $tradetype = 2102;  //订单支付(解冻扣款)
+                $tradenote = $Account->tradetype_config[$tradetype];
+                if($Account->unfreeze($userid,$paymoney,$tradetype,$tradenote)){
+                    return true;
+                }
+            }
         }
+        return false;
     }
     
     /**
@@ -159,7 +168,7 @@ class OrderModel extends Model
         );
         $orderinfo = Db::table('t_orders')
             ->alias('a')
-            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime')
+            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_servicemoney servicemoney,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime')
             ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
             ->join('t_user_address_info c', 'a.f_addressid = c.f_id','left')
             ->join('t_dineshop_distripersion d', 'a.f_deliveryid = d.f_id','left')
@@ -187,7 +196,7 @@ class OrderModel extends Model
     }
 
     /**
-     * 更新交易订单信息(订单支付退款用)
+     * 更新交易订单信息
      * @param $uid
      * @param $orderid
      * @param $status

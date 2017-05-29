@@ -28,6 +28,7 @@ class Order extends Base
         $deliverytime = input('deliverytime'); //外卖 配送时间
         $addressid = input('addressid'); //外卖 配送地址ID
         $mealsnum = input('mealsnum'); //食堂就餐 就餐人数
+        $servicemoney = input('servicemoney',0); //食堂就餐 服务费
         $startime = input('startime'); //食堂订餐 开始时间
         $endtime = input('endtime'); //食堂订餐 结束时间
         $date = input('date'); //折扣日期
@@ -120,7 +121,7 @@ class Order extends Base
             if($ordertype == 1){
                 $orderid = $OrderModel->addTakeoutOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $deliverytime, $addressid);
             }else{
-                $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime);
+                $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney);
             }
             if($orderid){
                 if($this->checkMoneyEnough($uid,$allmoney)){
@@ -136,8 +137,8 @@ class Order extends Base
     
     /**
      * 完成订单
+     * (前端仅余额支付方式时调用)
      */
-    //http://shanwei.boss.com/data/order/finishOrder?orderid=12&uid=10005&ck=ck_NGE5NJA5NWVMMTIYNWJKZMRLOWZKODFLNMM3YTVKZTU=
     public function finishOrder(){
         $uid = input('uid'); //用户ID
         $orderid = input('orderid'); //用户ID
@@ -147,13 +148,13 @@ class Order extends Base
         $OrderModel = new OrderModel();
         $orderinfo = $OrderModel->getOrderinfo($uid, $orderid);
         if(!$orderinfo)  return json($this->errjson(-30020));
-        $status = $orderinfo['status'];
+        $status = intval($orderinfo['status']); //订单支付状态 1为未付款
         $allmoney = floatval($orderinfo['allmoney']);
         $userid = $orderinfo['userid'];
-        if($status < 2){
-            //验证用户余额
+        if($status == $OrderModel->status_waiting_pay){
+            //检查用户余额
             if(!$this->checkMoneyEnough($userid,$allmoney)) return json($this->errjson(10002));
-            //完成订单 事务处理
+            //扣款完成订单
             $ret = $OrderModel->finishOrder($userid, $orderid, $allmoney);
             if(!$ret){
                 return json($this->errjson(-30021));
@@ -266,5 +267,42 @@ class Order extends Base
             $info['orderlist'] = $orderlist;
         }
         return json($this->sucres($info, $list));
+    }
+
+    /**
+     * 取消订单(退款)
+     */
+    public function cancelOrder()
+    {
+        $uid = input('uid'); //用户ID
+        $orderid = input('orderid'); //订单号
+        //判断用户登录
+        if ($this->checkLogin() === false) return json($this->errjson(-10001));
+
+        //检查订单状态
+        $OrderModel = new OrderModel();
+        $orderinfo  = $OrderModel->getOrderinfo($uid,$orderid);
+        if(empty($orderinfo)){
+            return json(self::errjson(-30020));
+        }
+        $ordertype = intval($orderinfo['ordertype']); //1,外卖订单  2,食堂订单
+        $orderstatus = intval($orderinfo['status']);  //订单状态（0,初始 1,未付款 2,已付款 3,配送中 4,配送完成 5,用餐中 100,已完成 -100逾期 -110退款待审核 -120退款审核通过 -130退款审核不通过  -200退款中 -300退款完成， -400已取消）
+        if($ordertype == 1){
+            if($orderstatus != 2){
+                return json(self::errjson(-30022));
+            }
+        }elseif($ordertype == 2){
+            $startime = $orderinfo['startime']; //用餐开始时间
+            if($orderstatus !=2 || strtotime($startime)-time() < 24*3600){
+                return json(self::errjson(-30022));
+            }
+        }
+
+        //更新订单状态为退款待审核状态
+        $wait_checkup = $OrderModel->updateTradeOrderInfo($uid,$orderid,$OrderModel->status_waiting_checkup_refund);
+        if(!$wait_checkup){
+            return json(self::errjson(-30023));
+        }
+        return json(self::sucjson());
     }
 }

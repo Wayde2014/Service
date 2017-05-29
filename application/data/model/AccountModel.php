@@ -20,6 +20,7 @@ class AccountModel extends Model
         1001 => '余额充值',
         1002 => '押金充值',
         1003 => '订单充值',
+        1004 => '撤单返款',
         1101 => '押金退款解冻',
         1102 => '订单支付解冻',
         1103 => '订单退款解冻',
@@ -188,8 +189,10 @@ class AccountModel extends Model
                 case 1003:
                 case 1102:
                 case 1103:
+                case 1004:
                     //余额充值
                     //订单充值
+                    //撤单返款
                     //订单支付解冻
                     //订单退款解冻
                     $usermoney += $money;
@@ -400,9 +403,9 @@ class AccountModel extends Model
                 $UserModel = new UserModel();
                 return $UserModel->updateUserInfo($uid,array('user_status'=>200));
             }else if($deposit && $paytype == config("paytype.order")){
-                //订单充值成功后,需要更新订单状态
+                //订单充值成功后,需要完成订单
                 $OrderModel = new OrderModel();
-                return $OrderModel->updateTradeOrderInfo($uid,$tradeorderid,$OrderModel->status_pay_suc,$bankmoney);
+                return $OrderModel->finishOrder($uid,$tradeorderid,$bankmoney);
             }else{
                 return $deposit;
             }
@@ -556,6 +559,8 @@ class AccountModel extends Model
             $new_tradetype = 1101;
         }else if($tradetype == 2103){
             $new_tradetype = 1103;
+        }else if($tradetype == 2102){
+            $new_tradetype = 1102;
         }else{
             return false;
         }
