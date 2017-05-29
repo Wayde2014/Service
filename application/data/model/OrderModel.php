@@ -69,7 +69,7 @@ class OrderModel extends Model
      * @params $endtime 就餐结束时间
      * @return \think\response\Json
      */
-    public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney)
+    public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid)
     {
         $table_name = 'orders';
         $data = array(
@@ -86,6 +86,7 @@ class OrderModel extends Model
             'f_endtime' => $endtime,
             'f_addtime' => date("Y-m-d H:i:s"),
             'f_servicemoney' => $servicemoney,
+            'f_deskid' => $deskid,
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
         if ($orderid <= 0) {
@@ -168,7 +169,7 @@ class OrderModel extends Model
         );
         $orderinfo = Db::table('t_orders')
             ->alias('a')
-            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_servicemoney servicemoney,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime')
+            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_servicemoney servicemoney,a.f_deskid deskid,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime')
             ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
             ->join('t_user_address_info c', 'a.f_addressid = c.f_id','left')
             ->join('t_dineshop_distripersion d', 'a.f_deliveryid = d.f_id','left')

@@ -28,6 +28,7 @@ class Order extends Base
         $deliverytime = input('deliverytime'); //外卖 配送时间
         $addressid = input('addressid'); //外卖 配送地址ID
         $mealsnum = input('mealsnum'); //食堂就餐 就餐人数
+        $deskid = input('deskid',0); //食堂就餐 预订桌型ID
         $servicemoney = input('servicemoney',0); //食堂就餐 服务费
         $startime = input('startime'); //食堂订餐 开始时间
         $endtime = input('endtime'); //食堂订餐 结束时间
@@ -121,7 +122,7 @@ class Order extends Base
             if($ordertype == 1){
                 $orderid = $OrderModel->addTakeoutOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $deliverytime, $addressid);
             }else{
-                $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney);
+                $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid);
             }
             if($orderid){
                 if($this->checkMoneyEnough($uid,$allmoney)){

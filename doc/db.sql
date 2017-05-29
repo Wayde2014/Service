@@ -560,6 +560,7 @@ CREATE TABLE `t_orders` (
   `f_paymoney` double(200,0) DEFAULT '0' COMMENT '已支付金额',
   `f_paytype` varchar(200) DEFAULT '0' COMMENT '支付方式（0余额，1微信，2支付宝）',
   `f_mealsnum` int(10) DEFAULT '0' COMMENT '就餐人数（仅食堂订单有）',
+  `f_deskid` int default null comment '预订桌型ID（仅食堂订单有）',
   `f_servicemoney` double(200,0) DEFAULT 0 COMMENT '服务费（仅食堂订单有）',
   `f_startime` varchar(200) DEFAULT '' COMMENT '用餐开始时间（仅食堂订单有）',
   `f_endtime` varchar(200) DEFAULT '' COMMENT '用餐结束时间（仅食堂订单有）',
