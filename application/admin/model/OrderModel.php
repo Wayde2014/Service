@@ -12,6 +12,15 @@ use think\Db;
 
 class OrderModel extends Model
 {
+
+    public $status_waiting_pay = 1;
+    public $status_waiting_refund = -200;
+    public $status_pay_suc = 2;
+    public $status_refund_suc = -300;
+    public $status_waiting_checkup_refund = -110;
+    public $status_checkup_suc_refund = -120;
+    public $status_checkup_fail_refund = -130;
+
     /**
      * 获取外卖订单列表
      */
@@ -87,5 +96,67 @@ class OrderModel extends Model
     {
         $res = Db::table('t_orders')->where('f_oid', $orderid)->update(array('f_status' => 3, 'f_deliveryid' => $distripid));
         return $res;
+    }
+
+    /**
+     * 获取订单详情
+     */
+    public function getOrderinfo($userid, $orderid)
+    {
+        $where = array(
+            'a.f_userid' => $userid,
+            'a.f_oid' => $orderid
+        );
+        $orderinfo = Db::table('t_orders')
+            ->alias('a')
+            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_servicemoney servicemoney,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime')
+            ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
+            ->join('t_user_address_info c', 'a.f_addressid = c.f_id','left')
+            ->join('t_dineshop_distripersion d', 'a.f_deliveryid = d.f_id','left')
+            ->where($where)
+            ->find();
+        return $orderinfo?$orderinfo:false;
+    }
+
+    /**
+     * 更新交易订单信息
+     * @param $uid
+     * @param $orderid
+     * @param $status
+     * @param $paymoney
+     * @return bool
+     */
+    public function updateTradeOrderInfo($uid, $orderid, $status, $paymoney=0){
+        $sql = "update t_orders set f_status = :status, f_paymoney = f_paymoney + :paymoney where f_userid = :uid and f_oid = :orderid";
+        $args = array(
+            "uid" => $uid,
+            "orderid" => $orderid,
+            "status" => $status,
+            "paymoney" => $paymoney
+        );
+        $ret = Db::execute($sql,$args);
+        if($ret !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 获取交易订单信息(订单支付退款用)
+     * @param $uid
+     * @param $orderid
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getTradeOrderInfo($uid, $orderid){
+        $table_name = 'orders';
+        $orderinfo = Db::name($table_name)
+            ->where('f_userid',$uid)
+            ->where('f_oid',$orderid)
+            ->field('f_status as status')
+            ->field('f_allmoney as allmoney')
+            ->field('f_paymoney as paymoney')
+            ->find();
+        return $orderinfo;
     }
 }
