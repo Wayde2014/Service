@@ -44,7 +44,7 @@ CREATE TABLE `t_user_paylog` (
   `f_uid` int NOT NULL COMMENT '用户uid',
   `f_inout` tinyint not null comment '出入账类型(1-入账,2-出账)',
   `f_trademoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' comment '交易金额',
-  `f_tradetype` smallint NOT NULL COMMENT '交易类型(1001-余额充值,1002-押金充值,1101-押金退款解冻,1102-订单支付解冻,2001-押金退款冻结,2002-订单支付冻结,2101-押金退款(解冻扣款),2102-订单支付(解冻扣款))',
+  `f_tradetype` smallint NOT NULL COMMENT '交易类型(1001-余额充值,1002-押金充值,1003-订单充值,1004-撤单返款,1101-押金退款解冻,1102-订单支付解冻,1103-订单退款解冻,2001-押金退款冻结,2002-订单支付冻结,2003-订单退款冻结,2101-押金退款(解冻扣款),2102-订单支付(解冻扣款),2103-订单退款(解冻扣款))',
   `f_orderid` varchar(200) default null COMMENT '订单号',
   `f_suborderid` varchar(200) default null COMMENT '子订单号',
   `f_tradenote` varchar(1000) default null comment '交易备注',

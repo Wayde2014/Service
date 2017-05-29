@@ -176,7 +176,7 @@ class Order extends Base
 
                 //检查当前充值渠道是否可退
                 $FrontUser = new FrontUser();
-                if(!in_array($paychannel,$FrontUser->allow_drawtype)){
+                if(!in_array($paychannel,$FrontUser->allow_drawchannel)){
                     return json(self::erres("该支付订单当前不支持原路退回"));
                 }
 

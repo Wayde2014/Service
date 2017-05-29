@@ -245,7 +245,7 @@
     deliveryphone: null  配送联系电话（仅外卖订单有）
 
     5、取消订单接口
-    http://119.23.73.39/data/User/cancelOrder?ck=ck_xxx&uid=xxx&orderid=xxx
+    http://119.23.73.39/data/Order/cancelOrder?ck=ck_xxx&uid=xxx&orderid=xxx
     入参：
         ck          唯一标示用户登录态信息
         uid         用户ID
@@ -274,8 +274,9 @@
     4）新增取消订单接口(cancelOrder)
     5）修改订单表(t_orders)，新增f_servicemoney服务费字段，f_status字段新增-110退款待审核 -120退款审核通过 -130退款审核不通过状态
     6）修改创建订单接口(createOrder)，新增入参，servicemoney即该订单餐位服务费
-    7) 修改订单详情接口(getOrderinfo),新增出参，servicemoney即该订单餐位服务费
-    8) 管理后台新增退款审核接口(checkupCancelOrder)
+    7) 修改完成订单接口(finishOrder)，扣款接入账户体系
+    8) 修改订单详情接口(getOrderinfo),新增出参，servicemoney即该订单餐位服务费
+    9) 管理后台新增退款审核接口(checkupCancelOrder)
 
 
 

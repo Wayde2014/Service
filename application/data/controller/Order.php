@@ -153,7 +153,7 @@ class Order extends Base
         $userid = $orderinfo['userid'];
         if($status == $OrderModel->status_waiting_pay){
             //检查用户余额
-            if(!$this->checkMoneyEnough($userid,$allmoney)) return json($this->errjson(10002));
+            if(!$this->checkMoneyEnough($userid,$allmoney)) return json($this->errjson(-10002));
             //扣款完成订单
             $ret = $OrderModel->finishOrder($userid, $orderid, $allmoney);
             if(!$ret){
