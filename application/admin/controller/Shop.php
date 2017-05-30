@@ -145,7 +145,7 @@ class Shop extends Base
         $info = $DineshopModel->getDineshopInfo($shopid);
         if(isset($info['menulist'])){
             $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesList($info['menulist']);
+            $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
             if($dishlist){
                 $disheslist = $dishlist;
             }
@@ -236,7 +236,7 @@ class Shop extends Base
             $info['shopicon'] = $shopinfo['shopicon'];
             $info['shopaddress'] = $shopinfo['address'];
             $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesList($shopinfo['menulist']);
+            $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
             if($dishlist){
                 foreach($dishlist as $key => $val){
                     $dishinfo[$val['id']] = $val['dishesname'];

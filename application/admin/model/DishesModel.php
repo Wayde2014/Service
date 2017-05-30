@@ -82,6 +82,21 @@ class DishesModel extends Model
             ->select();
         return $disheslist?$disheslist:false;
     }
+
+    /**
+     * 根据店铺ID获取菜品列表信息
+     */
+    public function getDishesListBysidNoPage($shopid){
+        $disheslist = Db::table('t_admin_food_dishes')
+            ->alias('a')
+            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,50 as salenum')
+            ->join('t_food_classify b','a.f_classid = b.f_cid','left')
+            ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
+            ->where('a.f_sid', $shopid)
+            ->select();
+        return $disheslist;
+    }
+
     /**
      * 根据店铺ID获取菜品列表信息
      */
