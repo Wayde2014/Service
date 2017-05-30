@@ -306,4 +306,23 @@ class Order extends Base
         }
         return json(self::sucjson());
     }
+
+    /**
+     * 修改订单信息
+     */
+    public function updateOrderInfo()
+    {
+        $uid = input('uid'); //用户ID
+        $orderid = input('orderid'); //订单号
+        //判断用户登录
+        if ($this->checkLogin() === false) return json($this->errjson(-10001));
+
+        //检查订单状态
+        $OrderModel = new OrderModel();
+        $orderinfo  = $OrderModel->getOrderinfo($uid,$orderid);
+        if(empty($orderinfo)){
+            return json(self::errjson(-30020));
+        }
+        //TODO
+    }
 }

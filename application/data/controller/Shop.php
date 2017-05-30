@@ -64,7 +64,7 @@ class Shop extends Base
                 $menulist = $info['menulist'];
                 $shopdishes = array();
                 $DishesModel = new DishesModel();
-                $reslist = $DishesModel->getDishesList($menulist);
+                $reslist = $DishesModel->getDishesListBysid($shopid);
                 if($reslist){
                     foreach($reslist as $key=>$val){
                         $shopdishes[$val['classifyname']][] = $val;
@@ -113,7 +113,7 @@ class Shop extends Base
                 $discount = array_combine($match[1], $match[0]);
             }
             $DishesModel = new DishesModel();
-            $reslist = $DishesModel->getDishesList($res['dishid']);
+            $reslist = $DishesModel->getDishesListBysid($shopid);
             foreach($reslist as $key => $val){
                 $classifyname = $val['classifyname'];
                 if(isset($discount[$val['id']])){

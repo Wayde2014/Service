@@ -227,6 +227,7 @@ CREATE TABLE `t_food_tastes` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-口味信息表';
+insert  into `t_food_tastes`(`f_tid`,`f_tname`) values (1,'不辣'),(2,'微辣'),(3,'超辣');
 
 
 /*菜肴管理-菜系信息表*/
@@ -237,6 +238,7 @@ CREATE TABLE `t_food_cuisine` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_cid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-菜系信息表';
+insert  into `t_food_cuisine`(`f_cid`,`f_cname`) values (1,'鲁菜'),(2,'川菜'),(3,'粤菜'),(4,'苏菜'),(5,'浙菜'),(6,'闽菜'),(7,'湘菜'),(8,'徽菜');
 
 
 /*菜肴管理-菜品信息表*/
@@ -424,6 +426,7 @@ CREATE TABLE `t_dineshop_discount_timeslot` (
   PRIMARY KEY (`f_id`),
   UNIQUE KEY `t_startime_endtime` (`f_starttime`,`f_endtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='门店管理-折扣时间段';
+insert  into `t_dineshop_discount_timeslot`(`f_starttime`,`f_endtime`,`f_addtime`) values ('13:00','14:00',now()),('16:00','17:00',now()),('17:00','18:00',now()),('00:00','03:00',now()),('17:00','20:00',now());
 
 
 /*配送员信息表*/
@@ -477,6 +480,7 @@ CREATE TABLE `t_food_classify` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_cid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-分类信息管理';
+insert  into `t_food_classify`(`f_cid`,`f_cname`) values (1,'招牌推荐'),(2,'开胃前菜'),(3,'美味甜品'),(4,'养生面食'),(5,'老火靓汤'),(6,'酒水饮料'),(7,'主食米饭'),(8,'家常小菜');
 
 
 /*菜肴管理-菜系信息表*/
@@ -573,6 +577,5 @@ CREATE TABLE `t_orders` (
   `f_addressid` int(10) DEFAULT NULL COMMENT '配送地址ID（仅外卖订单有）',
   `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
-  PRIMARY KEY (`f_oid`),
-  UNIQUE KEY `order_orderdetail_unique` (`f_shopid`,`f_userid`,`f_orderdetail`,`f_type`) USING BTREE
+  PRIMARY KEY (`f_oid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='外卖及预订订单表';

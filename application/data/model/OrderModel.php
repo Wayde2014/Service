@@ -132,6 +132,7 @@ class OrderModel extends Model
             ->where('f_userid', $userid)
             ->where('f_orderdetail', $orderdetail)
             ->where('f_type', $ordertype)
+            ->where('f_addtime', '> time', time()-10)
             ->find();
         return $check?$check['orderid']:false;
     }
