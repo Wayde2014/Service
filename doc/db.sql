@@ -28,6 +28,7 @@ CREATE TABLE `t_user_address_info` (
   `f_city` varchar(100) NOT NULL COMMENT '城市名称',
   `f_address` varchar(1000) NOT NULL COMMENT '详细地址',
   `f_name` varchar(100) NOT NULL COMMENT '收件人',
+  `f_sex` tinyint DEFAULT 1 COMMENT '性别(1-男,0-女)',
   `f_mobile` varchar(50) NOT NULL COMMENT '联系电话',
   `f_isactive` tinyint(4) DEFAULT '0' COMMENT '是否默认地址(0-否,1-是)',
   `f_status` tinyint(4) DEFAULT '0' COMMENT '地址状态(0-有效,-1-无效)',

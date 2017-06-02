@@ -206,7 +206,7 @@ class UserModel extends Model
     /**
      * 新增地址
      */
-    public function addAddress($userid, $province, $city, $address, $name, $mobile)
+    public function addAddress($userid, $province, $city, $address, $name, $mobile, $sex)
     {
         $table_name = 'user_address_info';
         $data = array(
@@ -215,6 +215,7 @@ class UserModel extends Model
             'f_city' => $city,
             'f_address' => $address,
             'f_name' => $name,
+            'f_sex' => $sex,
             'f_mobile' => $mobile,
             'f_addtime' => date("Y-m-d H:i:s"),
         );
@@ -257,6 +258,7 @@ class UserModel extends Model
         if($params['address']) $data['f_address'] = $params['address'];
         if($params['name']) $data['f_name'] = $params['name'];
         if($params['mobile']) $data['f_mobile'] = $params['mobile'];
+        if($params['sex']) $data['f_sex'] = $params['sex'];
         if(count($data) < 1) return true;
         $ret = Db::name($table_name)
             ->where('f_id', $addressid)
@@ -275,7 +277,7 @@ class UserModel extends Model
         $table_name = 'user_address_info';
         $address = Db::name($table_name)
             ->where('f_id', $addressid)
-            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_mobile mobile,f_isactive isactive')
+            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_sex male,f_mobile mobile,f_isactive isactive')
             ->order('f_addtime', 'desc')
             ->find();
         return $address?$address:false;
@@ -322,7 +324,7 @@ class UserModel extends Model
         $table_name = 'user_address_info';
         $address = Db::name($table_name)
             ->where('f_uid', $userid)
-            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_mobile mobile,f_isactive isactive')
+            ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_sex as male,f_mobile mobile,f_isactive isactive')
             ->order('f_addtime', 'desc')
             ->select();
         return $address;
