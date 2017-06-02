@@ -25,9 +25,9 @@ class Base
                 $this->res[$key] = $val;
             }
         }
-        if(!self::checkToken()){
-            //die(json_encode($this->res));
-        }
+        /*if(!self::checkToken()){
+            die(json_encode($this->res));
+        }*/
     }
     /**
      * 错误返回

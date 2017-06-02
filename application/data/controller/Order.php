@@ -189,6 +189,7 @@ class Order extends Base
         $OrderModel = new OrderModel();
         $res = $OrderModel->getOrderlist($uid, $ordertype, $page, $pagesize);
         $info["allnum"] = $res["allnum"];
+        $info["totalpage"] = ceil($res["allnum"]/$pagesize);
         if($res["orderlist"]) {
             $list = $res["orderlist"];
             $orderlist = array();
