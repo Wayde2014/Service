@@ -560,6 +560,7 @@ class User extends Base
         $subject = input('subject');
         $describle = input('describle');
         $suborder = intval(input('suborder',0));
+        $ordertype = intval(input('ordertype',0));
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
@@ -585,7 +586,12 @@ class User extends Base
             }else{
                 //查询该笔订单信息，检查是否存在，是否已交易成功
                 $OrderModel = new OrderModel();
-                $orderinfo = $OrderModel->getTradeOrderInfo($uid,$suborder);
+                if($ordertype == 0){
+                    $orderinfo = $OrderModel->getTradeOrderInfo($uid,$suborder);
+                }else{
+                    $orderinfo = $OrderModel->getTradeSubOrderInfo($uid,$suborder);
+                }
+
                 if(empty($orderinfo)){
                     return json(self::erres("待支付交易订单信息不存在"));
                 }
@@ -609,7 +615,7 @@ class User extends Base
 
         $AccountModel = new AccountModel();
         $paymoney = number_format($paymoney,2,'.','');
-        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel,$suborder);
+        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel,$suborder,$ordertype);
         if($orderid === false){
             return json(self::erres("创建充值订单失败"));
         }

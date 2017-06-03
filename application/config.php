@@ -274,4 +274,9 @@ return [
         "alipay" => 1001,  //支付宝提款
         "wechat" => 1002,  //微信提款
     ),
+
+    //子订单配置
+    "suborder" => array(
+        "endtime" => 1800,
+    ),
 ];

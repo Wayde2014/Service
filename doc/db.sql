@@ -63,6 +63,7 @@ CREATE TABLE `t_user_recharge_order` (
   `f_paytype` smallint NOT NULL COMMENT '充值类型(1001-充值余额,1002-充值押金,1003-订单充值)',
   `f_channel` smallint not NULL COMMENT '充值渠道(1001-支付宝充值,1002-微信充值)',
   `f_suborder` int default 0 comment '子订单号(订单充值时,不能为空)',
+  `f_ordertype` tinyint unsigned default 0 comment '子订单类型(0-默认订单，1-加餐订单)',
   `f_account` varchar(200) default NULL COMMENT '充值账号',
   `f_bankorderid` varchar(100) default null comment '第三方订单号',
   `f_suctime` timestamp default '0000-00-00 00:00:00' comment '成功时间',
@@ -576,7 +577,24 @@ CREATE TABLE `t_orders` (
   `f_deliveryid` int(10) DEFAULT '0' COMMENT '配送员ID（仅外卖订单有）',
   `f_deliverytime` varchar(20) DEFAULT '' COMMENT '配送时间',
   `f_addressid` int(10) DEFAULT NULL COMMENT '配送地址ID（仅外卖订单有）',
+  `f_hassuborder` tinyint unsigned default 0 comment '是否有子订单(0-无，1-有)',
   `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
   PRIMARY KEY (`f_oid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='外卖及预订订单表';
+
+/*堂食子订单表*/
+DROP TABLE IF EXISTS `t_sub_orders`;
+CREATE TABLE `t_sub_orders` (
+  `f_oid` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单ID,唯一标识',
+  `f_parentid` bigint unsigned not null comment '关联订单ID',
+  `f_userid` int(10) NOT NULL COMMENT '用户ID',
+  `f_status` int(2) NOT NULL DEFAULT '1' COMMENT '订单状态（0,初始 1,未付款 2,已付款）',
+  `f_orderdetail` varchar(255) NOT NULL COMMENT '订单详情',
+  `f_ordermoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '订单金额',
+  `f_paymoney` double(200,0) DEFAULT '0' COMMENT '已支付金额',
+  `f_paytype` varchar(200) DEFAULT '0' COMMENT '支付方式（0余额，1微信，2支付宝）',
+  `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
+  `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
+  PRIMARY KEY (`f_oid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='堂食子订单表';
