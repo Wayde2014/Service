@@ -235,7 +235,7 @@ class OrderModel extends Model
         //获取更新前订单信息
         $ori_orderinfo = self::getOrderinfo($uid,$orderid);
         $orderinfo = array(
-            'f_paytype' => empty($new_userinfo['paytype']) ? $ori_orderinfo['paytype'] : $new_orderinfo['paytype'],
+            'f_paytype' => isset($new_orderinfo['paytype']) ? $new_orderinfo['paytype'] : $ori_orderinfo['paytype'],
         );
         $retup = Db::name($table_name)
             ->where('f_uid',$uid)
@@ -270,7 +270,7 @@ class OrderModel extends Model
                 'f_hassuborder' => 1,
             );
             Db::name($table_order)
-                ->where('f_uid',$userid)
+                ->where('f_userid',$userid)
                 ->where('f_oid',$parentid)
                 ->update($p_orderinfo);
             Db::commit();
@@ -317,10 +317,10 @@ class OrderModel extends Model
         //获取更新前订单信息
         $ori_orderinfo = self::getSubOrderinfo($uid,$orderid);
         $orderinfo = array(
-            'f_paytype' => empty($new_userinfo['paytype']) ? $ori_orderinfo['paytype'] : $new_orderinfo['paytype'],
+            'f_paytype' => isset($new_orderinfo['paytype']) ? $new_orderinfo['paytype'] : $ori_orderinfo['paytype'],
         );
         $retup = Db::name($table_name)
-            ->where('f_uid',$uid)
+            ->where('f_userid',$uid)
             ->where('f_oid',$orderid)
             ->update($orderinfo);
         if($retup !== false){
@@ -366,7 +366,7 @@ class OrderModel extends Model
         );
         $orderinfo = Db::table('t_sub_orders')
             ->alias('a')
-            ->field('a.f_oid orderid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_addtime addtime')
+            ->field('a.f_oid orderid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_ordermoney allmoney,a.f_paytype paytype,a.f_addtime addtime')
             ->where($where)
             ->find();
         return $orderinfo?$orderinfo:false;

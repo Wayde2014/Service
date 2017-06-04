@@ -386,11 +386,11 @@ class Order extends Base
         if(empty($parent_orderinfo)){
             return json(self::errjson(-30026));
         }
-        $p_starttime = $parent_orderinfo['starttime'];
+        $p_endtime = $parent_orderinfo['endtime'];
         $p_orderstatus = $parent_orderinfo['status'];
         $p_shopid = $parent_orderinfo['shopid'];
         //检查当前订单是否允许添加子订单
-        if(config('suborder.endtime')+time() > strtotime($p_starttime)){
+        if(config('suborder.endtime')+time() > strtotime($p_endtime)){
             return json(self::errjson(-30027));
         }
         if(!in_array($p_orderstatus,array(2))){
