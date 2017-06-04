@@ -131,10 +131,11 @@ class Shop extends Base
                 $classifyname = $val['classifyname'];
                 if(isset($discount[$val['id']])){
                     preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $discount[$val['id']], $match);
+					$floatTemp = floatval(str_replace(',','',$val['price']));
                     if($match[2] == 1){
-                        $reslist[$key]['discountprice'] = floor($val['price']) * $match[3];
+                        $reslist[$key]['discountprice'] = $floatTemp * $match[3];
                     }elseif($match[2] == 2){
-                        $reslist[$key]['discountprice'] = floatval($val['price']) - $match[3];
+                        $reslist[$key]['discountprice'] = $floatTemp - $match[3];
                     }
                 }
                 if(isset($reslist[$key]['discountprice'])){
