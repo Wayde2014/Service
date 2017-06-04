@@ -313,5 +313,16 @@
     8) 修改订单详情接口(getOrderinfo),新增出参，deskid桌型ID、servicemoney即该订单餐位服务费
     9) 管理后台新增退款审核接口(checkupCancelOrder)
 
+    2017-06-04 modify by zhangw
+    1)新增子订单表t_sub_orders，存储堂食加餐信息
+    2)修改订单表t_orders，新增f_hassuborder字段，是否有子订单(0-无，1-有)
+    3)修改充值订单表t_user_recharge_order，新增f_ordertype，子订单类型(0-默认订单，1-加餐订单)
+    4)修改创建充值订单接口createRechargeOrder新增可选入参ordertype，加餐订单是ordertype=1
+    5)新增创建子订单接口createSubOrder
+    6)新增完成子订单接口finishSubOrder
+    7)新增修改订单信息接口(支付方式修改)updateOrderInfo
+    8)新增修改子订单信息接口(支付方式修改)updateSubOrderInfo
+    9)修改获取订单详情接口getOrderinfo，出参info字段新增suborderlist字段，返回子订单信息
+
 
 

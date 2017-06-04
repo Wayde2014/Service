@@ -271,6 +271,11 @@ class Order extends Base
                 $orderlist[$k]['num'] = $num;
             }
             $info['orderlist'] = $orderlist;
+            $suborder_list = array();
+            if($res['hassuborder'] != 0){
+                $suborder_list = $OrderModel->getSubOrderList($uid,$orderid);
+            }
+            $info['suborderlist'] = $suborder_list;
         }
         return json($this->sucres($info, $list));
     }

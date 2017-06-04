@@ -389,4 +389,21 @@ class OrderModel extends Model
             ->find();
         return $orderinfo;
     }
+
+    /**
+     * 根据父订单ID获取子订单列表
+     */
+    public function getSubOrderList($userid, $parentid)
+    {
+        $where = array(
+            'a.f_userid' => $userid,
+            'a.f_parentid' => $parentid
+        );
+        $orderlist = Db::table('t_sub_orders')
+            ->alias('a')
+            ->field('a.f_oid orderid,a.f_parentid parentid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_addtime addtime')
+            ->where($where)
+            ->find();
+        return $orderlist;
+    }
 }
