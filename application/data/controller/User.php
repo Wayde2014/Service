@@ -250,6 +250,7 @@ class User extends Base
         if(empty($name)) return json($this->erres('请传入收件人'));
         $mobile = input('mobile');
         if(empty($mobile)) return json($this->erres('请传入用户手机号'));
+        $sex = input('male',1);
     
         //判断用户登录
         if($this->checkLogin() === false) return json($this->errjson(-10001));
@@ -258,7 +259,7 @@ class User extends Base
         //检查该手机号是否已注册，如无则注册
         $addressid = $UserModel->checkAddress($uid, $province, $city, $address);
         if ($addressid === false) {
-            $addressid = $UserModel->addAddress($uid, $province, $city, $address, $name, $mobile);
+            $addressid = $UserModel->addAddress($uid, $province, $city, $address, $name, $mobile, $sex);
             if ($addressid === false) {
                 return json($this->erres('新增地址失败'));
             }else{
@@ -285,7 +286,8 @@ class User extends Base
         $address = input('address');
         $mobile = input('mobile');
         $name = input('name');
-        if(empty($province)&&empty($city)&&empty($address)&&empty($name)&&empty($mobile)){
+        $sex = input('male');
+        if(empty($province)&&empty($city)&&empty($address)&&empty($name)&&empty($mobile)&&empty($sex)){
             return json($this->erres('请传入要修改的值'));
         }
         
@@ -298,6 +300,7 @@ class User extends Base
             "address" => $address,
             "name" => $name,
             "mobile" => $mobile,
+            "sex" => $sex,
         );
         $UserModel = new UserModel();
         //检查该手机号是否已注册，如无则注册
@@ -557,6 +560,7 @@ class User extends Base
         $subject = input('subject');
         $describle = input('describle');
         $suborder = intval(input('suborder',0));
+        $ordertype = intval(input('ordertype',0));
 
         //检查用户是否登录
         if(!self::checkLogin($uid,$ck)){
@@ -582,7 +586,12 @@ class User extends Base
             }else{
                 //查询该笔订单信息，检查是否存在，是否已交易成功
                 $OrderModel = new OrderModel();
-                $orderinfo = $OrderModel->getTradeOrderInfo($uid,$suborder);
+                if($ordertype == 0){
+                    $orderinfo = $OrderModel->getTradeOrderInfo($uid,$suborder);
+                }else{
+                    $orderinfo = $OrderModel->getTradeSubOrderInfo($uid,$suborder);
+                }
+
                 if(empty($orderinfo)){
                     return json(self::erres("待支付交易订单信息不存在"));
                 }
@@ -606,7 +615,7 @@ class User extends Base
 
         $AccountModel = new AccountModel();
         $paymoney = number_format($paymoney,2,'.','');
-        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel,$suborder);
+        $orderid = $AccountModel->addRechargeOrderInfo($uid,$paymoney,$paytype,$paychannel,$suborder,$ordertype);
         if($orderid === false){
             return json(self::erres("创建充值订单失败"));
         }

@@ -143,6 +143,20 @@ class DineshopModel extends Model
             ->find();
         return $dineshopinfo;
     }
+
+	/**
+     * 获取店铺信息(按店铺名模糊搜索)
+     */
+    public function getDineshopInfoByName($shopname){
+        $dineshopinfo = Db::table('t_admin_dineshop')
+            ->alias('a')
+            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice, a.f_preconsume preconsume, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
+            ->join('t_food_cuisine b','a.f_cuisineid = b.f_cid','left')
+            ->where(array('a.f_shopname'=>array('like','%'.$shopname.'%')))
+            ->find();
+        return $dineshopinfo;
+    }
+
     /**
      * 查询店铺折扣记录 根据时间段和日期
      */

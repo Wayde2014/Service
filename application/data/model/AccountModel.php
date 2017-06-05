@@ -43,9 +43,10 @@ class AccountModel extends Model
      * @param $paytype
      * @param $channel
      * @param $suborder
+     * @param $ordertype
      * @return bool|int
      */
-    public function addRechargeOrderInfo($uid, $paymoney, $paytype, $channel, $suborder){
+    public function addRechargeOrderInfo($uid, $paymoney, $paytype, $channel, $suborder, $ordertype){
         $table_name = 'user_recharge_order';
         $data = array(
             'f_uid' => $uid,
@@ -53,6 +54,7 @@ class AccountModel extends Model
             'f_paytype' => $paytype,
             'f_channel' => $channel,
             'f_suborder' => $suborder,
+            'f_ordertype' => $ordertype,
             'f_addtime' => date("Y-m-d H:i:s"),
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
@@ -331,6 +333,7 @@ class AccountModel extends Model
             ->field('f_uid as uid')
             ->field('f_paymoney as paymoney')
             ->field('f_suborder as suborder')
+            ->field('f_ordertype as ordertype')
             ->field('f_suctime as suctime')
             ->field('f_paytype as paytype')
             ->field('f_channel as channel')
@@ -388,6 +391,7 @@ class AccountModel extends Model
         $paytype = $orderinfo['paytype'];
         $ori_status = $orderinfo['status'];
         $tradeorderid = $orderinfo['suborder'];
+        $ordertype = $orderinfo['ordertype'];
         if($ori_status == $this->paysuc){
             return true;
         }
@@ -405,7 +409,12 @@ class AccountModel extends Model
             }else if($deposit && $paytype == config("paytype.order")){
                 //订单充值成功后,需要完成订单
                 $OrderModel = new OrderModel();
-                return $OrderModel->finishOrder($uid,$tradeorderid,$bankmoney);
+                if($ordertype == 0){
+                    return $OrderModel->finishOrder($uid,$tradeorderid,$bankmoney);
+                }else{
+                    return $OrderModel->finishSubOrder($uid,$tradeorderid,$bankmoney);
+                }
+
             }else{
                 return $deposit;
             }

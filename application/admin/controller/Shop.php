@@ -142,14 +142,23 @@ class Shop extends Base
         }
         $disheslist = array();
         $DineshopModel = new DineshopModel();
-        $info = $DineshopModel->getDineshopInfo($shopid);
-        if(isset($info['menulist'])){
+		if (is_numeric($shopid)){
+			$info = $DineshopModel->getDineshopInfo($shopid);
+		}else{
+			//按用户名模糊搜索
+			$shopname = $shopid;
+			$info = $DineshopModel->getDineshopInfoByName($shopname);
+			if (isset($info['id'])){
+				$shopid = $info['id'];
+			}
+		}
+        //if(isset($info['menulist'])){
             $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesList($info['menulist']);
+            $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
             if($dishlist){
                 $disheslist = $dishlist;
             }
-        }
+        //}
         $info['disheslist'] = $disheslist;
         return json($this->sucjson($info, $list));
     }
@@ -236,7 +245,7 @@ class Shop extends Base
             $info['shopicon'] = $shopinfo['shopicon'];
             $info['shopaddress'] = $shopinfo['address'];
             $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesList($shopinfo['menulist']);
+            $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
             if($dishlist){
                 foreach($dishlist as $key => $val){
                     $dishinfo[$val['id']] = $val['dishesname'];
@@ -638,8 +647,16 @@ class Shop extends Base
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
-        $DineshopModel = new DineshopModel();
-        $shopinfo = $DineshopModel->getDineshopInfo($shopid);
+		$DineshopModel = new DineshopModel();
+		if (is_numeric($shopid)){
+			$shopinfo = $DineshopModel->getDineshopInfo($shopid);
+		}else{
+			//非数字的话，认为是字符串店名
+			$shopname = $shopid;
+			$shopinfo = $DineshopModel->getDineshopInfoByName($shopname);
+			if (isset($shopinfo['id']))
+				$shopid = $shopinfo['id'];
+		}
         if($shopinfo){
             $info['shopid'] = $shopinfo['id'];
             $info['shopname'] = $shopinfo['shopname'];

@@ -27,12 +27,18 @@ class Shop extends Base
         $pagesize = input('pagesize')?input('pagesize'):10; //每页数量
         $lon = input('lon')?input('lon'):'114.240668'; //经度
         $lat = input('lat')?input('lat'):'22.703796'; //纬度
-        $list = Db::query('SELECT f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sales sales, f_deliveryfee deliveryfee, f_minprice minprice, f_preconsume preconsume, f_modtime modtime, distance distance FROM(SELECT *,ROUND(6378.138 *2*ASIN(SQRT(POW(SIN((:lat1*PI()/180-f_maplat*PI()/180)/2),2)+COS(:lat2*PI()/180)*COS(f_maplat*PI()/180)*POW(SIN((:lon*PI()/180-f_maplon*PI()/180)/2),2)))*1000) AS distance FROM t_dineshop where f_isaway=:isaway ORDER BY distance ASC) a LIMIT :page,:pagesize',['lon'=>floatval($lon), 'lat1'=>floatval($lat), 'lat2'=>floatval($lat), 'isaway'=>1, 'page'=>intval(($page-1)*$pagesize), 'pagesize'=>intval($pagesize)]);
-        $this->res['code'] = 1;
-        if($list && count($list) > 0){
-            $this->res['list'] = $list;
+        $res_info = array();
+        $res_list = array();
+        $pageinfo = Db::query('SELECT count(1) cnt FROM t_dineshop where f_isaway = 1');
+        if(!empty($pageinfo)){
+            $totalpage = ceil($pageinfo[0]['cnt']/$pagesize);
+            $res_info = array("totalpage" => $totalpage);
         }
-        return json($this->res);
+        $list = Db::query('SELECT f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sales sales, f_deliveryfee deliveryfee, f_minprice minprice, f_preconsume preconsume, f_modtime modtime, distance distance FROM(SELECT *,ROUND(6378.138 *2*ASIN(SQRT(POW(SIN((:lat1*PI()/180-f_maplat*PI()/180)/2),2)+COS(:lat2*PI()/180)*COS(f_maplat*PI()/180)*POW(SIN((:lon*PI()/180-f_maplon*PI()/180)/2),2)))*1000) AS distance FROM t_dineshop where f_isaway=:isaway ORDER BY distance ASC) a LIMIT :page,:pagesize',['lon'=>floatval($lon), 'lat1'=>floatval($lat), 'lat2'=>floatval($lat), 'isaway'=>1, 'page'=>intval(($page-1)*$pagesize), 'pagesize'=>intval($pagesize)]);
+        if($list && count($list) > 0){
+            $res_list = $list;
+        }
+        return json(self::sucjson($res_info,$res_list));
     }
     /**
      * 获取食堂列表
@@ -42,12 +48,18 @@ class Shop extends Base
         $pagesize = input('pagesize')?input('pagesize'):10; //每页数量
         $lon = input('lon')?input('lon'):'114.240668'; //经度
         $lat = input('lat')?input('lat'):'22.703796'; //纬度
-        $list = Db::query('SELECT f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sales sales, f_deliveryfee deliveryfee, f_minprice minprice, f_preconsume preconsume, f_modtime modtime, distance distance FROM(SELECT *,ROUND(6378.138 *2*ASIN(SQRT(POW(SIN((:lat1*PI()/180-f_maplat*PI()/180)/2),2)+COS(:lat2*PI()/180)*COS(f_maplat*PI()/180)*POW(SIN((:lon*PI()/180-f_maplon*PI()/180)/2),2)))*1000) AS distance FROM t_dineshop where f_isbooking=:isbooking ORDER BY distance ASC) a LIMIT :page,:pagesize',['lon'=>floatval($lon), 'lat1'=>floatval($lat), 'lat2'=>floatval($lat), 'isbooking'=>1, 'page'=>intval(($page-1)*$pagesize), 'pagesize'=>intval($pagesize)]);
-        $this->res['code'] = 1;
-        if($list && count($list) > 0){
-            $this->res['list'] = $list;
+        $res_info = array();
+        $res_list = array();
+        $pageinfo = Db::query('SELECT count(1) cnt FROM t_dineshop where f_isbooking=1');
+        if(!empty($pageinfo)){
+            $totalpage = ceil($pageinfo[0]['cnt']/$pagesize);
+            $res_info = array("totalpage" => $totalpage);
         }
-        return json($this->res);
+        $list = Db::query('SELECT f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sales sales, f_deliveryfee deliveryfee, f_minprice minprice, f_preconsume preconsume, f_modtime modtime, distance distance FROM(SELECT *,ROUND(6378.138 *2*ASIN(SQRT(POW(SIN((:lat1*PI()/180-f_maplat*PI()/180)/2),2)+COS(:lat2*PI()/180)*COS(f_maplat*PI()/180)*POW(SIN((:lon*PI()/180-f_maplon*PI()/180)/2),2)))*1000) AS distance FROM t_dineshop where f_isbooking=:isbooking ORDER BY distance ASC) a LIMIT :page,:pagesize',['lon'=>floatval($lon), 'lat1'=>floatval($lat), 'lat2'=>floatval($lat), 'isbooking'=>1, 'page'=>intval(($page-1)*$pagesize), 'pagesize'=>intval($pagesize)]);
+        if($list && count($list) > 0){
+            $res_list = $list;
+        }
+        return json(self::sucjson($res_info,$res_list));
     }
     /**
      * 获取店铺详情
@@ -64,7 +76,7 @@ class Shop extends Base
                 $menulist = $info['menulist'];
                 $shopdishes = array();
                 $DishesModel = new DishesModel();
-                $reslist = $DishesModel->getDishesList($menulist);
+                $reslist = $DishesModel->getDishesListBysid($shopid);
                 if($reslist){
                     foreach($reslist as $key=>$val){
                         $shopdishes[$val['classifyname']][] = $val;
@@ -72,6 +84,7 @@ class Shop extends Base
                 }
                 $list = array_keys($shopdishes);
                 $info["shopdishes"] = $shopdishes;
+                $info["discounttimeslot"] = $DineshopModel->getDiscountTimeslot();
             }
         }
         return json($this->sucres($info,$list));
@@ -113,15 +126,16 @@ class Shop extends Base
                 $discount = array_combine($match[1], $match[0]);
             }
             $DishesModel = new DishesModel();
-            $reslist = $DishesModel->getDishesList($res['dishid']);
+            $reslist = $DishesModel->getDishesListBysid($shopid);
             foreach($reslist as $key => $val){
                 $classifyname = $val['classifyname'];
                 if(isset($discount[$val['id']])){
                     preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $discount[$val['id']], $match);
+					$floatTemp = floatval(str_replace(',','',$val['price']));
                     if($match[2] == 1){
-                        $reslist[$key]['discountprice'] = floor($val['price']) * $match[3];
+                        $reslist[$key]['discountprice'] = $floatTemp * $match[3];
                     }elseif($match[2] == 2){
-                        $reslist[$key]['discountprice'] = floatval($val['price']) - $match[3];
+                        $reslist[$key]['discountprice'] = $floatTemp - $match[3];
                     }
                 }
                 if(isset($reslist[$key]['discountprice'])){

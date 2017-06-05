@@ -28,6 +28,7 @@ CREATE TABLE `t_user_address_info` (
   `f_city` varchar(100) NOT NULL COMMENT '城市名称',
   `f_address` varchar(1000) NOT NULL COMMENT '详细地址',
   `f_name` varchar(100) NOT NULL COMMENT '收件人',
+  `f_sex` tinyint DEFAULT 1 COMMENT '性别(1-男,0-女)',
   `f_mobile` varchar(50) NOT NULL COMMENT '联系电话',
   `f_isactive` tinyint(4) DEFAULT '0' COMMENT '是否默认地址(0-否,1-是)',
   `f_status` tinyint(4) DEFAULT '0' COMMENT '地址状态(0-有效,-1-无效)',
@@ -62,6 +63,7 @@ CREATE TABLE `t_user_recharge_order` (
   `f_paytype` smallint NOT NULL COMMENT '充值类型(1001-充值余额,1002-充值押金,1003-订单充值)',
   `f_channel` smallint not NULL COMMENT '充值渠道(1001-支付宝充值,1002-微信充值)',
   `f_suborder` int default 0 comment '子订单号(订单充值时,不能为空)',
+  `f_ordertype` tinyint unsigned default 0 comment '子订单类型(0-默认订单，1-加餐订单)',
   `f_account` varchar(200) default NULL COMMENT '充值账号',
   `f_bankorderid` varchar(100) default null comment '第三方订单号',
   `f_suctime` timestamp default '0000-00-00 00:00:00' comment '成功时间',
@@ -227,6 +229,7 @@ CREATE TABLE `t_food_tastes` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-口味信息表';
+insert  into `t_food_tastes`(`f_tid`,`f_tname`) values (1,'不辣'),(2,'微辣'),(3,'超辣');
 
 
 /*菜肴管理-菜系信息表*/
@@ -237,6 +240,7 @@ CREATE TABLE `t_food_cuisine` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_cid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-菜系信息表';
+insert  into `t_food_cuisine`(`f_cid`,`f_cname`) values (1,'鲁菜'),(2,'川菜'),(3,'粤菜'),(4,'苏菜'),(5,'浙菜'),(6,'闽菜'),(7,'湘菜'),(8,'徽菜');
 
 
 /*菜肴管理-菜品信息表*/
@@ -306,8 +310,8 @@ CREATE TABLE `t_admin_dineshop` (
   `f_shopicon` varchar(200) DEFAULT '' COMMENT '店铺图标',
   `f_shophone` varchar(200) DEFAULT '' COMMENT '店铺联系电话',
   `f_address` varchar(200) NOT NULL COMMENT '门店地址',
+  `f_menulist` varchar(200) DEFAULT NULL,
   `f_cuisineid` int(10) DEFAULT '0' COMMENT '菜系',
-  `f_menulist` varchar(255) DEFAULT '' COMMENT '菜单列表',
   `f_maplon` varchar(30) DEFAULT '' COMMENT '地图坐标-经度',
   `f_maplat` varchar(30) DEFAULT '' COMMENT '地图坐标-纬度',
   `f_sales` int(10) DEFAULT '0' COMMENT '月销量',
@@ -320,6 +324,7 @@ CREATE TABLE `t_admin_dineshop` (
   `f_deliverytime` varchar(200) DEFAULT '' COMMENT '配送时间',
   `f_addtime` varchar(255) DEFAULT '' COMMENT '店铺入驻时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `f_fontshopid` int(11) DEFAULT NULL COMMENT '前端对应店铺ID',
   PRIMARY KEY (`f_sid`),
   UNIQUE KEY `s_add_name` (`f_adduser`) USING BTREE,
   UNIQUE KEY `s_add_shopname` (`f_shopname`),
@@ -334,14 +339,18 @@ CREATE TABLE `t_admin_food_dishes` (
   `f_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '菜肴ID(自增)',
   `f_adduser` int(11) NOT NULL DEFAULT '0' COMMENT '添加用户',
   `f_status` int(11) NOT NULL DEFAULT '0' COMMENT '店铺状态（0初始，1审核中，100审核通过，-100审核不通过，-300已下架）',
+  `f_sid` int(11) NOT NULL COMMENT '店铺ID',
   `f_icon` varchar(200) DEFAULT NULL COMMENT '菜品图片',
   `f_name` varchar(200) NOT NULL COMMENT '菜品名称',
+  `f_desc` text COMMENT '描述',
   `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+  `f_discount` double(11,2) DEFAULT '1.00' COMMENT '默认折扣（1表示不打折）',
   `f_state` smallint(6) NOT NULL DEFAULT '0' COMMENT '菜品状态（-1已停售， 0初始， 1预售，100已售完）',
   `f_tastesid` varchar(11) DEFAULT NULL COMMENT '口味ID',
   `f_cuisineid` int(11) DEFAULT NULL COMMENT '菜系ID',
   `f_classid` int(11) DEFAULT NULL COMMENT '菜品分类',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `f_fontdishid` int(11) DEFAULT NULL COMMENT '前端菜品ID',
   PRIMARY KEY (`f_id`),
   UNIQUE KEY `food_dishes_name` (`f_name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-菜品信息表后台审核表';
@@ -372,9 +381,7 @@ CREATE TABLE `t_dineshop` (
   `f_addtime` varchar(255) DEFAULT NULL COMMENT '店铺入驻时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`f_sid`,`f_shopname`),
-  KEY `s_shop_id` (`f_sid`) USING BTREE,
-  KEY `s_shop_maplat` (`f_maplon`) USING BTREE,
-  KEY `s_shop_maplng` (`f_maplat`) USING BTREE
+  UNIQUE KEY `s_shop_only` (`f_shopname`,`f_address`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='餐饮门店表';
 
 
@@ -385,6 +392,7 @@ CREATE TABLE `t_dineshop_deskinfo` (
   `f_sid` int(11) NOT NULL COMMENT '门店id',
   `f_seatnum` tinyint(4) NOT NULL DEFAULT '1' COMMENT '可坐人数',
   `f_amount` tinyint(4) NOT NULL DEFAULT '1' COMMENT '桌子数量',
+  `f_orderamount` tinyint(4) NOT NULL DEFAULT '0' COMMENT '已预订数量',
   `f_status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态(1-有效,0-无效/已删除)',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -420,6 +428,7 @@ CREATE TABLE `t_dineshop_discount_timeslot` (
   PRIMARY KEY (`f_id`),
   UNIQUE KEY `t_startime_endtime` (`f_starttime`,`f_endtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='门店管理-折扣时间段';
+insert  into `t_dineshop_discount_timeslot`(`f_starttime`,`f_endtime`,`f_addtime`) values ('13:00','14:00',now()),('16:00','17:00',now()),('17:00','18:00',now()),('00:00','03:00',now()),('17:00','20:00',now());
 
 
 /*配送员信息表*/
@@ -454,17 +463,14 @@ DROP TABLE IF EXISTS `t_dineshop_sellinfo`;
 CREATE TABLE `t_dineshop_sellinfo` (
   `f_id` smallint(6) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_sid` int(11) NOT NULL COMMENT '门店id',
-  `f_startdate` date DEFAULT NULL COMMENT '放号开始日期',
-  `f_enddate` date DEFAULT NULL COMMENT '放号结束日期',
-  `f_starttime` time DEFAULT NULL COMMENT '放号开始时间',
-  `f_endtime` time DEFAULT NULL COMMENT '放号结束时间',
-  `f_tabletype` varchar(100) DEFAULT NULL COMMENT '放号桌型ID(以英文逗号分隔)',
-  `f_sellnum` tinyint(4) DEFAULT '1' COMMENT '放号数量',
-  `f_tablenum` varchar(100) DEFAULT NULL COMMENT '放号桌号(以英文逗号分隔)',
+  `f_date` date DEFAULT NULL COMMENT '折扣日期',
+  `f_timeslot` int(11) DEFAULT NULL COMMENT '折扣时间段ID',
+  `f_sellinfo` varchar(200) DEFAULT NULL COMMENT '折扣信息',
   `f_status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '状态(1-有效,0-无效/已删除)',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`f_id`)
+  PRIMARY KEY (`f_id`),
+  UNIQUE KEY `t_discount_unique` (`f_sid`,`f_date`,`f_timeslot`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='门店管理-放号信息表';
 
 
@@ -476,6 +482,7 @@ CREATE TABLE `t_food_classify` (
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_cid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-分类信息管理';
+insert  into `t_food_classify`(`f_cid`,`f_cname`) values (1,'招牌推荐'),(2,'开胃前菜'),(3,'美味甜品'),(4,'养生面食'),(5,'老火靓汤'),(6,'酒水饮料'),(7,'主食米饭'),(8,'家常小菜');
 
 
 /*菜肴管理-菜系信息表*/
@@ -493,16 +500,19 @@ CREATE TABLE `t_food_cuisine` (
 DROP TABLE IF EXISTS `t_food_dishes`;
 CREATE TABLE `t_food_dishes` (
   `f_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '菜肴ID(自增)',
+  `f_sid` int(11) NOT NULL DEFAULT '0' COMMENT '店铺ID',
   `f_icon` varchar(200) DEFAULT NULL COMMENT '菜品图片',
   `f_name` varchar(200) NOT NULL COMMENT '菜品名称',
+  `f_desc` text COMMENT '描述',
   `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+  `f_discount` double(11,2) DEFAULT '1.00' COMMENT '默认折扣（1表示不打折）',
   `f_state` smallint(6) NOT NULL DEFAULT '0' COMMENT '菜品状态（-1已停售， 0初始， 1预售，100已售完）',
   `f_tastesid` varchar(11) DEFAULT NULL COMMENT '口味ID',
   `f_cuisineid` int(11) DEFAULT NULL COMMENT '菜系ID',
   `f_classid` int(11) DEFAULT NULL COMMENT '菜品分类',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`),
-  UNIQUE KEY `food_dishes_name` (`f_name`) USING BTREE
+  UNIQUE KEY `food_dishes_name` (`f_name`,`f_sid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜肴管理-菜品信息表';
 
 
@@ -560,14 +570,31 @@ CREATE TABLE `t_orders` (
   `f_paymoney` double(200,0) DEFAULT '0' COMMENT '已支付金额',
   `f_paytype` varchar(200) DEFAULT '0' COMMENT '支付方式（0余额，1微信，2支付宝）',
   `f_mealsnum` int(10) DEFAULT '0' COMMENT '就餐人数（仅食堂订单有）',
+  `f_deskid` int default null comment '预订桌型ID（仅食堂订单有）',
   `f_servicemoney` double(200,0) DEFAULT 0 COMMENT '服务费（仅食堂订单有）',
   `f_startime` varchar(200) DEFAULT '' COMMENT '用餐开始时间（仅食堂订单有）',
   `f_endtime` varchar(200) DEFAULT '' COMMENT '用餐结束时间（仅食堂订单有）',
   `f_deliveryid` int(10) DEFAULT '0' COMMENT '配送员ID（仅外卖订单有）',
   `f_deliverytime` varchar(20) DEFAULT '' COMMENT '配送时间',
   `f_addressid` int(10) DEFAULT NULL COMMENT '配送地址ID（仅外卖订单有）',
+  `f_hassuborder` tinyint unsigned default 0 comment '是否有子订单(0-无，1-有)',
   `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
-  PRIMARY KEY (`f_oid`),
-  UNIQUE KEY `order_orderdetail_unique` (`f_shopid`,`f_userid`,`f_orderdetail`,`f_type`) USING BTREE
+  PRIMARY KEY (`f_oid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='外卖及预订订单表';
+
+/*堂食子订单表*/
+DROP TABLE IF EXISTS `t_sub_orders`;
+CREATE TABLE `t_sub_orders` (
+  `f_oid` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单ID,唯一标识',
+  `f_parentid` bigint unsigned not null comment '关联订单ID',
+  `f_userid` int(10) NOT NULL COMMENT '用户ID',
+  `f_status` int(2) NOT NULL DEFAULT '1' COMMENT '订单状态（0,初始 1,未付款 2,已付款）',
+  `f_orderdetail` varchar(255) NOT NULL COMMENT '订单详情',
+  `f_ordermoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '订单金额',
+  `f_paymoney` double(200,0) DEFAULT '0' COMMENT '已支付金额',
+  `f_paytype` varchar(200) DEFAULT '0' COMMENT '支付方式（0余额，1微信，2支付宝）',
+  `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
+  `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
+  PRIMARY KEY (`f_oid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='堂食子订单表';

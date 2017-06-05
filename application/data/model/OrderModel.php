@@ -69,7 +69,7 @@ class OrderModel extends Model
      * @params $endtime 就餐结束时间
      * @return \think\response\Json
      */
-    public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney)
+    public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid)
     {
         $table_name = 'orders';
         $data = array(
@@ -86,6 +86,7 @@ class OrderModel extends Model
             'f_endtime' => $endtime,
             'f_addtime' => date("Y-m-d H:i:s"),
             'f_servicemoney' => $servicemoney,
+            'f_deskid' => $deskid,
         );
         $orderid = intval(Db::name($table_name)->insertGetId($data));
         if ($orderid <= 0) {
@@ -131,9 +132,11 @@ class OrderModel extends Model
             ->where('f_userid', $userid)
             ->where('f_orderdetail', $orderdetail)
             ->where('f_type', $ordertype)
+            ->where('f_addtime', '> time', time()-10)
             ->find();
         return $check?$check['orderid']:false;
     }
+
     /**
      * 获取订单列表
      */
@@ -157,6 +160,7 @@ class OrderModel extends Model
             "orderlist" => $orderlist
         );
     }
+
     /**
      * 获取订单详情
      */
@@ -168,7 +172,7 @@ class OrderModel extends Model
         );
         $orderinfo = Db::table('t_orders')
             ->alias('a')
-            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_servicemoney servicemoney,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime')
+            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_servicemoney servicemoney,a.f_deskid deskid,a.f_startime startime,a.f_endtime endtime,c.f_name recipientname,c.f_mobile recipientmobile,d.f_username deliveryname,d.f_mobile deliveryphone,a.f_deliverytime deliverytime,CONCAT(c.f_province,c.f_city,c.f_address) deliveryaddress,a.f_addtime addtime,a.f_hassuborder hassuborder')
             ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
             ->join('t_user_address_info c', 'a.f_addressid = c.f_id','left')
             ->join('t_dineshop_distripersion d', 'a.f_deliveryid = d.f_id','left')
@@ -217,5 +221,189 @@ class OrderModel extends Model
         }else{
             return false;
         }
+    }
+
+    /**
+     * 更新订单信息
+     * @param $uid
+     * @param $orderid
+     * @param $new_orderinfo
+     * @return bool
+     */
+    public function updateOrderInfo($uid, $orderid, $new_orderinfo){
+        $table_name = 'orders';
+        //获取更新前订单信息
+        $ori_orderinfo = self::getOrderinfo($uid,$orderid);
+        $orderinfo = array(
+            'f_paytype' => isset($new_orderinfo['paytype']) ? $new_orderinfo['paytype'] : $ori_orderinfo['paytype'],
+        );
+        $retup = Db::name($table_name)
+            ->where('f_uid',$uid)
+            ->where('f_oid',$orderid)
+            ->update($orderinfo);
+        if($retup !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 新增堂食子订单
+     */
+    public function addEatinSubOrders($userid,$parentid,$orderdetail,$ordermoney,$paytype)
+    {
+        $table_order = 'orders';
+        $table_suborder = 'sub_orders';
+        $data = array(
+            'f_userid' => $userid,
+            'f_parentid' => $parentid,
+            'f_orderdetail' => $orderdetail,
+            'f_ordermoney' => $ordermoney,
+            'f_paytype' => $paytype,
+            'f_addtime' => date("Y-m-d H:i:s"),
+        );
+        Db::startTrans();
+        try{
+            $sub_orderid = Db::name($table_suborder)->insertGetId($data);
+            $p_orderinfo = array(
+                'f_hassuborder' => 1,
+            );
+            Db::name($table_order)
+                ->where('f_userid',$userid)
+                ->where('f_oid',$parentid)
+                ->update($p_orderinfo);
+            Db::commit();
+            return $sub_orderid;
+        }catch (Exception $e){
+            Db::rollback();
+            return false;
+        }
+    }
+
+    /**
+     * 更新子交易订单信息
+     * @param $uid
+     * @param $orderid
+     * @param $status
+     * @param $paymoney
+     * @return bool
+     */
+    public function updateTradeSubOrderInfo($uid, $orderid, $status, $paymoney=0){
+        $sql = "update t_sub_orders set f_status = :status, f_paymoney = f_paymoney + :paymoney where f_userid = :uid and f_oid = :orderid";
+        $args = array(
+            "uid" => $uid,
+            "orderid" => $orderid,
+            "status" => $status,
+            "paymoney" => $paymoney
+        );
+        $ret = Db::execute($sql,$args);
+        if($ret !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 更新订单信息
+     * @param $uid
+     * @param $orderid
+     * @param $new_orderinfo
+     * @return bool
+     */
+    public function updateSubOrderInfo($uid, $orderid, $new_orderinfo){
+        $table_name = 'sub_orders';
+        //获取更新前订单信息
+        $ori_orderinfo = self::getSubOrderinfo($uid,$orderid);
+        $orderinfo = array(
+            'f_paytype' => isset($new_orderinfo['paytype']) ? $new_orderinfo['paytype'] : $ori_orderinfo['paytype'],
+        );
+        $retup = Db::name($table_name)
+            ->where('f_userid',$uid)
+            ->where('f_oid',$orderid)
+            ->update($orderinfo);
+        if($retup !== false){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 完成子订单
+     */
+    public function finishSubOrder($userid, $orderid, $paymoney)
+    {
+        $Account = new AccountModel();
+        //冻结
+        $tradetype = 2002;  //订单支付冻结
+        $tradenote = $Account->tradetype_config[$tradetype];
+        $freeze = $Account->freeze($userid,$paymoney,$tradetype,$tradenote);
+        if($freeze){
+            //更新订单状态
+            $uporder = self::updateTradeSubOrderInfo($userid,$orderid,$this->status_pay_suc,$paymoney);
+            if($uporder){
+                //解冻扣款
+                $tradetype = 2102;  //订单支付(解冻扣款)
+                $tradenote = $Account->tradetype_config[$tradetype];
+                if($Account->unfreeze($userid,$paymoney,$tradetype,$tradenote)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取子订单订单详情
+     */
+    public function getSubOrderinfo($userid, $orderid)
+    {
+        $where = array(
+            'a.f_userid' => $userid,
+            'a.f_oid' => $orderid
+        );
+        $orderinfo = Db::table('t_sub_orders')
+            ->alias('a')
+            ->field('a.f_oid orderid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_ordermoney allmoney,a.f_paytype paytype,a.f_addtime addtime')
+            ->where($where)
+            ->find();
+        return $orderinfo?$orderinfo:false;
+    }
+
+    /**
+     * 获取交易子订单信息
+     * @param $uid
+     * @param $orderid
+     * @return array|false|\PDOStatement|string|Model
+     */
+    public function getTradeSubOrderInfo($uid, $orderid){
+        $table_name = 'sub_orders';
+        $orderinfo = Db::name($table_name)
+            ->where('f_userid',$uid)
+            ->where('f_oid',$orderid)
+            ->field('f_status as status')
+            ->field('f_ordermoney as allmoney')
+            ->field('f_paymoney as paymoney')
+            ->find();
+        return $orderinfo;
+    }
+
+    /**
+     * 根据父订单ID获取子订单列表
+     */
+    public function getSubOrderList($userid, $parentid)
+    {
+        $where = array(
+            'a.f_userid' => $userid,
+            'a.f_parentid' => $parentid
+        );
+        $orderlist = Db::table('t_sub_orders')
+            ->alias('a')
+            ->field('a.f_oid orderid,a.f_parentid parentid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_addtime addtime')
+            ->where($where)
+            ->find();
+        return $orderlist;
     }
 }

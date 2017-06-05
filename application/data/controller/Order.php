@@ -6,6 +6,7 @@ use \app\data\model\UserModel;
 use \app\data\model\DineshopModel;
 use \app\data\model\DishesModel;
 use \app\data\model\OrderModel;
+use think\Log;
 
 class Order extends Base
 {
@@ -28,6 +29,7 @@ class Order extends Base
         $deliverytime = input('deliverytime'); //外卖 配送时间
         $addressid = input('addressid'); //外卖 配送地址ID
         $mealsnum = input('mealsnum'); //食堂就餐 就餐人数
+        $deskid = input('deskid',0); //食堂就餐 预订桌型ID
         $servicemoney = input('servicemoney',0); //食堂就餐 服务费
         $startime = input('startime'); //食堂订餐 开始时间
         $endtime = input('endtime'); //食堂订餐 结束时间
@@ -99,12 +101,15 @@ class Order extends Base
             }
         }
         $_ordermoney = 0;
+        Log::record($orderdetail);
+        Log::record($priceinfo);
         foreach(explode(',', $orderdetail) as $key=>$val){
             preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
             $_dishid = $match[1];
             $_dishnum = $match[3];
             $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
         }
+        Log::record($_ordermoney.'**'.$ordermoney);
         if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
         //验证外卖配送地址
         if($ordertype == 1){
@@ -121,7 +126,7 @@ class Order extends Base
             if($ordertype == 1){
                 $orderid = $OrderModel->addTakeoutOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $deliverytime, $addressid);
             }else{
-                $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney);
+                $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid);
             }
             if($orderid){
                 if($this->checkMoneyEnough($uid,$allmoney)){
@@ -188,6 +193,7 @@ class Order extends Base
         $OrderModel = new OrderModel();
         $res = $OrderModel->getOrderlist($uid, $ordertype, $page, $pagesize);
         $info["allnum"] = $res["allnum"];
+        $info["totalpage"] = ceil($res["allnum"]/$pagesize);
         if($res["orderlist"]) {
             $list = $res["orderlist"];
             $orderlist = array();
@@ -265,6 +271,11 @@ class Order extends Base
                 $orderlist[$k]['num'] = $num;
             }
             $info['orderlist'] = $orderlist;
+            $suborder_list = array();
+            if($res['hassuborder'] != 0){
+                $suborder_list = $OrderModel->getSubOrderList($uid,$orderid);
+            }
+            $info['suborderlist'] = $suborder_list;
         }
         return json($this->sucres($info, $list));
     }
@@ -304,5 +315,212 @@ class Order extends Base
             return json(self::errjson(-30023));
         }
         return json(self::sucjson());
+    }
+
+    /**
+     * 修改订单信息
+     */
+    public function updateOrderInfo()
+    {
+        $uid = input('uid'); //用户ID
+        $orderid = input('orderid'); //订单号
+        $paytype = intval(input('paytype',-1)); //支付方式
+        //判断用户登录
+        if ($this->checkLogin() === false) return json($this->errjson(-10001));
+        if(!in_array($paytype,array(0,1,2))){
+            return json(self::errjson(-30004));
+        }
+
+        //检查订单状态
+        $OrderModel = new OrderModel();
+        $orderinfo  = $OrderModel->getOrderinfo($uid,$orderid);
+        if(empty($orderinfo)){
+            return json(self::errjson(-30020));
+        }
+        $ori_paytype = $orderinfo['paytype'];
+        $ori_status = $orderinfo['status'];
+        if($ori_status != $OrderModel->status_waiting_pay){
+            return json(self::errjson(-30024));
+        }
+        if($ori_paytype == $paytype){
+            return json(self::sucjson());
+        }
+        $orderinfo = array(
+            'paytype' => $paytype,
+        );
+        if($OrderModel->updateOrderInfo($uid,$orderid,$orderinfo)){
+            return json(self::sucjson());
+        }else{
+            return json(self::errjson());
+        }
+    }
+
+    /**
+     * 创建堂食子订单信息
+     */
+    public function createSubOrder(){
+        $uid = input('uid'); //用户ID
+        $parentidid = input('parentid'); //父订单ID
+        $orderdetail = input('orderdetail'); //订单明细
+        $ordermoney = floatval(input('ordermoney','0')); //订单金额
+        $paytype = input('paytype'); //支付方式
+        $date = input('date'); //折扣日期
+        $slotid = input('slotid'); //折扣时间段
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
+        //判断参数
+        if(empty($parentidid)) return json($this->errjson(-30025));
+        if(!$orderdetail) return json($this->errjson(-30002));
+        if($ordermoney == 0){
+            return json($this->errjson(-30003));
+        }
+        if($paytype == '') return json($this->errjson(-30004));
+        //验证用户
+        $UserModel = new UserModel();
+        $userinfo = $UserModel->getUserInfoByUid($uid);
+        if(empty($userinfo)) return json($this->errjson(-30014));
+
+        //验证父订单是否存在
+        $OrderModel = new OrderModel();
+        $parent_orderinfo = $OrderModel->getOrderinfo($uid,$parentidid);
+        if(empty($parent_orderinfo)){
+            return json(self::errjson(-30026));
+        }
+        $p_endtime = $parent_orderinfo['endtime'];
+        $p_orderstatus = $parent_orderinfo['status'];
+        $p_shopid = $parent_orderinfo['shopid'];
+        //检查当前订单是否允许添加子订单
+        if(config('suborder.endtime')+time() > strtotime($p_endtime)){
+            return json(self::errjson(-30027));
+        }
+        if(!in_array($p_orderstatus,array(2))){
+            return json(self::errjson(-30027));
+        }
+
+        $_orderinfo = array();
+        foreach(explode(',', $orderdetail) as $key=>$val){
+            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
+            $_orderinfo[$match[1]] = $match[3];
+        }
+        //获取折扣信息
+        $DineshopModel = new DineshopModel();
+        $_discount = array();
+        $res = $DineshopModel->getDineshopDiscount($p_shopid, $slotid, $date);
+        if($res && $res['discount']){
+            foreach(explode('$', $res['discount']) as $key=>$val){
+                preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $val, $match);
+                $_discount[$match[1]] = array(
+                    "type" => $match[2],
+                    "discount" => $match[3]
+                );
+            }
+        }
+        $DishesModel = new DishesModel();
+        $list = $DishesModel->getDishesList(implode(',', array_keys($_orderinfo)));
+        $priceinfo = array();
+        if(count($list) > 0){
+            for($i = 0; $i < count($list); $i++){
+                $_dishid = $list[$i]['id'];
+                $_price = floatval($list[$i]['price']);
+                if(isset($_discount[$_dishid])){
+                    if($_discount[$_dishid]['type'] == 1){
+                        $_price = $_price * $_discount[$_dishid]['discount'];
+                    }else if($_discount[$_dishid]['type'] == 2){
+                        $_price = $_price - $_discount[$_dishid]['discount'];
+                    }
+                }
+                $priceinfo[$_dishid] = $_price;
+            }
+        }
+        $_ordermoney = 0;
+        Log::record($orderdetail);
+        Log::record($priceinfo);
+        foreach(explode(',', $orderdetail) as $key=>$val){
+            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
+            $_dishid = $match[1];
+            $_dishnum = $match[3];
+            $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
+        }
+        Log::record($_ordermoney.'**'.$ordermoney);
+        if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
+
+        //创建订单
+        $OrderModel = new OrderModel();
+        $orderid = $OrderModel->addEatinSubOrders($uid,$parentidid,$orderdetail,$ordermoney,$paytype);
+        if($orderid){
+            $orderinfo = array(
+                'parentid' => $parentidid,
+                'orderid' => $orderid,
+            );
+            return json($this->sucjson($orderinfo));
+        }else{
+            return json($this->errjson(-30019));
+        }
+    }
+
+    /**
+     * 修改子订单信息
+     */
+    public function updateSubOrderInfo()
+    {
+        $uid = input('uid'); //用户ID
+        $orderid = input('orderid'); //订单号
+        $paytype = intval(input('paytype',-1)); //支付方式
+        //判断用户登录
+        if ($this->checkLogin() === false) return json($this->errjson(-10001));
+        if(!in_array($paytype,array(0,1,2))){
+            return json(self::errjson(-30004));
+        }
+
+        //检查订单状态
+        $OrderModel = new OrderModel();
+        $orderinfo  = $OrderModel->getSubOrderinfo($uid,$orderid);
+        if(empty($orderinfo)){
+            return json(self::errjson(-30020));
+        }
+        $ori_paytype = $orderinfo['paytype'];
+        $ori_status = $orderinfo['status'];
+        if($ori_status != $OrderModel->status_waiting_pay){
+            return json(self::errjson(-30024));
+        }
+        if($ori_paytype == $paytype){
+            return json(self::sucjson());
+        }
+        $orderinfo = array(
+            'paytype' => $paytype,
+        );
+        if($OrderModel->updateSubOrderInfo($uid,$orderid,$orderinfo)){
+            return json(self::sucjson());
+        }else{
+            return json(self::errjson());
+        }
+    }
+
+    /**
+     * 完成子订单
+     * (前端仅余额支付方式时调用)
+     */
+    public function finishSubOrder(){
+        $uid = input('uid'); //用户ID
+        $orderid = input('orderid'); //用户ID
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
+        //获取订单信息
+        $OrderModel = new OrderModel();
+        $orderinfo = $OrderModel->getSubOrderinfo($uid, $orderid);
+        if(!$orderinfo)  return json($this->errjson(-30020));
+        $status = intval($orderinfo['status']); //订单支付状态 1为未付款
+        $allmoney = floatval($orderinfo['allmoney']);
+        $userid = $orderinfo['userid'];
+        if($status == $OrderModel->status_waiting_pay){
+            //检查用户余额
+            if(!$this->checkMoneyEnough($userid,$allmoney)) return json($this->errjson(-10002));
+            //扣款完成订单
+            $ret = $OrderModel->finishSubOrder($userid, $orderid, $allmoney);
+            if(!$ret){
+                return json($this->errjson(-30021));
+            }
+        }
+        return json($this->sucres());
     }
 }
