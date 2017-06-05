@@ -523,4 +523,50 @@ class Order extends Base
         }
         return json($this->sucres());
     }
+
+    /**
+     * 设置订单状态
+     */
+    public function setOrderStatus(){
+        $uid = input('uid'); //用户ID
+        $orderid = input('orderid'); //用户ID
+        $orderstatus = intval(input('status',-1));
+
+        //判断用户登录
+        if($this->checkLogin() === false) return json($this->errjson(-10001));
+        if(!in_array($orderstatus,array(5,6))){
+            return json($this->errjson(-30028));
+        }
+
+        //获取订单信息
+        $OrderModel = new OrderModel();
+        $orderinfo = $OrderModel->getOrderinfo($uid, $orderid);
+        if(!$orderinfo)  return json($this->errjson(-30020));
+        $order_status = intval($orderinfo['status']);
+        $order_type = intval($orderinfo['ordertype']);
+        $order_starttime = $orderinfo['startime'];
+
+        //堂食订单方可设置
+        if($order_type == 2){
+            //设置用餐中
+            if($orderstatus == $OrderModel->status_start_eat){
+                if($order_status == $OrderModel->status_pay_suc && time() > strtotime($order_starttime)){
+                    if($OrderModel->updateTradeOrderInfo($uid,$orderid,$orderstatus)){
+                        return json(self::sucjson());
+                    }
+                }
+            }
+
+            //设置申请打包
+            if($orderstatus == $OrderModel->status_apply_packing){
+                if($order_status == $OrderModel->status_pay_suc && time() > strtotime($order_starttime)){
+                    if($OrderModel->updateTradeOrderInfo($uid,$orderid,$orderstatus)){
+                        return json(self::sucjson());
+                    }
+                }
+            }
+        }
+
+        return json(self::errjson());
+    }
 }

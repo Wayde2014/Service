@@ -19,6 +19,8 @@ class OrderModel extends Model
     public $status_waiting_checkup_refund = -110;
     public $status_checkup_suc_refund = -120;
     public $status_checkup_fail_refund = -130;
+    public $status_start_eat = 5;
+    public $status_apply_packing = 6;
 
     /**
      * 新增外卖订单
