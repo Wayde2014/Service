@@ -64,8 +64,10 @@ class OrderModel extends Model
         $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
         $orderlist = Db::table('t_orders')
             ->alias('a')
-            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,a.f_addtime addtime')
+            ->field('a.f_oid orderid,a.f_shopid shopid,b.f_shopname shopname,a.f_userid userid,c.f_mobile usermobile,a.f_deskid deskid,d.f_seatnum seatnum,a.f_type ordertype,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_deliverymoney deliverymoney,a.f_allmoney allmoney,a.f_paymoney paymoney,a.f_paytype paytype,a.f_mealsnum mealsnum,a.f_startime startime,a.f_endtime endtime,a.f_addtime addtime')
             ->join('t_dineshop b','a.f_shopid = b.f_sid','left')
+            ->join('t_user_info c','a.f_userid = c.f_uid','left')
+            ->join('t_dineshop_deskinfo d','a.f_deskid = d.f_id','left')
             ->where($where)
             ->order('a.f_addtime desc')
             ->page($page, $pagesize)
