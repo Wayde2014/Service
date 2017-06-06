@@ -562,7 +562,7 @@ CREATE TABLE `t_orders` (
   `f_shopid` bigint(20) NOT NULL COMMENT '店铺ID',
   `f_userid` int(10) NOT NULL COMMENT '用户ID',
   `f_type` int(2) NOT NULL DEFAULT '1' COMMENT '订单类型（1,外卖订单  2,食堂订单）',
-  `f_status` int(2) NOT NULL DEFAULT '1' COMMENT '订单状态（0,初始 1,未付款 2,已付款 3,配送中 4,配送完成 5,用餐中 100,已完成 -100逾期 -110退款待审核 -120退款审核通过 -130退款审核不通过 -200退款中 -300退款完成， -400已取消）',
+  `f_status` int(2) NOT NULL DEFAULT '1' COMMENT '订单状态（0,初始 1,未付款 2,已付款 3,配送中 4,配送完成 5,用餐中 6,申请打包 90,已打包 100,已完成 -100逾期 -110退款待审核 -120退款审核通过 -130退款审核不通过 -200退款中 -300退款完成， -400已取消）',
   `f_orderdetail` varchar(255) NOT NULL COMMENT '订单详情',
   `f_ordermoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '订单金额',
   `f_deliverymoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '配送费',
