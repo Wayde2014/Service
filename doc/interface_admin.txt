@@ -1,9 +1,9 @@
 后台相关接口:
     1、登录接口(系统管理员: sysadmin，密码: 123456)
-        http://119.23.73.39/admin/User/login?username=sysadmin&passwordadmin/User/login?username=sysadmin&password=E10ADC3949BA59ABBE56E057F20F883E&ip=192.168.1.1
+        http://119.23.73.39/admin/User/login?username=sysadmin&passwordadmin/User/login?username=sysadmin&password=123456&ip=192.168.1.1
         入参：
             username    登录用户名
-            password    登录密码(32位MD5(123456))
+            password    登录密码
             ip          登录设备IP地址
         结果说明：
             {"code":1,"msg":"successs","info":{"ck":"ck_ZDYZODLMNWE1NTDIYJAWMJJMODCZMDJJM2EZMDA0MJM=","uid":10001},"list":[]}
@@ -85,7 +85,7 @@
              uidlist 删除用户ID列表(英文逗号分隔字符串)
 
         5)获取单个用户信息
-        http://119.23.73.39/admin/User/delUser?ck=ck_xxx&uid=xxx&userid=10001
+        http://119.23.73.39/admin/User/getUserInfo?ck=ck_xxx&uid=xxx&userid=10001
         入参：
             ck  唯一标示用户登录态信息
             uid 用户ID
@@ -284,4 +284,13 @@
         ordertype(订单类型)=1外卖订单，2食堂订单，startime订单起始时间，endtime订单结束时间，shopname店铺名称
         http://119.23.73.39/admin/order/getOrderlist?startime=2017/05/07&endtime=2017/05/14&shopname=&page=1&pagesize=20&ordertype=1
         2)处理订单
-        http://119.23.73.39/admin/order/processOrder?orderid=1&status=3
+        http://119.23.73.39/admin/order/processOrder?uid=xxx&orderid=1&status=3
+        3)审核退款订单
+        http://119.23.73.39/admin/order/checkupCancelOrder?uid=xxx&orderid=1&checkupstatus=1
+        入参：
+            uid             登录用户ID
+            orderid         订单ID
+            checkupstatus   审核状态(0-审核不通过，1-审核通过)
+        结果说明：
+            {"code":1,"msg":"success","info":[],"list":[]}
+            code > 0，即订单审核成功

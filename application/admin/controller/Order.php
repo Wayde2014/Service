@@ -98,20 +98,33 @@ class Order extends Base
     public function processOrder(){
         $info = array();
         $list = array();
+        $uid = input('uid');
         $orderid = input('orderid');
-        $status = input('status');
+        $status = intval(input('status',-1));
+        $distripid = input('distripid'); //配送员ID;
         $data = array();
-        if($status == 2){ //已付款处理
-            $distripid = input('distripid'); //配送员ID;
-            if(empty($distripid)) return json($this->erres("缺少参数"));
-            $data['status'] = 3;
-            $data['distripid'] = $distripid;
-        }else if($status == 3){ //配送中处理
-            $data['status'] = 4;
-        }else if($status == 4) { //配送完成处理
-            $data['status'] = 100;
+        switch($status){
+            case 2:
+                if(empty($distripid)) return json($this->erres("缺少参数"));
+                $data['status'] = 3;
+                $data['distripid'] = $distripid;
+                break;
+            case 3:
+                if(empty($distripid)) return json($this->erres("缺少参数"));
+                $data['status'] = 4;
+                break;
+            case 4:
+                $data['status'] = 100;
+                break;
+            case 5:
+                $data['status'] = 100;
+                break;
+            case 6:
+                $data['status'] = 90;
+                break;
+            default:
+                return json($this->erres("参数错误"));
         }
-        if(count($data) == 0) return json($this->erres("参数错误"));
         $OrderModel = new OrderModel();
         $info = $OrderModel->processOrder($orderid, $data);
         if(!$info) return json($this->erres("更新失败"));
