@@ -3,6 +3,7 @@ namespace app\admin\controller;
 
 use base\Base;
 use \app\admin\model\AdminUserModel;
+use think\Log;
 use think\Request;
 
 class User extends Base
@@ -212,7 +213,7 @@ class User extends Base
             return json(self::erres("用户ID不存在"));
         }
 
-        if(strtoupper(md5($password)) !== $userinfo['password']){
+        if(strtoupper(md5(md5($password))) !== $userinfo['password']){
             return json(self::erres("登录密码不正确"));
         }
 
