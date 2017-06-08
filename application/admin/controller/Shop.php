@@ -46,6 +46,7 @@ class Shop extends Base
         $deliveryfee = input('deliveryfee');
         $minprice = input('minprice');
         $minconsume = intval(input('minconsume',0));
+        $servicecharge = intval(input('servicecharge',0));
         $preconsume = input('preconsume');
         $isbooking = input('isbooking');
         $isaway = input('isaway');
@@ -64,9 +65,9 @@ class Shop extends Base
         }
         $DineshopModel = new DineshopModel();
         if($shopid){
-            $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume);
+            $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume, $servicecharge);
         }else{
-            $res = $DineshopModel->addDineshop($shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume);
+            $res = $DineshopModel->addDineshop($shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume, $servicecharge);
         }
         if($res){
             return json($this->sucjson($info, $list));

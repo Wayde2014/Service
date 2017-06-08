@@ -13,7 +13,7 @@ class DineshopModel extends Model
      * 新增店铺
      * @return bool|int
      */
-    public function addDineshop($shopname,$shophone,$address,$maplon,$maplat,$shopdesc='',$shopicon='',$cuisineid='',$menulist='',$sales='',$deliveryfee='',$minprice='',$preconsume='',$isbooking='',$opentime='',$isaway='',$deliverytime='',$minconsume='')
+    public function addDineshop($shopname,$shophone,$address,$maplon,$maplat,$shopdesc='',$shopicon='',$cuisineid='',$menulist='',$sales='',$deliveryfee='',$minprice='',$preconsume='',$isbooking='',$opentime='',$isaway='',$deliverytime='',$minconsume='',$servicecharge='')
     {
         $table_name = 'dineshop';
         $data = array(
@@ -33,6 +33,7 @@ class DineshopModel extends Model
         if($minprice) $data['f_minprice'] = $minprice;
         if($minconsume) $data['f_minconsume'] = $minconsume;
         if($preconsume) $data['f_preconsume'] = $preconsume;
+        if($servicecharge) $data['f_servicecharge'] = $servicecharge;
         if($isbooking) $data['f_isbooking'] = $isbooking;
         if($opentime) $data['f_opentime'] = $opentime;
         if($isaway) $data['f_isaway'] = $isaway;
@@ -79,8 +80,9 @@ class DineshopModel extends Model
         if($params['sales']) $data['f_sales'] = $params['sales'];
         if($params['deliveryfee']) $data['f_deliveryfee'] = $params['deliveryfee'];
         if($params['minprice']) $data['f_minprice'] = $params['minprice'];
-        if($params['minconsume']) $data['f_minconsume'] = $params['minconsume'];;
+        if($params['minconsume']) $data['f_minconsume'] = $params['minconsume'];
         if($params['preconsume']) $data['f_preconsume'] = $params['preconsume'];
+        if($params['servicecharge']) $data['f_servicecharge'] = $params['servicecharge'];
         if($params['isbooking']) $data['f_isbooking'] = $params['isbooking'];
         if($params['opentime']) $data['f_opentime'] = $params['opentime'];
         if($params['isaway']) $data['f_isaway'] = $params['isaway'];
