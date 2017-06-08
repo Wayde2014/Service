@@ -22,7 +22,7 @@ class User extends Base
         $this->model = new AdminUserModel();
         //检查用户是否登录
         $request = Request::instance();
-        if(!in_array($request->action(),array('login'))){
+        if(!in_array($request->action(),array('login','logout'))){
             if(!self::checkAdminLogin($this->uid,$this->ck)){
                 die(json_encode(self::erres("用户未登录，请先登录")));
             }

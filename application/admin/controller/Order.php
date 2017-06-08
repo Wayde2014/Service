@@ -99,33 +99,51 @@ class Order extends Base
         $info = array();
         $list = array();
         $uid = input('uid');
+        $userid = input('userid');
         $orderid = input('orderid');
         $status = intval(input('status',-1));
         $distripid = input('distripid'); //配送员ID;
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $OrderModel = new OrderModel();
+        $orderinfo =$OrderModel->getOrderinfo($userid, $orderid);
+        if(empty($orderinfo)){
+            return json($this->erres("订单信息不存在"));
+        }
+        $order_status = $orderinfo['status'];
+        $order_type = $orderinfo['ordertype'];
+        $order_endtime = $orderinfo['endtime'];
+        if($order_type==1 && !in_array($status,array(2,3))){
+            return json(self::erres("外卖订单状态错误"));
+        }elseif($order_type==2 && !in_array($status,array(5,6))){
+            return json(self::erres("堂食订单状态错误"));
+        }
         $data = array();
         switch($status){
-            case 2:
+            case 2: //当前已付款，需设置成配送中
                 if(empty($distripid)) return json($this->erres("缺少参数"));
                 $data['status'] = 3;
                 $data['distripid'] = $distripid;
                 break;
-            case 3:
-                if(empty($distripid)) return json($this->erres("缺少参数"));
-                $data['status'] = 4;
-                break;
-            case 4:
+            case 3: //当前配送中，需设置成配送完成
                 $data['status'] = 100;
                 break;
-            case 5:
+            case 5: //当前用餐中，需设置成用餐结束
                 $data['status'] = 100;
+                if(strtotime($order_endtime) < time()){
+                    return json(self::erres("当前堂食订单尚未到截止时间!"));
+                }
                 break;
-            case 6:
+            case 6: //当前申请打包中，需设置成打包完成
                 $data['status'] = 90;
                 break;
             default:
                 return json($this->erres("参数错误"));
         }
-        $OrderModel = new OrderModel();
+        if($order_status == $data['status']){
+            return json(self::sucjson());
+        }
         $info = $OrderModel->processOrder($orderid, $data);
         if(!$info) return json($this->erres("更新失败"));
         return json($this->sucjson($info));
@@ -138,6 +156,9 @@ class Order extends Base
         $uid = input('uid');
         $orderid = input('orderid');
         $checkupstatus = input('checkupstatus',1);    //审核结果 0-不通过，1-通过
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
         $OrderModel = new OrderModel();
         $orderinfo =$OrderModel->getOrderinfo($uid, $orderid);
         if(empty($orderinfo)){

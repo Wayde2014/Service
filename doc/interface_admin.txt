@@ -284,9 +284,9 @@
         ordertype(订单类型)=1外卖订单，2食堂订单，startime订单起始时间，endtime订单结束时间，shopname店铺名称
         http://119.23.73.39/admin/order/getOrderlist?startime=2017/05/07&endtime=2017/05/14&shopname=&page=1&pagesize=20&ordertype=1
         2)处理订单
-        http://119.23.73.39/admin/order/processOrder?uid=xxx&orderid=1&status=3
+        http://119.23.73.39/admin/order/processOrder?ck=xxx&uid=xxx&orderid=1&status=3&userid=100003
         3)审核退款订单
-        http://119.23.73.39/admin/order/checkupCancelOrder?uid=xxx&orderid=1&checkupstatus=1
+        http://119.23.73.39/admin/order/checkupCancelOrder?ck=xxx&uid=xxx&orderid=1&checkupstatus=1
         入参：
             uid             登录用户ID
             orderid         订单ID
@@ -294,3 +294,13 @@
         结果说明：
             {"code":1,"msg":"success","info":[],"list":[]}
             code > 0，即订单审核成功
+
+        4)根据用户ID获取店铺信息
+        http://119.23.73.39/admin/shop/getUserDineshopInfo?ck=xxx&uid=xxx&userid=10001
+        入参：
+            ck          唯一标示用户登录态信息
+            uid         登录用户ID
+            userid      查询用户ID
+        结果说明：
+            {"code":1,"msg":"success","info":[],"list":[]}
+            code > 0，即查询成功，info字段为店铺相关信息

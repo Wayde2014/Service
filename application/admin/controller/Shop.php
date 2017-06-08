@@ -737,4 +737,19 @@ class Shop extends Base
         }
         return json($this->sucjson($info, $list));
     }
+
+    /**
+     * 获取指定用户的店铺信息
+     */
+    public function getUserDineshopInfo(){
+        $info = array();
+        $list = array();
+        $userid = input('userid');
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $info = $DineshopModel->getUserDineshopInfo($userid);
+        return json($this->sucjson($info, $list));
+    }
 }
