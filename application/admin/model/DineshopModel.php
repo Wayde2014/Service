@@ -12,7 +12,7 @@ class DineshopModel extends Model
     /**
      * 添加店铺信息
      */
-    public function addDineshop($shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume=0){
+    public function addDineshop($shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume){
         try{
             $data = array(
                 'f_adduser' => $adduser,
@@ -48,7 +48,7 @@ class DineshopModel extends Model
     /**
      * 修改店铺信息
      */
-    public function modDineshop($shopid, $shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume=0){
+    public function modDineshop($shopid, $shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume){
         // 启动事务
         Db::startTrans();
         try{

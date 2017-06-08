@@ -30,7 +30,9 @@ class OrderModel extends Model
             'a.f_type' => 1,
             'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
         );
-        if(!empty($shopname)){
+		if (is_numeric($shopname)){
+			$where['a.f_oid'] = $shopname;
+        }else if(!empty($shopname)){
             $where['b.f_shopname'] = $shopname;
         }
         $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
@@ -58,7 +60,9 @@ class OrderModel extends Model
             'a.f_type' => 2,
             'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
         );
-        if(!empty($shopname)){
+        if (is_numeric($shopname)){
+			$where['a.f_oid'] = $shopname;
+        }else if(!empty($shopname)){
             $where['b.f_shopname'] = $shopname;
         }
         $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
