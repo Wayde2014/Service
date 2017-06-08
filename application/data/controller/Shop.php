@@ -140,6 +140,11 @@ class Shop extends Base
                 }
                 if(isset($reslist[$key]['discountprice'])){
                     $reslist[$key]['discountprice'] = number_format($reslist[$key]['discountprice'] , 2, ".", "");
+                }else{
+                    $default_discount = $val['default_discount'];
+                    $floatTemp = floatval(str_replace(',','',$val['price']));
+                    $discount_price = $floatTemp * $default_discount;
+                    $reslist[$key]['discountprice'] = number_format($discount_price , 2, ".", "");
                 }
                 if(!isset($info[$classifyname])) $info[$classifyname] = array();
                 array_push($info[$classifyname], $reslist[$key]);

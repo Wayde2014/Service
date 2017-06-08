@@ -153,27 +153,32 @@ class Order extends Base
      * 审核退款订单
      */
     public function checkupCancelOrder(){
-        $uid = input('uid');
+        $userid = input('userid');
         $orderid = input('orderid');
         $checkupstatus = input('checkupstatus',1);    //审核结果 0-不通过，1-通过
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
         $OrderModel = new OrderModel();
-        $orderinfo =$OrderModel->getOrderinfo($uid, $orderid);
+        $orderinfo =$OrderModel->getOrderinfo($userid, $orderid);
         if(empty($orderinfo)){
             return json($this->erres("订单信息不存在"));
         }
         $order_status = $orderinfo['status'];
         $order_paytype = $orderinfo['paytype'];
         $order_paymoney = $orderinfo['paymoney'];
+        $order_type = $orderinfo['ordertype'];
+        $order_deskid = $orderinfo['deskid'];
         if($order_status != $OrderModel->status_waiting_checkup_refund){
             return json($this->erres("订单非待审核退款状态"));
         }
         if($checkupstatus == 1){
             //审核通过
-            if(!$OrderModel->updateTradeOrderInfo($uid,$orderid,$OrderModel->status_checkup_suc_refund)){
+            if(!$OrderModel->updateTradeOrderInfo($userid,$orderid,$OrderModel->status_checkup_suc_refund)){
                 return json(self::erres("退款订单审核失败"));
+            }
+            if($order_type == 2){
+                $OrderModel->cancelTradeOrderDeskOrdernum($order_deskid);
             }
 
             if($order_paytype == 0){
@@ -181,18 +186,18 @@ class Order extends Base
                 //撤单返款
                 $Account = new AccountModel();
                 $tradetype = 1004;
-                $deposit = $Account->deposit($uid,$order_paymoney,$tradetype,$orderid);
+                $deposit = $Account->deposit($userid,$order_paymoney,$tradetype,$orderid);
                 if(!$deposit){
                     return json(self::erres("撤单返款失败"));
                 }
-                if($OrderModel->updateTradeOrderInfo($uid,$orderid,$OrderModel->status_refund_suc)){
+                if($OrderModel->updateTradeOrderInfo($userid,$orderid,$OrderModel->status_refund_suc)){
                     return json(self::sucjson());
                 }
             }else{
                 //支付宝支付or微信支付
                 //检查订单对应充值信息
                 $AccountModel = new AccountModel();
-                $rechargeinfo = $AccountModel->getTradeOrderRechargeInfo($uid,$orderid);
+                $rechargeinfo = $AccountModel->getTradeOrderRechargeInfo($userid,$orderid);
                 if(empty($rechargeinfo)){
                     return json(self::erres("查不到该交易订单对应充值信息"));
                 }
@@ -217,7 +222,7 @@ class Order extends Base
                 //撤单返款
                 $Account = new AccountModel();
                 $tradetype = 1004;
-                $deposit = $Account->deposit($uid,$order_paymoney,$tradetype,$orderid);
+                $deposit = $Account->deposit($userid,$order_paymoney,$tradetype,$orderid);
                 if(!$deposit){
                     return json(self::erres("撤单返款失败"));
                 }
@@ -225,12 +230,12 @@ class Order extends Base
                 //冻结
                 $tradetype = 2003;
                 $tradenote = "订单退款冻结";
-                $freeze = $AccountModel->freeze($uid,$order_paymoney,$tradetype,$tradenote);
+                $freeze = $AccountModel->freeze($userid,$order_paymoney,$tradetype,$tradenote);
                 if(!$freeze){
                     return json(self::erres("订单退款冻结失败"));
                 }
 
-                $refundid = $AccountModel->addDrawOrderInfo($uid,$order_paymoney,config("drawtype.order"),$paychannel,$orderid,$payorderid,$paybankorderid);
+                $refundid = $AccountModel->addDrawOrderInfo($userid,$order_paymoney,config("drawtype.order"),$paychannel,$orderid,$payorderid,$paybankorderid);
                 if($refundid === false){
                     return json(self::erres("创建退款订单失败"));
                 }
@@ -241,7 +246,7 @@ class Order extends Base
                     $ret = $Alipay->toRefund($refundid,$order_paymoney,$rechargeinfo,$describle);
                     if($ret['code'] > 0){
                         //将订单状态更新为退款中
-                        if($OrderModel->updateTradeOrderInfo($uid,$orderid,$OrderModel->status_waiting_refund)){
+                        if($OrderModel->updateTradeOrderInfo($userid,$orderid,$OrderModel->status_waiting_refund)){
                             return json(self::sucjson());
                         }
                     }else{
@@ -250,7 +255,7 @@ class Order extends Base
                 }
             }
         }else{
-            if($OrderModel->updateTradeOrderInfo($uid,$orderid,$OrderModel->status_checkup_fail_refund)){
+            if($OrderModel->updateTradeOrderInfo($userid,$orderid,$OrderModel->status_checkup_fail_refund)){
                 return json(self::sucjson());
             }
         }

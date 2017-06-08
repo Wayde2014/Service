@@ -165,4 +165,14 @@ class OrderModel extends Model
             ->find();
         return $orderinfo;
     }
+
+    /**
+     * 堂食订单取消后更新预订桌型数量
+     */
+    public function cancelTradeOrderDeskOrdernum($deskid){
+        $table_name = 'dineshop_deskinfo';
+        Db::name($table_name)
+            ->where('f_id',$deskid)
+            ->setDec('f_orderamount');
+    }
 }
