@@ -40,7 +40,7 @@ class Order extends Base
         //判断参数
         if(!$shopid) return json($this->errjson(-30001));
         if(!$orderdetail) return json($this->errjson(-30002));
-        if($ordermoney == 0 || $allmoney == 0 || $ordermoney + $deliverymoney != $allmoney){
+        if($ordermoney == 0 || $allmoney == 0 || $ordermoney + $deliverymoney + $servicemoney != $allmoney){
             return json($this->errjson(-30003)); 
         }
         if($paytype == '') return json($this->errjson(-30004));
@@ -65,7 +65,6 @@ class Order extends Base
         $shopinfo = $DineshopModel->getShopInfo($shopid);
         if(empty($shopinfo)) return json($this->errjson(-30015));
         //验证订单金额
-        if($ordermoney + $deliverymoney != $allmoney) return json($this->errjson(-30016));
         $DishesModel = new DishesModel();
         $_orderinfo = array();
         foreach(explode(',', $orderdetail) as $key=>$val){
