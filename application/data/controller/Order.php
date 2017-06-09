@@ -193,6 +193,15 @@ class Order extends Base
         if($this->checkLogin() === false) return json($this->errjson(-10001));
         $OrderModel = new OrderModel();
         $res = $OrderModel->getOrderlist($uid, $ordertype, $page, $pagesize);
+        if(!empty($res) && !empty($res['orderlist'])){
+            $DineshopModel = new DineshopModel();
+            foreach($res['orderlist'] as $k=>$value){
+                $shopid = $value['shopid'];
+                $dineshop_info = $DineshopModel->getShopInfo($shopid);
+                $res['orderlist'][$k]['shopicon'] = $dineshop_info['shopicon'];
+                $res['orderlist'][$k]['address'] = $dineshop_info['address'];
+            }
+        }
         $info["allnum"] = $res["allnum"];
         $info["totalpage"] = ceil($res["allnum"]/$pagesize);
         if($res["orderlist"]) {

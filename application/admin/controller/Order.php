@@ -117,18 +117,26 @@ class Order extends Base
         }
         $order_status = $orderinfo['status'];
         $order_type = $orderinfo['ordertype'];
+        $order_startime = $orderinfo['startime'];
         $order_endtime = $orderinfo['endtime'];
         if($order_type==1 && !in_array($status,array(2,3))){
             return json(self::erres("外卖订单状态错误"));
-        }elseif($order_type==2 && !in_array($status,array(5,6))){
+        }elseif($order_type==2 && !in_array($status,array(2,5,6))){
             return json(self::erres("堂食订单状态错误"));
         }
         $data = array();
         switch($status){
-            case 2: //当前已付款，需设置成配送中
-                if(empty($distripid)) return json($this->erres("缺少参数"));
-                $data['status'] = 3;
-                $data['distripid'] = $distripid;
+            case 2: //当前已付款，需设置成配送中/就餐中
+                if($order_type == 1){
+                    if(empty($distripid)) return json($this->erres("缺少参数"));
+                    $data['status'] = 3;
+                    $data['distripid'] = $distripid;
+                }else{
+                    if(strtotime($order_startime) < time()){
+                        return json(self::erres("当前堂食订单尚未到就餐开始时间!"));
+                    }
+                    $data['status'] = 5;
+                }
                 break;
             case 3: //当前配送中，需设置成配送完成
                 $data['status'] = 100;
@@ -136,7 +144,7 @@ class Order extends Base
             case 5: //当前用餐中，需设置成用餐结束
                 $data['status'] = 100;
                 if(strtotime($order_endtime) < time()){
-                    return json(self::erres("当前堂食订单尚未到截止时间!"));
+                    return json(self::erres("当前堂食订单尚未到就餐截止时间!"));
                 }
                 break;
             case 6: //当前申请打包中，需设置成打包完成
