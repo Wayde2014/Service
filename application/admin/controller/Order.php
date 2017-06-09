@@ -20,7 +20,11 @@ class Order extends Base
         $list = array();
         $startime = input('startime'); //起始时间
         $endtime = input('endtime'); //结束时间
-        $shopname = input('shopname',''); //店铺名称
+        $shopid = input('shopid',''); //店铺ID或名称
+        $orderid = input('orderid',''); //订单ID
+        if(!empty($orderid) && !is_numeric($orderid)){
+            return json($this->erres('订单ID必须为数字'));
+        }
         $page = input('page',1); //页码
         $pagesize = input('pagesize',20); //每页显示数
         $ordertype = input('ordertype',1); //ordertype订单类型 1外卖订单 2食堂订单
@@ -33,9 +37,9 @@ class Order extends Base
         }
         $OrderModel = new OrderModel();
         if($ordertype == 1){
-            $res = $OrderModel->getTakeoutlist($startime, $endtime, $shopname, $page, $pagesize);
+            $res = $OrderModel->getTakeoutlist($startime, $endtime, $shopid, $orderid, $page, $pagesize);
         }else{
-            $res = $OrderModel->getEatinlist($startime, $endtime, $shopname, $page, $pagesize);
+            $res = $OrderModel->getEatinlist($startime, $endtime, $shopid, $orderid, $page, $pagesize);
         }
         $info['allnum'] = $res['allnum'];
         if($res['orderlist']) {

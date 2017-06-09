@@ -154,13 +154,11 @@ class Shop extends Base
 				$shopid = $info['id'];
 			}
 		}
-        //if(isset($info['menulist'])){
-            $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
-            if($dishlist){
-                $disheslist = $dishlist;
-            }
-        //}
+        $DishesModel = new DishesModel();
+        $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
+        if($dishlist){
+            $disheslist = $dishlist;
+        }
         $info['disheslist'] = $disheslist;
         return json($this->sucjson($info, $list));
     }
@@ -656,8 +654,7 @@ class Shop extends Base
 			//非数字的话，认为是字符串店名
 			$shopname = $shopid;
 			$shopinfo = $DineshopModel->getDineshopInfoByName($shopname);
-			if (isset($shopinfo['id']))
-				$shopid = $shopinfo['id'];
+			if (isset($shopinfo['id'])) $shopid = $shopinfo['id'];
 		}
         if($shopinfo){
             $info['shopid'] = $shopinfo['id'];
