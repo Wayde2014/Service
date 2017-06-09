@@ -95,6 +95,8 @@ class Order extends Base
                     }else if($_discount[$_dishid]['type'] == 2){
                         $_price = $_price - $_discount[$_dishid]['discount'];
                     }
+                }else{
+                    $_price = $_price*floatval($list[$i]['discount']);
                 }
                 $priceinfo[$_dishid] = $_price;
             }

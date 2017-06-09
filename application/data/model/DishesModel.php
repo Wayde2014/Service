@@ -79,7 +79,7 @@ class DishesModel extends Model
     public function getDishesList($menulist){
         $disheslist = Db::table('t_food_dishes')
             ->alias('a')
-            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,f_salenum as salenum')
+            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_discount discount, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,f_salenum as salenum')
             ->join('t_food_classify b','a.f_classid = b.f_cid','left')
             ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->whereIn('a.f_id', explode(',',$menulist))
