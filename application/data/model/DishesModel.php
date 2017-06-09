@@ -61,6 +61,7 @@ class DishesModel extends Model
         if($params['tastesid']) $data['f_tastesid'] = $params['tastesid'];
         if($params['cuisineid']) $data['f_cuisineid'] = $params['cuisineid'];
         if($params['classid']) $data['f_classid'] = $params['classid'];
+        if($params['salenum']) $data['f_salenum'] = $params['salenum'];
         if(count($data) < 1) return true;
         $ret = Db::name($table_name)
             ->where('f_id', $dishesid)
@@ -78,7 +79,7 @@ class DishesModel extends Model
     public function getDishesList($menulist){
         $disheslist = Db::table('t_food_dishes')
             ->alias('a')
-            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,50 as salenum')
+            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,f_salenum as salenum')
             ->join('t_food_classify b','a.f_classid = b.f_cid','left')
             ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->whereIn('a.f_id', explode(',',$menulist))
@@ -92,7 +93,7 @@ class DishesModel extends Model
     public function getDishesListBysid($shopid){
         $disheslist = Db::table('t_food_dishes')
             ->alias('a')
-            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,50 as salenum')
+            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,f_salenum as salenum,a.f_discount default_discount')
             ->join('t_food_classify b','a.f_classid = b.f_cid','left')
             ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->where('a.f_sid', $shopid)

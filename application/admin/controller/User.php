@@ -3,6 +3,7 @@ namespace app\admin\controller;
 
 use base\Base;
 use \app\admin\model\AdminUserModel;
+use think\Log;
 use think\Request;
 
 class User extends Base
@@ -21,7 +22,7 @@ class User extends Base
         $this->model = new AdminUserModel();
         //检查用户是否登录
         $request = Request::instance();
-        if(!in_array($request->action(),array('login'))){
+        if(!in_array($request->action(),array('login','logout'))){
             if(!self::checkAdminLogin($this->uid,$this->ck)){
                 die(json_encode(self::erres("用户未登录，请先登录")));
             }
@@ -212,7 +213,7 @@ class User extends Base
             return json(self::erres("用户ID不存在"));
         }
 
-        if(strtoupper(md5($password)) !== $userinfo['password']){
+        if(strtoupper(md5(md5($password))) !== $userinfo['password']){
             return json(self::erres("登录密码不正确"));
         }
 

@@ -12,7 +12,7 @@ class DishesModel extends Model
     /**
      * 添加菜肴信息
      */
-    public function addDishes($dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid, $shopid, $adduser){
+    public function addDishes($dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid, $shopid, $adduser, $salenum){
         try{
             $data = array(
                 'f_adduser' => $adduser,
@@ -24,7 +24,8 @@ class DishesModel extends Model
                 'f_discount' => $discount,
                 'f_tastesid' => $tastesid,
                 'f_cuisineid' => $cuisineid,
-                'f_classid' => $classid
+                'f_classid' => $classid,
+                'f_salenum' => $salenum,
             );
             $dishid = intval(Db::table('t_admin_food_dishes')->insertGetId($data));
             return $dishid;
@@ -40,7 +41,7 @@ class DishesModel extends Model
     /**
      * 修改菜肴信息
      */
-    public function modDishes($dishid, $dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid){
+    public function modDishes($dishid, $dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid,$salenum){
         // 启动事务
         Db::startTrans();
         try{
@@ -52,7 +53,8 @@ class DishesModel extends Model
                 'f_discount' => $discount,
                 'f_tastesid' => $tastesid,
                 'f_cuisineid' => $cuisineid,
-                'f_classid' => $classid
+                'f_classid' => $classid,
+                'f_salenum' => $salenum,
             );
             Db::table('t_admin_food_dishes')->where('f_id', $dishid)->update($data); //更新管理后台表
             $dishesinfo = Db::table('t_admin_food_dishes')->field('f_status status, f_fontdishid fontdishid')->where('f_id', $dishid)->find();
@@ -75,7 +77,7 @@ class DishesModel extends Model
     public function getDishesList($menulist){
         $disheslist = Db::table('t_food_dishes')
             ->alias('a')
-            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, a.f_price price, b.f_cname classifyname, c.f_cname cuisinename')
+            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, a.f_price price, b.f_cname classifyname, c.f_cname cuisinename, a.f_salenum salenum')
             ->join('t_food_classify b','a.f_classid = b.f_cid','left')
             ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->whereIn('a.f_id', explode(',',$menulist))
@@ -89,7 +91,7 @@ class DishesModel extends Model
     public function getDishesListBysidNoPage($shopid){
         $disheslist = Db::table('t_admin_food_dishes')
             ->alias('a')
-            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,50 as salenum')
+            ->field('a.f_id id, a.f_icon icon, a.f_name dishesname, format(a.f_price,2) price, a.f_tastesid tastesid, b.f_cname classifyname, c.f_cname cuisinename,a.f_desc as food_desc,a.f_salenum as salenum')
             ->join('t_food_classify b','a.f_classid = b.f_cid','left')
             ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->where('a.f_sid', $shopid)
@@ -104,7 +106,7 @@ class DishesModel extends Model
         $allnum = Db::table('t_admin_food_dishes')->where('f_sid', $shopid)->count();
         $disheslist = Db::table('t_admin_food_dishes')
             ->alias('a')
-            ->field('a.f_id id, a.f_adduser userid, b.f_username adduser, a.f_status status, a.f_sid shopid, e.f_shopname shopname, a.f_name dishname, a.f_desc dishdesc, a.f_icon dishicon, a.f_price dishprice, a.f_discount defdiscount, a.f_tastesid tastesid, a.f_cuisineid cuisineid, d.f_cname cuisinename, a.f_classid classid, c.f_cname classname, a.f_lasttime addtime')
+            ->field('a.f_id id, a.f_adduser userid, b.f_username adduser, a.f_status status, a.f_sid shopid, e.f_shopname shopname, a.f_name dishname, a.f_desc dishdesc, a.f_icon dishicon, a.f_price dishprice, a.f_discount defdiscount, a.f_tastesid tastesid, a.f_cuisineid cuisineid, d.f_cname cuisinename, a.f_classid classid, c.f_cname classname, a.f_lasttime addtime, a.f_salenum salenum')
             ->join('t_admin_userinfo b','a.f_adduser = b.f_uid','left')
             ->join('t_food_classify c','a.f_classid = c.f_cid','left')
             ->join('t_food_cuisine d','a.f_cuisineid = d.f_cid','left')
@@ -124,7 +126,7 @@ class DishesModel extends Model
     public function getDishesInfo($dishid){
         $dishesinfo = Db::table('t_admin_food_dishes')
             ->alias('a')
-            ->field('a.f_id id, a.f_adduser userid, b.f_username adduser, a.f_status status, a.f_sid shopid, e.f_shopname shopname, a.f_name dishname, a.f_desc dishdesc, a.f_icon dishicon, a.f_price dishprice, a.f_discount defdiscount, a.f_tastesid tastesid, a.f_cuisineid cuisineid, d.f_cname cuisinename, a.f_classid classid, c.f_cname classname, a.f_lasttime addtime')
+            ->field('a.f_id id, a.f_adduser userid, b.f_username adduser, a.f_status status, a.f_sid shopid, e.f_shopname shopname, a.f_name dishname, a.f_desc dishdesc, a.f_icon dishicon, a.f_price dishprice, a.f_discount defdiscount, a.f_tastesid tastesid, a.f_cuisineid cuisineid, d.f_cname cuisinename, a.f_classid classid, c.f_cname classname, a.f_lasttime addtime, a.f_salenum salenum')
             ->join('t_admin_userinfo b','a.f_adduser = b.f_uid','left')
             ->join('t_food_classify c','a.f_classid = c.f_cid','left')
             ->join('t_food_cuisine d','a.f_cuisineid = d.f_cid','left')
@@ -143,7 +145,7 @@ class DishesModel extends Model
             Db::table('t_admin_food_dishes')->where('f_id', $dishid)->update(array('f_status' => $status)); //更新管理后台表
             if($status == 100){
                 //审核通过则同步到前端表
-                $dishinfo = Db::table('t_admin_food_dishes')->field('f_sid,f_icon,f_name,f_desc,f_price,f_discount,f_state,f_tastesid,f_cuisineid,f_classid')->where('f_id', $dishid)->find();
+                $dishinfo = Db::table('t_admin_food_dishes')->field('f_sid,f_icon,f_name,f_desc,f_price,f_discount,f_state,f_tastesid,f_cuisineid,f_classid,f_salenum')->where('f_id', $dishid)->find();
                 $fontdishid = Db::table('t_food_dishes')->insertGetId($dishinfo);
                 Db::table('t_admin_food_dishes')->where('f_id', $dishid)->update(array('f_fontdishid' => $fontdishid)); 
             }else if($status == -300){

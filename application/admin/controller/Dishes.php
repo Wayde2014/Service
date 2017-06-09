@@ -55,6 +55,7 @@ class Dishes extends Base
             }
         }
         $cuisineid = input('cuisineid');
+        $salenum = intval(input('salenum',0));
         if(empty($cuisineid)){
             return json($this->errjson(-80009));
         }
@@ -64,9 +65,9 @@ class Dishes extends Base
         }
         $DishesModel = new DishesModel();
         if($dishid){
-            $res = $DishesModel->modDishes($dishid, $dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid);
+            $res = $DishesModel->modDishes($dishid, $dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid,$salenum);
         }else{
-            $res = $DishesModel->addDishes($dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid, $shopid, $adduser);
+            $res = $DishesModel->addDishes($dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid, $shopid, $adduser,$salenum);
         }
         if($res){
             return json($this->sucjson($info, $list));

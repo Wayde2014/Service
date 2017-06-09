@@ -73,7 +73,8 @@ class OrderModel extends Model
      */
     public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid)
     {
-        $table_name = 'orders';
+        $table_orders = 'orders';
+        $table_deskinfo = 'dineshop_deskinfo';
         $data = array(
             'f_userid' => $userid,
             'f_shopid' => $shopid,
@@ -90,11 +91,23 @@ class OrderModel extends Model
             'f_servicemoney' => $servicemoney,
             'f_deskid' => $deskid,
         );
-        $orderid = intval(Db::name($table_name)->insertGetId($data));
-        if ($orderid <= 0) {
+        Db::startTrans();
+        try{
+            $orderid = intval(Db::name($table_orders)->insertGetId($data));
+            if ($orderid > 0) {
+                Db::name($table_deskinfo)
+                    ->where('f_sid',$shopid)
+                    ->where('f_id',$deskid)
+                    ->setInc('f_orderamount');
+                Db::commit();
+                return $orderid;
+            }
+            Db::rollback();
+            return false;
+        }catch (Exception $e){
+            Db::rollback();
             return false;
         }
-        return $orderid;
     }
     
     /**
