@@ -24,14 +24,19 @@ class OrderModel extends Model
     /**
      * 获取外卖订单列表
      */
-    public function getTakeoutlist($startime, $endtime, $shopname = '', $page = 1, $pagesize = 20)
+    public function getTakeoutlist($startime, $endtime, $shopid = '', $orderid = '', $page = 1, $pagesize = 20)
     {
         $where = array(
             'a.f_type' => 1,
             'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
         );
-        if(!empty($shopname)){
-            $where['b.f_shopname'] = $shopname;
+		if (is_numeric($shopid)){
+			$where['a.f_shopid'] = $shopid;
+        }else if(!empty($shopid)){
+            $where['b.f_shopname'] = array('like','%'.$shopid.'%');
+        }
+        if(!empty($orderid)) {
+            $where['a.f_oid'] = $orderid;
         }
         $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
         $orderlist = Db::table('t_orders')
@@ -52,14 +57,19 @@ class OrderModel extends Model
     /**
      * 获取食堂订单列表
      */
-    public function getEatinlist($startime, $endtime, $shopname = '', $page = 1, $pagesize = 20)
+    public function getEatinlist($startime, $endtime, $shopid = '', $orderid = '', $page = 1, $pagesize = 20)
     {
         $where = array(
             'a.f_type' => 2,
             'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
         );
-        if(!empty($shopname)){
-            $where['b.f_shopname'] = $shopname;
+        if (is_numeric($shopid)){
+			$where['a.f_shopid'] = $shopid;
+        }else if(!empty($shopid)){
+            $where['b.f_shopname'] = array('like','%'.$shopid.'%');
+        }
+        if(!empty($orderid)) {
+            $where['a.f_oid'] = $orderid;
         }
         $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
         $orderlist = Db::table('t_orders')
@@ -160,5 +170,15 @@ class OrderModel extends Model
             ->field('f_paymoney as paymoney')
             ->find();
         return $orderinfo;
+    }
+
+    /**
+     * 堂食订单取消后更新预订桌型数量
+     */
+    public function cancelTradeOrderDeskOrdernum($deskid){
+        $table_name = 'dineshop_deskinfo';
+        Db::name($table_name)
+            ->where('f_id',$deskid)
+            ->setDec('f_orderamount');
     }
 }

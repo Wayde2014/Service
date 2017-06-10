@@ -12,7 +12,7 @@ class DineshopModel extends Model
     /**
      * 添加店铺信息
      */
-    public function addDineshop($shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser){
+    public function addDineshop($shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume,$servicecharge){
         try{
             $data = array(
                 'f_adduser' => $adduser,
@@ -27,7 +27,9 @@ class DineshopModel extends Model
                 'f_sales' => $sales,
                 'f_deliveryfee' => $deliveryfee,
                 'f_minprice' => $minprice,
+                'f_minconsume' => $minconsume,
                 'f_preconsume' => $preconsume,
+                'f_servicecharge' => $servicecharge,
                 'f_isbooking' => $isbooking,
                 'f_opentime' => $opentime,
                 'f_isaway' => $isaway,
@@ -47,7 +49,7 @@ class DineshopModel extends Model
     /**
      * 修改店铺信息
      */
-    public function modDineshop($shopid, $shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address){
+    public function modDineshop($shopid, $shopname, $shopdesc, $shopicon, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume,$servicecharge){
         // 启动事务
         Db::startTrans();
         try{
@@ -63,8 +65,10 @@ class DineshopModel extends Model
                 'f_sales' => $sales,
                 'f_deliveryfee' => $deliveryfee,
                 'f_minprice' => $minprice,
+                'f_minconsume' => $minconsume,
                 'f_preconsume' => $preconsume,
                 'f_isbooking' => $isbooking,
+                'f_servicecharge' => $servicecharge,
                 'f_opentime' => $opentime,
                 'f_isaway' => $isaway
             );
@@ -95,7 +99,7 @@ class DineshopModel extends Model
             Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update(array('f_status' => $status)); //更新管理后台表
             if($status == 100){
                 //审核通过则同步到前端表
-                $shopinfo = Db::table('t_admin_dineshop')->field('f_shopname,f_shopdesc,f_shopicon,f_shophone,f_address,f_cuisineid,f_maplon,f_maplat,f_sales,f_deliveryfee,f_minprice,f_preconsume,f_isbooking,f_opentime,f_isaway')->where('f_sid', $shopid)->find();
+                $shopinfo = Db::table('t_admin_dineshop')->field('f_shopname,f_shopdesc,f_shopicon,f_shophone,f_address,f_cuisineid,f_maplon,f_maplat,f_sales,f_deliveryfee,f_minprice,f_minconsume,f_preconsume,f_isbooking,f_servicecharge,f_opentime,f_isaway')->where('f_sid', $shopid)->find();
                 $shopinfo['f_addtime'] = date('Y-m-d H:i:s');
                 $fontshopid = Db::table('t_dineshop')->insertGetId($shopinfo);
                 Db::table('t_admin_dineshop')->where('f_sid', $shopid)->update(array('f_fontshopid' => $fontshopid)); 
@@ -137,7 +141,7 @@ class DineshopModel extends Model
     public function getDineshopInfo($shopid){
         $dineshopinfo = Db::table('t_admin_dineshop')
             ->alias('a')
-            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice, a.f_preconsume preconsume, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
+            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice,a.f_minconsume minconsume, a.f_preconsume preconsume,a.f_servicecharge servicecharge, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
             ->join('t_food_cuisine b','a.f_cuisineid = b.f_cid','left')
             ->where('a.f_sid', $shopid)
             ->find();
@@ -150,7 +154,7 @@ class DineshopModel extends Model
     public function getDineshopInfoByName($shopname){
         $dineshopinfo = Db::table('t_admin_dineshop')
             ->alias('a')
-            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice, a.f_preconsume preconsume, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
+            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice, a.f_minconsume minconsume, a.f_preconsume preconsume, a.f_servicecharge servicecharge, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
             ->join('t_food_cuisine b','a.f_cuisineid = b.f_cid','left')
             ->where(array('a.f_shopname'=>array('like','%'.$shopname.'%')))
             ->find();
@@ -415,5 +419,19 @@ class DineshopModel extends Model
             ->field('f_cid id, f_cname cuisinename, f_lasttime addtime')
             ->select();
         return $list;
+    }
+
+    /**
+     * 获取用户的店铺信息
+     */
+    public function getUserDineshopInfo($userid){
+        $table_name = 'admin_dineshop';
+        $dineshopinfo = Db::name($table_name)
+            ->alias('a')
+            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice,a.f_minconsume minconsume, a.f_preconsume preconsume, a.f_servicecharge servicecharge, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
+            ->join('t_food_cuisine b','a.f_cuisineid = b.f_cid','left')
+            ->where('a.f_adduser', $userid)
+            ->find();
+        return $dineshopinfo;
     }
 }

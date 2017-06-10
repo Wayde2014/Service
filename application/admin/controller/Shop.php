@@ -45,6 +45,8 @@ class Shop extends Base
         $sales = input('sales');
         $deliveryfee = input('deliveryfee');
         $minprice = input('minprice');
+        $minconsume = intval(input('minconsume',0));
+        $servicecharge = intval(input('servicecharge',0));
         $preconsume = input('preconsume');
         $isbooking = input('isbooking');
         $isaway = input('isaway');
@@ -63,9 +65,9 @@ class Shop extends Base
         }
         $DineshopModel = new DineshopModel();
         if($shopid){
-            $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address);
+            $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume, $servicecharge);
         }else{
-            $res = $DineshopModel->addDineshop($shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser);
+            $res = $DineshopModel->addDineshop($shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume, $servicecharge);
         }
         if($res){
             return json($this->sucjson($info, $list));
@@ -152,13 +154,11 @@ class Shop extends Base
 				$shopid = $info['id'];
 			}
 		}
-        //if(isset($info['menulist'])){
-            $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
-            if($dishlist){
-                $disheslist = $dishlist;
-            }
-        //}
+        $DishesModel = new DishesModel();
+        $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
+        if($dishlist){
+            $disheslist = $dishlist;
+        }
         $info['disheslist'] = $disheslist;
         return json($this->sucjson($info, $list));
     }
@@ -654,8 +654,7 @@ class Shop extends Base
 			//非数字的话，认为是字符串店名
 			$shopname = $shopid;
 			$shopinfo = $DineshopModel->getDineshopInfoByName($shopname);
-			if (isset($shopinfo['id']))
-				$shopid = $shopinfo['id'];
+			if (isset($shopinfo['id'])) $shopid = $shopinfo['id'];
 		}
         if($shopinfo){
             $info['shopid'] = $shopinfo['id'];
@@ -735,6 +734,21 @@ class Shop extends Base
         if($res['disheslist']) {
             $list = $res['disheslist'];
         }
+        return json($this->sucjson($info, $list));
+    }
+
+    /**
+     * 获取指定用户的店铺信息
+     */
+    public function getUserDineshopInfo(){
+        $info = array();
+        $list = array();
+        $userid = input('userid');
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $info = $DineshopModel->getUserDineshopInfo($userid);
         return json($this->sucjson($info, $list));
     }
 }

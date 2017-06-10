@@ -40,7 +40,7 @@ class Order extends Base
         //判断参数
         if(!$shopid) return json($this->errjson(-30001));
         if(!$orderdetail) return json($this->errjson(-30002));
-        if($ordermoney == 0 || $allmoney == 0 || $ordermoney + $deliverymoney != $allmoney){
+        if($ordermoney == 0 || $allmoney == 0 || $ordermoney + $deliverymoney + $servicemoney != $allmoney){
             return json($this->errjson(-30003)); 
         }
         if($paytype == '') return json($this->errjson(-30004));
@@ -65,7 +65,6 @@ class Order extends Base
         $shopinfo = $DineshopModel->getShopInfo($shopid);
         if(empty($shopinfo)) return json($this->errjson(-30015));
         //验证订单金额
-        if($ordermoney + $deliverymoney != $allmoney) return json($this->errjson(-30016));
         $DishesModel = new DishesModel();
         $_orderinfo = array();
         foreach(explode(',', $orderdetail) as $key=>$val){
@@ -96,6 +95,8 @@ class Order extends Base
                     }else if($_discount[$_dishid]['type'] == 2){
                         $_price = $_price - $_discount[$_dishid]['discount'];
                     }
+                }else{
+                    $_price = $_price*floatval($list[$i]['discount']);
                 }
                 $priceinfo[$_dishid] = $_price;
             }
@@ -192,6 +193,15 @@ class Order extends Base
         if($this->checkLogin() === false) return json($this->errjson(-10001));
         $OrderModel = new OrderModel();
         $res = $OrderModel->getOrderlist($uid, $ordertype, $page, $pagesize);
+        if(!empty($res) && !empty($res['orderlist'])){
+            $DineshopModel = new DineshopModel();
+            foreach($res['orderlist'] as $k=>$value){
+                $shopid = $value['shopid'];
+                $dineshop_info = $DineshopModel->getShopInfo($shopid);
+                $res['orderlist'][$k]['shopicon'] = $dineshop_info['shopicon'];
+                $res['orderlist'][$k]['address'] = $dineshop_info['address'];
+            }
+        }
         $info["allnum"] = $res["allnum"];
         $info["totalpage"] = ceil($res["allnum"]/$pagesize);
         if($res["orderlist"]) {

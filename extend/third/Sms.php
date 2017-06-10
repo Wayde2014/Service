@@ -13,7 +13,7 @@ class Sms extends Base{
     public function sendsms($mobile){
         $url = Config::get('sms_sendurl');
         $Curl = new \third\Curl();
-        $res = $Curl->post($url, array("mobile"=>$mobile), $this->getHttpHeader());
+        $res = $Curl->post($url, array("mobile"=>$mobile, "templateid"=>"3056293"), $this->getHttpHeader());
         if($res){
             $res = json_decode($res, true);
             if($res['code'] == 200){

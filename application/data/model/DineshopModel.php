@@ -13,7 +13,7 @@ class DineshopModel extends Model
      * 新增店铺
      * @return bool|int
      */
-    public function addDineshop($shopname,$shophone,$address,$maplon,$maplat,$shopdesc='',$shopicon='',$cuisineid='',$menulist='',$sales='',$deliveryfee='',$minprice='',$preconsume='',$isbooking='',$opentime='',$isaway='',$deliverytime='')
+    public function addDineshop($shopname,$shophone,$address,$maplon,$maplat,$shopdesc='',$shopicon='',$cuisineid='',$menulist='',$sales='',$deliveryfee='',$minprice='',$preconsume='',$isbooking='',$opentime='',$isaway='',$deliverytime='',$minconsume='',$servicecharge='')
     {
         $table_name = 'dineshop';
         $data = array(
@@ -31,7 +31,9 @@ class DineshopModel extends Model
         if($sales) $data['f_sales'] = $sales;
         if($deliveryfee) $data['f_deliveryfee'] = $deliveryfee;
         if($minprice) $data['f_minprice'] = $minprice;
+        if($minconsume) $data['f_minconsume'] = $minconsume;
         if($preconsume) $data['f_preconsume'] = $preconsume;
+        if($servicecharge) $data['f_servicecharge'] = $servicecharge;
         if($isbooking) $data['f_isbooking'] = $isbooking;
         if($opentime) $data['f_opentime'] = $opentime;
         if($isaway) $data['f_isaway'] = $isaway;
@@ -78,7 +80,9 @@ class DineshopModel extends Model
         if($params['sales']) $data['f_sales'] = $params['sales'];
         if($params['deliveryfee']) $data['f_deliveryfee'] = $params['deliveryfee'];
         if($params['minprice']) $data['f_minprice'] = $params['minprice'];
+        if($params['minconsume']) $data['f_minconsume'] = $params['minconsume'];
         if($params['preconsume']) $data['f_preconsume'] = $params['preconsume'];
+        if($params['servicecharge']) $data['f_servicecharge'] = $params['servicecharge'];
         if($params['isbooking']) $data['f_isbooking'] = $params['isbooking'];
         if($params['opentime']) $data['f_opentime'] = $params['opentime'];
         if($params['isaway']) $data['f_isaway'] = $params['isaway'];
@@ -100,7 +104,7 @@ class DineshopModel extends Model
     public function getShopInfo($shopid){
         $shopinfo = Db::table('t_dineshop')
             ->alias('a')
-            ->field('a.f_sid sid,a.f_shopname shopname,a.f_shopicon shopicon,a.f_shophone shophone,a.f_address address,a.f_menulist menulist,a.f_sales sales,a.f_deliveryfee deliveryfee,a.f_minprice minprice,a.f_preconsume preconsume,a.f_servicecharge servicecharge,a.f_isbooking isbooking,a.f_isaway isaway,a.f_opentime opentime,a.f_deliverytime deliverytime,b.f_cname cuisinename')
+            ->field('a.f_sid sid,a.f_shopname shopname,a.f_shopicon shopicon,a.f_shophone shophone,a.f_address address,a.f_menulist menulist,a.f_sales sales,a.f_deliveryfee deliveryfee,a.f_minprice minprice,a.f_minconsume minconsume,a.f_preconsume preconsume,a.f_servicecharge servicecharge,a.f_isbooking isbooking,a.f_isaway isaway,a.f_opentime opentime,a.f_deliverytime deliverytime,b.f_cname cuisinename')
             ->join('food_cuisine b','a.f_cuisineid = b.f_cid','left')
             ->where('a.f_sid',$shopid)
             ->find();
