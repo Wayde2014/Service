@@ -173,24 +173,44 @@ class Shop extends Base
         $list = array();
         $DineshopModel = new DineshopModel();
 
-        //取某店铺某日期某时间段放号的桌型信息
-        $sellinfo = $DineshopModel->getDeskSellIinfo($shopid,$date,$slotid);
-        if(!empty($sellinfo)){
-            $desk_num_arr = array();
-            foreach($sellinfo as $row){
-                $desk_num_str = explode('$',$row['sellinfo']);
-                if(!empty($desk_num_str)){
-                    foreach($desk_num_str as $v){
-                        $temp = explode('@',$v);
-                        $desk_num_arr[$temp[0]] = $temp[1];
+        //取店铺桌型信息
+        $deskinfo = $DineshopModel->getDeskInfo($shopid);
+        if(!empty($deskinfo)){
+            $deskid_sell = array();
+            //取某店铺某日期某时间段放号的桌型信息
+            $sellinfo = $DineshopModel->getDeskSellIinfo($shopid,$date,$slotid);
+            if(!empty($sellinfo)){
+                foreach($sellinfo as $row){
+                    $desk_num_str = explode('$',$row['sellinfo']);
+                    if(!empty($desk_num_str)){
+                        foreach($desk_num_str as $v){
+                            $temp = explode('@',$v);
+                            $deskid_sell[$temp[0]] = $temp[1];
+                        }
                     }
                 }
             }
-            //根据放号桌型ID获取桌型详细信息
-            $deskinfo = $DineshopModel->getDeskInfo($shopid,array_keys($desk_num_arr));
-            if(!empty($deskinfo)){
+            if(empty($deskid_sell)){
+                //默认全放
                 foreach($deskinfo as $row){
-                    $sellnum = $desk_num_arr[$row['deskid']];
+                    $sellnum = $row["amount"];
+                    $orderamount = $row["orderamount"];
+                    $new_sellnum = $sellnum - $orderamount;
+                    $list[$row['deskid']] = array(
+                        "shopid" => $row["shopid"],
+                        "deskid" => $row["deskid"],
+                        "seatnum" => $row["seatnum"],
+                        "sellnum" => $new_sellnum >= 0 ? $new_sellnum : 0,
+                        "usable" => $new_sellnum > 0 ? true : false,
+                    );
+                }
+            }else{
+                foreach($deskinfo as $row){
+                    $deskid = intval($row['deskid']);
+                    if(!array_key_exists($deskid,$deskid_sell)){
+                        continue;
+                    }
+                    $sellnum = $deskid_sell[$deskid];
                     $orderamount = $row["orderamount"];
                     $new_sellnum = $sellnum - $orderamount;
                     $list[$row['deskid']] = array(
@@ -203,6 +223,7 @@ class Shop extends Base
                 }
             }
         }
+
         $info = array();
         return json($this->sucjson($info, array_values($list)));
     }

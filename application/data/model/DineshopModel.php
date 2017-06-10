@@ -173,14 +173,12 @@ class DineshopModel extends Model
     /**
      * 获取桌型信息
      * @param $shopid
-     * @param $deskid_list
-     * @return $this
+     * @return false|\PDOStatement|string|\think\Collection
      */
-    public function getDeskInfo($shopid, $deskid_list){
+    public function getDeskInfo($shopid){
         $table_name = "dineshop_deskinfo";
         $deskinfo = Db::name($table_name)
             ->where('f_sid',$shopid)
-            ->where('f_id','in',$deskid_list)
             ->where('f_status',1)
             ->field('f_id as deskid')
             ->field('f_sid as shopid')

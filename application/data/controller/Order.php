@@ -102,16 +102,20 @@ class Order extends Base
             }
         }
         $_ordermoney = 0;
-        Log::record($orderdetail);
-        Log::record($priceinfo);
+
         foreach(explode(',', $orderdetail) as $key=>$val){
             preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
             $_dishid = $match[1];
             $_dishnum = $match[3];
             $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
         }
-        Log::record($_ordermoney.'**'.$ordermoney);
-        if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
+        if($_ordermoney != $ordermoney){
+            Log::record($orderdetail,'debug');
+            Log::record($priceinfo.'debug');
+            Log::record($_ordermoney.'**'.$ordermoney,'debug');
+            Log::record('error-30017,订单金额不正确','debug');
+            //return json($this->errjson(-30017));
+        }
         //验证外卖配送地址
         if($ordertype == 1){
             $addressinfo = $UserModel->getAddressInfo($addressid);
@@ -578,5 +582,33 @@ class Order extends Base
         }
 
         return json(self::errjson());
+    }
+
+    /**
+     * 扫码获取用户某店铺某桌型最近一笔未完成堂食订单ID
+     */
+    public function scan(){
+        //获取参数
+        $ck = input('ck');
+        $uid = input('uid');
+        $shopid = intval(input('shopid',-1));
+        $deskid = intval(input('deskid',-1));
+
+        if($shopid < 0 || $deskid < 0){
+            return json(self::errjson(-20001));
+        }
+
+        //检查用户是否登录
+        if(!self::checkLogin($uid,$ck)){
+            return json($this->errjson(-10001));
+        }
+
+        //获取订单信息
+        $OrderModel = new OrderModel();
+        $orderinfo = $OrderModel->getScanOrderInfo($uid,$shopid,$deskid);
+        if(!empty($orderinfo)){
+            return json(self::sucjson(array("orderid"=>$orderinfo['orderid'])));
+        }
+        return json(self::sucjson());
     }
 }

@@ -422,4 +422,22 @@ class OrderModel extends Model
             ->find();
         return $orderlist;
     }
+
+    /**
+     * 获取用户扫码用餐订单信息
+     */
+    public function getScanOrderInfo($userid,$shopid,$deskid){
+        $table_name = "orders";
+        $orderinfo = Db::name($table_name)
+            ->where('f_userid',$userid)
+            ->where('f_shopid',$shopid)
+            ->where('f_deskid',$deskid)
+            ->where('f_type',2)
+            ->where('f_status',$this->status_pay_suc)
+            ->field('f_oid as orderid')
+            ->order('f_startime','desc')
+            ->limit(1)
+            ->find();
+        return $orderinfo;
+    }
 }

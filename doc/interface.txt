@@ -299,6 +299,17 @@
         {"code":1,"msg":"success","info":[],"list":[]}
         code > 0，即订单设置成功
 
+    11、扫码获取用户最新待用餐订单ID
+    http://119.23.73.39/data/Order/scan?ck=ck_xxx&uid=xxx&shopid=xxx&deskid=xxx
+    入参：
+        ck          唯一标示用户登录态信息
+        uid         用户ID
+        shopid      店铺ID
+        deskid      桌型ID
+    结果说明：
+        {"code":1,"msg":"success","info":{"orderid":"1000000057"},"list":[]}
+        code > 0，即查询成功，当有符合条件订单时，info中包含orderid信息，否则为空
+
 更新内容：
     2017-05-29 modify by zhangw
     1) 梳理修改订单支付流程
