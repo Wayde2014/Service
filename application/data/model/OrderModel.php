@@ -7,6 +7,7 @@
  */
 namespace app\data\model;
 
+use think\Log;
 use think\Model;
 use think\Db;
 
@@ -147,7 +148,7 @@ class OrderModel extends Model
             ->where('f_userid', $userid)
             ->where('f_orderdetail', $orderdetail)
             ->where('f_type', $ordertype)
-            ->where('f_addtime', '> time', time()-10)
+            ->where('f_addtime', '>', (date("Y-m-d H:i:s",time()-10)))
             ->find();
         return $check?$check['orderid']:false;
     }
