@@ -443,16 +443,19 @@ class Order extends Base
             }
         }
         $_ordermoney = 0;
-        Log::record($orderdetail);
-        Log::record($priceinfo);
         foreach(explode(',', $orderdetail) as $key=>$val){
             preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
             $_dishid = $match[1];
             $_dishnum = $match[3];
             $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
         }
-        Log::record($_ordermoney.'**'.$ordermoney);
-        if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
+        if($_ordermoney != $ordermoney){
+            Log::record($orderdetail,'debug');
+            Log::record($priceinfo.'debug');
+            Log::record($_ordermoney.'**'.$ordermoney,'debug');
+            Log::record('error-30017,suborder订单金额不正确','debug');
+            //return json($this->errjson(-30017));
+        }
 
         //创建订单
         $OrderModel = new OrderModel();
