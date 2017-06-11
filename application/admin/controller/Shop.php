@@ -590,6 +590,9 @@ class Shop extends Base
         if(!empty($deskinfo)){
             return json(self::erres("桌型编号已存在"));
         }
+        if($seatnum == $deskinfo['seatnum']){
+            return json(self::erres("已有该座位数的桌型信息"));
+        }
         if($DineshopModel->addDesk($shopid, $deskid, $seatnum, $desknum)){
             return json($this->sucjson(array('deskid' => $deskid)));
         }else{
@@ -602,7 +605,6 @@ class Shop extends Base
     public function modDesk(){
         $shopid = input('shopid');
         $deskid = input('deskid'); //桌型ID
-        $seatnum = intval(input('seatnum',-1)); //就餐人数
         $desknum = intval(input('desknum',-1)); //数量
         $status = intval(input('status',1)); //桌型状态
         if(empty($shopid) || empty($deskid)) {
@@ -616,9 +618,8 @@ class Shop extends Base
         if(empty($deskinfo)){
             return json(self::erres("桌型信息不存在"));
         }
-        $seatnum = $seatnum > 0 ? $seatnum : $deskinfo['seatnum'];
         $desknum = $desknum > 0 ? $desknum : $deskinfo['desknum'];
-        $info = $DineshopModel->modDesk($shopid, $deskid,$seatnum,$desknum, $status);
+        $info = $DineshopModel->modDesk($shopid, $deskid, $desknum, $status);
         if($info){
            return json($this->sucjson()); 
         }else{

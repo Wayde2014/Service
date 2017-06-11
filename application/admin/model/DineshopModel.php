@@ -373,10 +373,9 @@ class DineshopModel extends Model
     /**
      * 修改店铺桌型
      */
-    public function modDesk($shopid, $deskid, $seatnum, $desknum, $status)
+    public function modDesk($shopid, $deskid, $desknum, $status)
     {
         $data = array(
-            "f_seatnum" => $seatnum,
             "f_amount" => $desknum,
             "f_status" => $status
         );
