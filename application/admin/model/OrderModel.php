@@ -33,7 +33,7 @@ class OrderModel extends Model
     {
         $where = array(
             'a.f_type' => 1,
-            'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
+            'a.f_addtime' => array('between time', [$startime, $endtime])
         );
 		if (is_numeric($shopid)){
 			$where['a.f_shopid'] = $shopid;
@@ -66,7 +66,7 @@ class OrderModel extends Model
     {
         $where = array(
             'a.f_type' => 2,
-            'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
+            'a.f_addtime' => array('between time', [$startime, $endtime])
         );
         if (is_numeric($shopid)){
 			$where['a.f_shopid'] = $shopid;
