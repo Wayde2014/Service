@@ -573,9 +573,11 @@ class Shop extends Base
         $info = array();
         $list = array();
         $shopid = input('shopid'); //店铺ID
-        if(empty($shopid)) return json($this->errjson(-20003));
+        $deskid = input('deskid'); //桌型ID
         $seatnum = input('seatnum'); //就餐人数
         $desknum = input('desknum'); //数量
+        if(empty($shopid)) return json($this->errjson(-20003));
+        if(empty($deskid)) return json(self::erres("桌型编号不能为空"));
         if(empty($seatnum) || empty($desknum)) {
             return json($this->errjson(-20001));
         }
@@ -583,8 +585,12 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $deskid = $DineshopModel->addDesk($shopid, $seatnum, $desknum);
-        if($deskid){
+        //检查桌型编号是否已经存在
+        $deskinfo = $DineshopModel->getDeskinfo($shopid,$deskid);
+        if(!empty($deskinfo)){
+            return json(self::erres("桌型编号已存在"));
+        }
+        if($DineshopModel->addDesk($shopid, $deskid, $seatnum, $desknum)){
             return json($this->sucjson(array('deskid' => $deskid)));
         }else{
             return json($this->erres('添加桌型信息失败！')); 
@@ -594,46 +600,32 @@ class Shop extends Base
      * 修改店铺桌型
      */
     public function modDesk(){
-        $info = array();
-        $list = array();
+        $shopid = input('shopid');
         $deskid = input('deskid'); //桌型ID
-        $seatnum = input('seatnum'); //就餐人数
-        $desknum = input('desknum'); //数量
-        if(empty($deskid) || empty($seatnum) || empty($desknum)) {
+        $seatnum = intval(input('seatnum',-1)); //就餐人数
+        $desknum = intval(input('desknum',-1)); //数量
+        $status = intval(input('status',1)); //桌型状态
+        if(empty($shopid) || empty($deskid)) {
             return json($this->errjson(-20001));
         }     
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $info = $DineshopModel->modDesk($deskid,$seatnum,$desknum);
+        $deskinfo = $DineshopModel->getDeskinfo($shopid,$deskid);
+        if(empty($deskinfo)){
+            return json(self::erres("桌型信息不存在"));
+        }
+        $seatnum = $seatnum > 0 ? $seatnum : $deskinfo['seatnum'];
+        $desknum = $desknum > 0 ? $desknum : $deskinfo['desknum'];
+        $info = $DineshopModel->modDesk($shopid, $deskid,$seatnum,$desknum, $status);
         if($info){
            return json($this->sucjson()); 
         }else{
            return json($this->errjson($this->erres('修改桌型信息失败！'))); 
         }
     }
-    /**
-     * 删除店铺桌型
-     */
-    public function delDesk(){
-        $info = array();
-        $list = array();
-        $deskid = input('deskid'); //桌型ID
-        if(empty($deskid)){
-            return json($this->errjson(-20001));
-        }        
-        if(!$this->checkAdminLogin()){
-            return json($this->errjson(-10001));
-        }
-        $DineshopModel = new DineshopModel();
-        $info = $DineshopModel->delDesk($deskid);
-        if($info){
-           return json($this->sucjson()); 
-        }else{
-           return json($this->errjson()); 
-        }
-    }
+
     /**
      * 获取店铺桌型
      */
@@ -671,15 +663,16 @@ class Shop extends Base
     public function getDeskinfo(){
         $info = array();
         $list = array();
-        $deskid = input('deskid'); //店铺ID
-        if(empty($deskid)){
+        $shopid = input('shopid'); //店铺ID
+        $deskid = input('deskid'); //桌型编号
+        if(empty($deskid) || empty($shopid)){
             return json($this->errjson(-20001));
         }        
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $info = $DineshopModel->getDeskinfo($deskid);
+        $info = $DineshopModel->getDeskinfo($shopid,$deskid);
         return json($this->sucjson($info, $list));
     }
     /**

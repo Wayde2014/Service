@@ -353,16 +353,19 @@ class DineshopModel extends Model
     /**
      * 添加店铺桌型
      */
-    public function addDesk($shopid, $seatnum, $desknum){
+    public function addDesk($shopid, $deskid, $seatnum, $desknum){
         try{
             $data = array(
                 'f_sid' => $shopid,
+                'f_deskid' => $deskid,
                 'f_seatnum' => $seatnum,
                 'f_amount' => $desknum,
                 'f_addtime' => date('Y-m-d H:i:s')
             );
-            $deskid = intval(Db::table('t_dineshop_deskinfo')->insertGetId($data));
-            return $deskid;
+            if(Db::table('t_dineshop_deskinfo')->insertGetId($data) > 0){
+                return true;
+            }
+            return false;
         } catch (\Exception $e) {
             return false;
         }
@@ -370,22 +373,24 @@ class DineshopModel extends Model
     /**
      * 修改店铺桌型
      */
-    public function modDesk($deskid, $seatnum, $desknum){
-        $data = array("f_seatnum" => $seatnum, "f_amount" => $desknum);
-        $ret = Db::table('t_dineshop_deskinfo')->where('f_id', $deskid)->update($data);
-        if($ret !== false){
+    public function modDesk($shopid, $deskid, $seatnum, $desknum, $status)
+    {
+        $data = array(
+            "f_seatnum" => $seatnum,
+            "f_amount" => $desknum,
+            "f_status" => $status
+        );
+        $ret = Db::table('t_dineshop_deskinfo')
+            ->where('f_sid', $shopid)
+            ->where('f_deskid', $deskid)
+            ->update($data);
+        if ($ret !== false) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-    /**
-     * 删除店铺桌型
-     */
-    public function delDesk($deskid){
-        $ret = Db::table('t_dineshop_deskinfo')->where('f_id', $deskid)->delete();
-        return $ret<0?false:true;
-    }
+
     /**
      * 获取店铺桌型列表
      */
@@ -401,13 +406,14 @@ class DineshopModel extends Model
     /**
      * 获取店铺桌型信息
      */
-    public function getDeskinfo($deskid){
+    public function getDeskinfo($shopid, $deskid)
+    {
         $deskinfo = Db::table('t_dineshop_deskinfo')
             ->alias('a')
-            ->field('a.f_id id, a.f_sid shopid, b.f_shopname shopname, b.f_shopdesc shopdesc, b.f_shopicon shopicon, b.f_shophone shophone, b.f_address address, a.f_seatnum seatnum, a.f_amount desknum, a.f_addtime addtime')
-            ->join('t_dineshop b','a.f_sid = b.f_sid','left')
-            ->where('a.f_id', $deskid)
-            ->where('a.f_status', 1)
+            ->field('a.f_id id, a.f_sid shopid, b.f_shopname shopname, b.f_shopdesc shopdesc, b.f_shopicon shopicon, b.f_shophone shophone, b.f_address address, a.f_seatnum seatnum, a.f_amount desknum, a.f_status status, a.f_addtime addtime')
+            ->join('t_dineshop b', 'a.f_sid = b.f_sid', 'left')
+            ->where('a.f_sid', $shopid)
+            ->where('a.f_deskid', $deskid)
             ->find();
         return $deskinfo;
     }

@@ -393,6 +393,7 @@ CREATE TABLE `t_dineshop` (
 DROP TABLE IF EXISTS `t_dineshop_deskinfo`;
 CREATE TABLE `t_dineshop_deskinfo` (
   `f_id` smallint(6) NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `f_deskid` varchar(50) not null comment '桌型ID',
   `f_sid` int(11) NOT NULL COMMENT '门店id',
   `f_seatnum` tinyint(4) NOT NULL DEFAULT '1' COMMENT '可坐人数',
   `f_amount` tinyint(4) NOT NULL DEFAULT '1' COMMENT '桌子数量',
@@ -401,7 +402,7 @@ CREATE TABLE `t_dineshop_deskinfo` (
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`),
-  UNIQUE KEY `t_sid_seatnum` (`f_sid`,`f_seatnum`)
+  UNIQUE KEY `t_sid_seatnum` (`f_sid`,`f_deskid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='门店管理-门店信息表';
 
 
@@ -575,7 +576,7 @@ CREATE TABLE `t_orders` (
   `f_paymoney` double(200,0) DEFAULT '0' COMMENT '已支付金额',
   `f_paytype` varchar(200) DEFAULT '0' COMMENT '支付方式（0余额，1微信，2支付宝）',
   `f_mealsnum` int(10) DEFAULT '0' COMMENT '就餐人数（仅食堂订单有）',
-  `f_deskid` int default null comment '预订桌型ID（仅食堂订单有）',
+  `f_deskid` varchar(50) default null comment '预订桌型ID（仅食堂订单有）',
   `f_servicemoney` double(200,0) DEFAULT 0 COMMENT '服务费（仅食堂订单有）',
   `f_startime` varchar(200) DEFAULT '' COMMENT '用餐开始时间（仅食堂订单有）',
   `f_endtime` varchar(200) DEFAULT '' COMMENT '用餐结束时间（仅食堂订单有）',
