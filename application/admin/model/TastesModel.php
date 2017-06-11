@@ -21,4 +21,46 @@ class TastesModel extends Model
         }
         return $tasteslist?$tasteslist:array();
     }
+
+	/**
+     * 添加口味
+     */
+    public function addTastes($tname){
+        try{
+            $data = array(
+                'f_tname' => $tname
+            );
+            $dishid = intval(Db::table('t_food_tastes')->insertGetId($data));
+            return $dishid;
+        }catch (\Exception $e) {
+            return false;
+        }
+    }
+
+	/**
+     * 修改口味
+     */
+    public function modTastes($tid,$tname){
+        try{
+            $data = array(
+                'f_tname' => $tname
+            );
+            $ret = Db::table('t_food_tastes')->where('f_tid', $tid)->update($data);
+            return $ret;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+	/**
+     * 删除口味
+     */
+    public function delTastes($tid){
+        try{
+            $ret = Db::table('t_food_tastes')->where('f_tid', $tid)->delete();
+            return $ret;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }

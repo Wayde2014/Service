@@ -396,10 +396,9 @@ class DineshopModel extends Model
      */
     public function getDesklist($shopid){
         $desklist = Db::table('t_dineshop_deskinfo')
-            ->field('f_id id, f_sid shopid, f_seatnum seatnum, f_amount desknum, f_orderamount ordernum, f_addtime addtime')
+            ->field('f_deskid deskid, f_sid shopid, f_seatnum seatnum, f_amount desknum, f_orderamount ordernum,f_status status, f_addtime addtime')
             ->where('f_sid', $shopid)
-            ->where('f_status', 1)
-            ->order('f_seatnum asc')
+            ->order('f_deskid asc')
             ->select();
         return $desklist;
     }

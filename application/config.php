@@ -279,4 +279,8 @@ return [
     "suborder" => array(
         "endtime" => 1800,
     ),
+    "order" => array(
+        "overtime_closed" => 900, //超时未付款自动关闭
+        "overtime_repast" => 1800, //逾期未就餐
+    ),
 ];

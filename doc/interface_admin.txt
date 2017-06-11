@@ -304,3 +304,12 @@
         结果说明：
             {"code":1,"msg":"success","info":[],"list":[]}
             code > 0，即查询成功，info字段为店铺相关信息
+
+    10、菜肴相关
+	1)添加/修改菜肴分类
+	cname:菜肴分类名,type:type=1表示第一分类,type=2表示第二分类,type=3表示口味
+	http://admin.yee.website/admin/classify/addClassify?adduser=10001&cname=%E6%9D%A5%E6%B5%8B%E8%AF%95%E7%9A%84%E8%8F%9C&type=1
+	2)删除菜肴分类
+	cid:菜肴分类id,type:type=1表示第一分类,type=2表示第二分类,type=3表示口味
+	http://admin.yee.website/admin/classify/delClassify?adduser=10001&cid=1&type=1
+	

@@ -12,14 +12,19 @@ use think\Db;
 
 class OrderModel extends Model
 {
-
     public $status_waiting_pay = 1;
-    public $status_waiting_refund = -200;
     public $status_pay_suc = 2;
-    public $status_refund_suc = -300;
+    public $status_in_delivery = 3;
+    public $status_start_eat = 5;
+    public $status_apply_packing = 6;
     public $status_waiting_checkup_refund = -110;
     public $status_checkup_suc_refund = -120;
     public $status_checkup_fail_refund = -130;
+    public $status_waiting_refund = -200;
+    public $status_refund_suc = -300;
+    public $status_overtime_repast = -400;
+    public $status_overtime_closed = -900;
+    public $status_final_closed = -1000;
 
     /**
      * 获取外卖订单列表

@@ -417,7 +417,7 @@ class Shop extends Base
         $deskinfo = array();
         $desklist = $DineshopModel->getDesklist($shopid);
         foreach($desklist as $key=>$val){
-            $deskinfo[$val['id']] = $val;
+            $deskinfo[$val['deskid']] = $val;
         }
         $sellist = $DineshopModel->getDineshopSell($shopid, $startdate, $endate);
         $timeslotlist = $DineshopModel->getDiscountTimeslot();
@@ -490,7 +490,7 @@ class Shop extends Base
         }
         foreach(explode('$', $sellinfo) as $key=>$val){
             if(!preg_match( '/^\d+\@\d+$/i' , $val, $result)){
-                return json($this->errjson(-80004)); exit;
+                return json($this->errjson(-80004));
             }
         }
         if(!$this->checkAdminLogin()){
@@ -528,7 +528,7 @@ class Shop extends Base
         if(!empty($sellinfo)){
             foreach(explode('$', $sellinfo) as $key=>$val){
                 if(!preg_match( '/^\d+\@\d+$/i' , $val)){
-                    return json($this->errjson(-80004)); exit;
+                    return json($this->errjson(-80004));
                 }
             }
         }
