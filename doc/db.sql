@@ -584,7 +584,7 @@ CREATE TABLE `t_orders` (
   `f_deliverytime` varchar(20) DEFAULT '' COMMENT '配送时间',
   `f_addressid` int(10) DEFAULT NULL COMMENT '配送地址ID（仅外卖订单有）',
   `f_hassuborder` tinyint unsigned default 0 comment '是否有子订单(0-无，1-有)',
-  `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '订单时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
   PRIMARY KEY (`f_oid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='外卖及预订订单表';

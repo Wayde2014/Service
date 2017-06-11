@@ -186,4 +186,44 @@ class OrderModel extends Model
             ->where('f_id',$deskid)
             ->setDec('f_orderamount');
     }
+
+    /**
+     * 获取待处理订单列表
+     */
+    public function getPendingOrderList($status_final,$limit_num=100){
+        $table_name = "orders";
+        $order_list = Db::name($table_name)
+            ->where('f_status','not in',$status_final)
+            ->field('f_oid as orderid')
+            ->field('f_userid as userid')
+            ->field('f_type as ordertype')
+            ->field('f_status as status')
+            ->field('f_shopid as shopid')
+            ->field('f_deskid as deskid')
+            ->field('f_addtime as addtime')
+            ->field('f_startime as startime')
+            ->field('f_endtime as endtime')
+            ->order('f_addtime asc')
+            ->limit($limit_num)
+            ->select();
+        return $order_list;
+    }
+
+    /**
+     * 释放桌型
+     * @param $shopid
+     * @param $deskid
+     * @return bool
+     */
+    public function releaseDesk($shopid, $deskid){
+        $table_deskinfo = 'dineshop_deskinfo';
+        $retup = Db::name($table_deskinfo)
+            ->where('f_sid',$shopid)
+            ->where('f_deskid',$deskid)
+            ->setInc('f_orderamount');
+        if($retup !== false){
+            return true;
+        }
+        return false;
+    }
 }

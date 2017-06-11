@@ -102,7 +102,7 @@ class OrderModel extends Model
             if ($orderid > 0) {
                 Db::name($table_deskinfo)
                     ->where('f_sid',$shopid)
-                    ->where('f_id',$deskid)
+                    ->where('f_deskid',$deskid)
                     ->setInc('f_orderamount');
                 Db::commit();
                 return $orderid;
