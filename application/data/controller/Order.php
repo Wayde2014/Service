@@ -134,11 +134,7 @@ class Order extends Base
                 $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid);
             }
             if($orderid){
-                if($this->checkMoneyEnough($uid,$allmoney)){
-                    return json($this->sucjson(array('orderid' => $orderid)));
-                }else{
-                    return json($this->errjson(-10002, array('orderid' => $orderid)));
-                }
+                return json($this->sucjson(array('orderid' => $orderid)));
             }else{
                 return json($this->errjson(-30019));
             }
