@@ -124,6 +124,10 @@ class Order extends Base
         }elseif($order_type==2 && !in_array($status,array(2,5,6))){
             return json(self::erres("堂食订单状态错误"));
         }
+        //判断当前传入订单状态与数据库订单状态是否一致
+        if($status != $order_status){
+            return json($this->erres("订单状态不一致，请刷新页面重试！"));
+        }
         $data = array();
         switch($status){
             case 2: //当前已付款，需设置成配送中/就餐中
