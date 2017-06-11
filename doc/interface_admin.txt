@@ -57,22 +57,22 @@
             username 待检测用户名
 
         2)新增用户
-        http://119.23.73.39/admin/User/getMenuList?ck=ck_xxx&uid=xxx&username=zhangsan&password=E10ADC3949BA59ABBE56E057F20F883E&realname=张三
+        http://119.23.73.39/admin/User/addUser?ck=ck_xxx&uid=xxx&username=zhangsan&password=123456&realname=张三
         入参：
             ck  唯一标示用户登录态信息
             uid 用户ID
             username 用户名
-            password 登录密码(32位MD5(123456))
+            password 登录密码
             realname 真实姓名(可选)
 
         3)修改用户信息
-        http://119.23.73.39/admin/User/updateUserInfo?ck=ck_xxx&uid=xxx&userid=10002&username=zhangsan&password=E10ADC3949BA59ABBE56E057F20F883E&realname=张三&userstatus=100&rolelist=10001,10002
+        http://119.23.73.39/admin/User/updateUserInfo?ck=ck_xxx&uid=xxx&userid=10002&username=zhangsan&password=123456&realname=张三&userstatus=100&rolelist=10001,10002
         入参：
             ck  唯一标示用户登录态信息
             uid 用户ID
             userid 修改用户ID
             username 用户名(可选)
-            password 登录密码(可选)(32位MD5(123456))
+            password 登录密码(可选)
             realname 真实姓名(可选)
             userstatus 用户状态(可选)(100-正常,-100-禁用)
             rolelist 用户分配的角色ID列表(英文逗号分隔字符串)
