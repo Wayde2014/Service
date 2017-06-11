@@ -66,7 +66,7 @@ class Classify extends Base
     public function delClassify(){
         $info = array();
         $list = array();
-        $dishid = input('cid');
+        $cid = input('cid');
 		$type = input('type');
 		$type = intval($type);
         if(empty($cid)){

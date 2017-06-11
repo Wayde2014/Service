@@ -190,10 +190,10 @@ class OrderModel extends Model
     /**
      * 获取待处理订单列表
      */
-    public function getPendingOrderList($status_final,$limit_num=100){
+    public function getPendingOrderList($pending_list,$limit_num=100){
         $table_name = "orders";
         $order_list = Db::name($table_name)
-            ->where('f_status','not in',$status_final)
+            ->where('f_status','in',$pending_list)
             ->field('f_oid as orderid')
             ->field('f_userid as userid')
             ->field('f_type as ordertype')
@@ -203,7 +203,7 @@ class OrderModel extends Model
             ->field('f_addtime as addtime')
             ->field('f_startime as startime')
             ->field('f_endtime as endtime')
-            ->order('f_addtime asc')
+            ->order('f_addtime desc')
             ->limit($limit_num)
             ->select();
         return $order_list;

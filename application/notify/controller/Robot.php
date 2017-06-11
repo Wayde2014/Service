@@ -16,6 +16,19 @@ class Robot extends Base
     private $order_type_eatin = 2;
     private $limit_num = 100;
     private $final_status_list = array(-1000,-900,-300,90,100);
+    private $pending_status_list = array();
+
+    /**
+     * 控制器初始化
+     */
+    public function __construct(){
+        parent::__construct();
+
+        $OrderModel = new OrderModel();
+        array_push($this->pending_status_list,$OrderModel->status_waiting_pay);
+        array_push($this->pending_status_list,$OrderModel->status_pay_suc);
+        array_push($this->pending_status_list,$OrderModel->status_overtime_repast);
+    }
 
     /**
      * 订单自动处理
@@ -24,7 +37,7 @@ class Robot extends Base
         //查询待处理订单
         $OrderModel = new OrderModel();
         $AdminOrderModel = new AdminOrderModel();
-        $order_list = $AdminOrderModel->getPendingOrderList($this->final_status_list,$this->limit_num);
+        $order_list = $AdminOrderModel->getPendingOrderList($this->pending_status_list,$this->limit_num);
         if(empty($order_list)){
             return json(self::sucjson());
         }
