@@ -111,8 +111,8 @@ class Order extends Base
         }
         if($_ordermoney != $ordermoney){
             Log::record($orderdetail,'debug');
-            Log::record($priceinfo.'debug');
-            Log::record($_ordermoney.'**'.$ordermoney,'debug');
+            Log::record($priceinfo,'debug');
+            Log::record($_ordermoney.'---'.$ordermoney,'debug');
             Log::record('error-30017,订单金额不正确','debug');
             //return json($this->errjson(-30017));
         }
@@ -451,8 +451,8 @@ class Order extends Base
         }
         if($_ordermoney != $ordermoney){
             Log::record($orderdetail,'debug');
-            Log::record($priceinfo.'debug');
-            Log::record($_ordermoney.'**'.$ordermoney,'debug');
+            Log::record($priceinfo,'debug');
+            Log::record($_ordermoney.'---'.$ordermoney,'debug');
             Log::record('error-30017,suborder订单金额不正确','debug');
             //return json($this->errjson(-30017));
         }
