@@ -64,6 +64,11 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
+        //店铺重复添加判断
+        //if($adduser != 10001){
+            $shopinfo = $DineshopModel->getDineshopInfoByadduser($adduser);
+            if($shopinfo) return json($this->erres('您已经添加店铺不能重复添加'));
+        //}
         if($shopid){
             $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume, $servicecharge);
         }else{

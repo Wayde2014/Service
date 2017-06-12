@@ -38,7 +38,7 @@ class DineshopModel extends Model
             $shopid = intval(Db::table('t_admin_dineshop')->insertGetId($data));
             return $shopid;
         }catch (\Exception $e) {
-            $shopinfo = Db::table('t_admin_dineshop')->field('f_sid shopid')->where('f_shopname', $shopname)->where('f_adduser', $adduser)->find();
+            $shopinfo = Db::table('t_admin_dineshop')->field('f_sid shopid')->where('f_adduser', $adduser)->find();
             if($shopinfo && isset($shopinfo['shopid'])){
                 return $shopinfo['shopid'];
             }else{
@@ -147,7 +147,13 @@ class DineshopModel extends Model
             ->find();
         return $dineshopinfo;
     }
-
+    /**
+     * 获取店铺信息
+     */
+    public function getDineshopInfoByadduser($adduser){
+        $dineshopinfo = Db::table('t_admin_dineshop')->where('f_adduser', $adduser)->find();
+        return $dineshopinfo;
+    }
 	/**
      * 获取店铺信息(按店铺名模糊搜索)
      */
