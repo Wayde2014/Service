@@ -89,19 +89,39 @@ class Shop extends Base
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
+        //查询店铺信息
+        $DineshopModel = new DineshopModel();
+        $shopinfo = $DineshopModel->getDineshopInfo($shopid);
+        $shopstatus = $shopinfo['status'];
         $status = '';
         if($key == '审核'){
+            if($shopstatus != 0){
+                return json($this->erres('店铺状态错误'));
+            }
             $status = 1;
         }else if($key == '通过审核'){
+            if($shopstatus != 1){
+                return json($this->erres('店铺状态错误'));
+            }
             $status = 100;
         }else if($key == '审核不通过'){
+            if($shopstatus != 1){
+                return json($this->erres('店铺状态错误'));
+            }
             $status = -100;
-        }else if($key == '删除'){
+        }else if($key == '下架'){
+            if($shopstatus != 100 && $shopstatus != -100){
+                return json($this->erres('店铺状态错误'));
+            }
             $status = -300;
+        }else if($key == '重新提交审核'){
+            if($shopstatus != -300){
+                return json($this->erres('店铺状态错误'));
+            }
+            $status = 0;
         }
         $res = false;
-        $DineshopModel = new DineshopModel();
-        if($status != ''){
+        if($status !== ''){
             $res = $DineshopModel->modDineshopStatus($shopid, $status);
         }
         if($res){

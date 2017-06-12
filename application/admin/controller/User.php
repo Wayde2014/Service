@@ -2,6 +2,7 @@
 namespace app\admin\controller;
 
 use base\Base;
+use \app\admin\model\UserModel;
 use \app\admin\model\AdminUserModel;
 use think\Log;
 use think\Request;
@@ -189,6 +190,51 @@ class User extends Base
         $resinfo = array();
         $reslist = $userlist;
         return json(self::sucres($resinfo,$reslist));
+    }
+    
+    /**
+     * 根据注册用户列表
+     */
+    public function getRegUserList(){
+        $info = array();
+        $list = array();
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        $model = new UserModel();
+        $res = $model->getUserList($page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        $list = $res['userlist'];
+        $list = $res['userlist'];
+        return json($this->sucjson($info, $list));
+    }
+    
+    /**
+     * 根据注册用户列表
+     */
+    public function userDisable(){
+        $info = array();
+        $list = array();
+        $userid = input('userid'); //处理用户ID
+        $status = input('status'); //当前用户状态
+        $model = new UserModel();
+        //根据用户ID获取用户信息
+        $userinfo = $model->getUserInfo($userid);
+        if($userinfo['user_status'] != $status){
+            return json($this->erres("用户状态已更新，请刷新页面后重试"));
+        }
+        $afterStatus = '';
+        if($status > 0){
+            $afterStatus = -100;
+        }else if($status == -100){
+            $afterStatus = 0;
+        }
+        if($afterStatus !== ''){
+            $res = $model->updateUserInfo($userid, $afterStatus);
+            if(!$res){
+                return json($this->erres("更新用户状态失败，请刷新页面后重试"));
+            }
+        }
+        return json($this->sucjson($info, $list));
     }
 
     /**
