@@ -178,7 +178,7 @@ class Alipay
             //"goods_type" => "1", //商品主类型：0—虚拟类商品，1—实物类商品
         );*/
         $params = array(
-            "timeout_express" => "24h", //超时时间,此处默认24小时
+            "timeout_express" => "15m", //超时时间,此处默认15分钟
             "seller_id" => $this->uuid, //收款支付宝用户ID
             "product_code" => "QUICK_MSECURITY_PAY", //销售产品码-固定值
             "total_amount" => $totalmount, //订单总金额

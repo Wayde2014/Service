@@ -242,8 +242,8 @@
     addressid: null, 配送地址ID（仅外卖订单有）
     shopname: "味千拉面(深圳福华三路分店)",
     deliveryaddress: null,  配送地址（仅外卖订单有）
-    deliveryname: null, 配送收货人（仅外卖订单有）
-    deliveryphone: null  配送联系电话（仅外卖订单有）
+    deliveryname: null, 配送员姓名（仅外卖订单有）
+    deliveryphone: null  配送员联系电话（仅外卖订单有）
 
     5、取消订单接口
     http://119.23.73.39/data/Order/cancelOrder?ck=ck_xxx&uid=xxx&orderid=xxx
