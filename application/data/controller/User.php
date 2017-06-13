@@ -580,7 +580,7 @@ class User extends Base
             return json(self::erres("商品标题不能为空"));
         }
 
-        if($paytype == config("drawtype.order")){
+        if($paytype == config("paytype.order")){
             if($suborder <= 0){
                 return json(self::erres("订单充值子订单号不能为空"));
             }else{
