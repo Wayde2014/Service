@@ -32,8 +32,7 @@ class OrderModel extends Model
     public function getTakeoutlist($startime, $endtime, $shopid = '', $orderid = '', $page = 1, $pagesize = 20)
     {
         $where = array(
-            'a.f_type' => 1,
-            'a.f_addtime' => array('between time', [$startime.' 00:00:00', $endtime.' 23:59:59'])
+            'a.f_type' => 1
         );
 		if (is_numeric($shopid)){
 			$where['a.f_shopid'] = $shopid;
@@ -42,6 +41,8 @@ class OrderModel extends Model
         }
         if(!empty($orderid)) {
             $where['a.f_oid'] = $orderid;
+        }else{
+            $where['a.f_addtime'] = array('between time', [$startime.' 00:00:00', $endtime.' 23:59:59']);
         }
         $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
         $orderlist = Db::table('t_orders')
