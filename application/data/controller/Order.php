@@ -109,21 +109,15 @@ class Order extends Base
                 $_dishnum = $match[3];
                 if(!isset($priceinfo[$_dishid])){
                     return json($this->erres('['.$_dishid.']菜肴信息不存在'));
-                    exit;
                 }
                 $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
             }else{
                 return json($this->erres('订单格式不正确'));
-                exit;
             }
         }
-        if($_ordermoney != $ordermoney){
-            Log::record($orderdetail,'debug');
-            Log::record($priceinfo,'debug');
-            Log::record($_ordermoney.'---'.$ordermoney,'debug');
-            Log::record('error-30017,订单金额不正确','debug');
-            //return json($this->errjson(-30017));
-        }
+        /*if($_ordermoney != $ordermoney){
+            return json($this->errjson(-30017));
+        }*/
         //验证外卖配送地址
         if($ordertype == 1){
             $addressinfo = $UserModel->getAddressInfo($addressid);
@@ -142,6 +136,13 @@ class Order extends Base
                 $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid);
             }
             if($orderid){
+                if($_ordermoney != $ordermoney){
+                    Log::record('wayde-orderid='.$orderid,'error');
+                    Log::record('wayde-orderid='.$orderdetail,'error');
+                    Log::record($priceinfo,'error');
+                    Log::record('wayde-'.$_ordermoney.'---'.$ordermoney,'error');
+                    Log::record('error-30017,订单金额不正确','error');
+                }
                 return json($this->sucjson(array('orderid' => $orderid)));
             }else{
                 return json($this->errjson(-30019));
@@ -457,13 +458,9 @@ class Order extends Base
             $_dishnum = $match[3];
             $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
         }
-        if($_ordermoney != $ordermoney){
-            Log::record($orderdetail,'debug');
-            Log::record($priceinfo,'debug');
-            Log::record($_ordermoney.'---'.$ordermoney,'debug');
-            Log::record('error-30017,suborder订单金额不正确','debug');
-            //return json($this->errjson(-30017));
-        }
+        /*if($_ordermoney != $ordermoney){
+            return json($this->errjson(-30017));
+        }*/
 
         //创建订单
         $OrderModel = new OrderModel();
@@ -473,6 +470,14 @@ class Order extends Base
                 'parentid' => $parentidid,
                 'orderid' => $orderid,
             );
+            if($_ordermoney != $ordermoney){
+                Log::record('wayde-parentid='.$parentidid,'error');
+                Log::record('wayde-orderid='.$orderid,'error');
+                Log::record('wayde-orderdetail='.$orderdetail,'error');
+                Log::record($priceinfo,'error');
+                Log::record('wayde-'.$_ordermoney.'---'.$ordermoney,'error');
+                Log::record('error-30017,suborder订单金额不正确','error');
+            }
             return json($this->sucjson($orderinfo));
         }else{
             return json($this->errjson(-30019));

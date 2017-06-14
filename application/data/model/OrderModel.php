@@ -29,16 +29,16 @@ class OrderModel extends Model
 
     /**
      * 新增外卖订单
-     * @params $userid 用户ID
-     * @params $shopid 店铺ID
-     * @params $orderdetail 订单详情
-     * @params $ordermoney 订单金额
-     * @params $deliverymoney 配送费
-     * @params $allmoney 订单总金额
-     * @params $paytype 支付方式
-     * @params $deliverytime 配送时间
-     * @params $addressid 配送地址ID
-     * @return \think\response\Json
+     * @param $userid 用户ID
+     * @param $shopid 店铺ID
+     * @param $orderdetail 订单详情
+     * @param $ordermoney 订单金额
+     * @param $deliverymoney 配送费
+     * @param $allmoney 订单总金额
+     * @param $paytype 支付方式
+     * @param $deliverytime 配送时间
+     * @param $addressid 配送地址ID
+     * @return bool|int
      */
     public function addTakeoutOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $deliverytime, $addressid)
     {
@@ -62,19 +62,22 @@ class OrderModel extends Model
         }
         return $orderid;
     }
+
     /**
      * 新增食堂订单
-     * @params $userid 用户ID
-     * @params $shopid 店铺ID
-     * @params $orderdetail 订单详情
-     * @params $ordermoney 订单金额
-     * @params $deliverymoney 配送费
-     * @params $allmoney 订单总金额
-     * @params $paytype 支付方式
-     * @params $mealsnum 就餐人数
-     * @params $startime 就餐开始时间
-     * @params $endtime 就餐结束时间
-     * @return \think\response\Json
+     * @param $userid 用户ID
+     * @param $shopid 店铺ID
+     * @param $orderdetail 订单详情
+     * @param $ordermoney 订单金额
+     * @param $deliverymoney 配送费
+     * @param $allmoney 订单总金额
+     * @param $paytype 支付方式
+     * @param $mealsnum 就餐人数
+     * @param $startime 就餐开始时间
+     * @param $endtime 就餐结束时间
+     * @param $servicemoney
+     * @param $deskid
+     * @return bool|int
      */
     public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid)
     {
@@ -104,6 +107,9 @@ class OrderModel extends Model
                     ->where('f_sid',$shopid)
                     ->where('f_deskid',$deskid)
                     ->setInc('f_orderamount');
+                Log::record('wayde-orderid='.$orderid,'error');
+                Log::record('wayde-f_sid='.$shopid,'error');
+                Log::record('wayde-f_deskid='.$deskid,'error');
                 Db::commit();
                 return $orderid;
             }
