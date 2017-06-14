@@ -180,7 +180,7 @@ class DineshopModel extends Model
         $deskinfo = Db::name($table_name)
             ->where('f_sid',$shopid)
             ->where('f_status',1)
-            ->field('f_id as deskid')
+            ->field('f_deskid as deskid')
             ->field('f_sid as shopid')
             ->field('f_seatnum as seatnum')
             ->field('f_amount as amount')
@@ -188,5 +188,17 @@ class DineshopModel extends Model
             ->select();
 
         return $deskinfo;
+    }
+
+    /**
+     * 获取菜肴口味字典表
+     */
+    public function getFoodTastesInfo(){
+        $table_name = "food_tastes";
+        $result = Db::name($table_name)
+            ->field('f_tid as tastid')
+            ->field('f_tname as tastname')
+            ->select();
+        return $result;
     }
 }

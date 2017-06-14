@@ -58,6 +58,15 @@
             seatnum : 可坐人数
             sellnum : 该桌型剩余可预订数量
             usable : 是否可预订(true-可预订，false-不可预订)
+
+    4、获取菜肴口味信息
+    http://119.23.73.39/data/Shop/getFoodTastesInfo
+    入参说明：
+        无
+    结果说明：
+        list:
+            tastid : 口味ID
+            tastname : 口味名称
     
 
 账户模块

@@ -226,4 +226,14 @@ class Shop extends Base
         $info = array();
         return json($this->sucjson($info, array_values($list)));
     }
+
+    /**
+     * 获取菜肴口味字典表
+     */
+    public function getFoodTastesInfo(){
+        $DineshopModel = new DineshopModel();
+        $tastes_list = $DineshopModel->getFoodTastesInfo();
+        $tastes_info = array();
+        return json($this->sucjson($tastes_info,$tastes_list));
+    }
 }
