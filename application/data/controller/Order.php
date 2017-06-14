@@ -102,12 +102,20 @@ class Order extends Base
             }
         }
         $_ordermoney = 0;
-
         foreach(explode(',', $orderdetail) as $key=>$val){
-            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
-            $_dishid = $match[1];
-            $_dishnum = $match[3];
-            $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
+            if(preg_match('/^(\d+)\|(\d+)\@(\d+)$/i', $val)){
+                preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
+                $_dishid = $match[1];
+                $_dishnum = $match[3];
+                if(!isset($priceinfo[$_dishid])){
+                    return json($this->erres('['.$_dishid.']菜肴信息不存在'));
+                    exit;
+                }
+                $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
+            }else{
+                return json($this->erres('订单格式不正确'));
+                exit;
+            }
         }
         if($_ordermoney != $ordermoney){
             Log::record($orderdetail,'debug');

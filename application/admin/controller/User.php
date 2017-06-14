@@ -223,7 +223,7 @@ class User extends Base
             return json($this->erres("用户状态已更新，请刷新页面后重试"));
         }
         $afterStatus = '';
-        if($status > 0){
+        if($status >= 0){
             $afterStatus = -100;
         }else if($status == -100){
             $afterStatus = 0;

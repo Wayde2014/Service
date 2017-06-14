@@ -73,7 +73,6 @@ class Shop extends Base
             $res = $DineshopModel->getShopInfo($shopid);
             if($res){
                 $info = $res;
-                $menulist = $info['menulist'];
                 $shopdishes = array();
                 $DishesModel = new DishesModel();
                 $reslist = $DishesModel->getDishesListBysid($shopid);

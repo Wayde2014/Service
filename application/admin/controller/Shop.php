@@ -169,20 +169,27 @@ class Shop extends Base
         }
         $disheslist = array();
         $DineshopModel = new DineshopModel();
+        $fontshopid = '';
 		if (is_numeric($shopid)){
 			$info = $DineshopModel->getDineshopInfo($shopid);
+            if (isset($info['fontshopid'])){
+                $fontshopid = $info['fontshopid'];
+			}
 		}else{
 			//按用户名模糊搜索
 			$shopname = $shopid;
 			$info = $DineshopModel->getDineshopInfoByName($shopname);
 			if (isset($info['id'])){
 				$shopid = $info['id'];
+                $fontshopid = $info['fontshopid'];
 			}
 		}
-        $DishesModel = new DishesModel();
-        $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
-        if($dishlist){
-            $disheslist = $dishlist;
+        if($fontshopid){
+            $DishesModel = new DishesModel();
+            $dishlist = $DishesModel->getDishesListBysidNoPage($fontshopid);
+            if($dishlist){
+                $disheslist = $dishlist;
+            }
         }
         $info['disheslist'] = $disheslist;
         return json($this->sucjson($info, $list));

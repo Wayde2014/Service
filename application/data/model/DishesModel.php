@@ -97,6 +97,7 @@ class DishesModel extends Model
             ->join('t_food_classify b','a.f_classid = b.f_cid','left')
             ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->where('a.f_sid', $shopid)
+            ->where('a.f_state', '>=', 0)
             ->select();
         return $disheslist;
     }
