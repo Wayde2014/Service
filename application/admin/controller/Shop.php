@@ -169,24 +169,19 @@ class Shop extends Base
         }
         $disheslist = array();
         $DineshopModel = new DineshopModel();
-        $fontshopid = '';
 		if (is_numeric($shopid)){
 			$info = $DineshopModel->getDineshopInfo($shopid);
-            if (isset($info['fontshopid'])){
-                $fontshopid = $info['fontshopid'];
-			}
 		}else{
 			//按用户名模糊搜索
 			$shopname = $shopid;
 			$info = $DineshopModel->getDineshopInfoByName($shopname);
 			if (isset($info['id'])){
 				$shopid = $info['id'];
-                $fontshopid = $info['fontshopid'];
 			}
 		}
-        if($fontshopid){
+        if(isset($info['fontshopid']) && $info['fontshopid']){
             $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesListBysidNoPage($fontshopid);
+            $dishlist = $DishesModel->getDishesListBysidNoPage($info['fontshopid']);
             if($dishlist){
                 $disheslist = $dishlist;
             }
@@ -276,50 +271,53 @@ class Shop extends Base
             $info['shopname'] = $shopinfo['shopname'];
             $info['shopicon'] = $shopinfo['shopicon'];
             $info['shopaddress'] = $shopinfo['address'];
+            $fontshopid = $shopinfo['fontshopid'];
             $DishesModel = new DishesModel();
-            $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
+            $dishlist = $DishesModel->getDishesListBysidNoPage($fontshopid);
+            
             if($dishlist){
                 foreach($dishlist as $key => $val){
                     $dishinfo[$val['id']] = $val['dishesname'];
                 }
             }
-        }
-        $discountlist = $DineshopModel->getDineshopDiscount($shopid, $startdate, $endate);
-        $discountimeslot = $DineshopModel->getDiscountTimeslot();
-        foreach($discountimeslot as $key=>$val){
-            $slotid = $val['id'];
-            $timeslot = $val['timeslot'];
-            $discid_list = array();
-            $discount_list = array();
-            foreach($discountlist as $k=>$v){
-                if($v['timeslot'] == $timeslot){
-                    $discid_list[$v['date']] = $v['id'];
-                    $discount = array();
-                    foreach(explode('$', $v['discount']) as $_k=>$_v){
-                        preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $_v, $match);
-                        if($match[1]){
-                            $discount[$_k]['dishid'] = $match[1];
-                            $discount[$_k]['dishname'] = isset($dishinfo[$match[1]])?$dishinfo[$match[1]]:'';
-                            $discount[$_k]['type'] = $match[2];
-                            $discount[$_k]['num'] = $match[3]*10;
+            $discountlist = $DineshopModel->getDineshopDiscount($fontshopid, $startdate, $endate);
+            $discountimeslot = $DineshopModel->getDiscountTimeslot();
+            foreach($discountimeslot as $key=>$val){
+                $slotid = $val['id'];
+                $timeslot = $val['timeslot'];
+                $discid_list = array();
+                $discount_list = array();
+                foreach($discountlist as $k=>$v){
+                    if($v['timeslot'] == $timeslot){
+                        $discid_list[$v['date']] = $v['id'];
+                        $discount = array();
+                        foreach(explode('$', $v['discount']) as $_k=>$_v){
+                            preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $_v, $match);
+                            if($match[1]){
+                                $discount[$_k]['dishid'] = $match[1];
+                                $discount[$_k]['dishname'] = isset($dishinfo[$match[1]])?$dishinfo[$match[1]]:'';
+                                $discount[$_k]['type'] = $match[2];
+                                $discount[$_k]['num'] = $match[3]*10;
+                            }
                         }
+                        $discount_list[$v['date']] = $discount;
                     }
-                    $discount_list[$v['date']] = $discount;
                 }
+                $discountdata = array();
+                for($i=0;$i<7;$i++){
+                    $date = Date('Y-m-d', strtotime('+'.$i.' days'));
+                    $discountdata[] = array(
+                        'date' => $date,
+                        'discid' => isset($discid_list[$date])?$discid_list[$date]:'',
+                        'discount' => isset($discount_list[$date])?$discount_list[$date]:array()
+                    );
+                }
+                $list[$key]['slotid'] = $slotid;
+                $list[$key]['timeslot'] = $timeslot;
+                $list[$key]['discountdata'] = $discountdata;
             }
-            $discountdata = array();
-            for($i=0;$i<7;$i++){
-                $date = Date('Y-m-d', strtotime('+'.$i.' days'));
-                $discountdata[] = array(
-                    'date' => $date,
-                    'discid' => isset($discid_list[$date])?$discid_list[$date]:'',
-                    'discount' => isset($discount_list[$date])?$discount_list[$date]:array()
-                );
-            }
-            $list[$key]['slotid'] = $slotid;
-            $list[$key]['timeslot'] = $timeslot;
-            $list[$key]['discountdata'] = $discountdata;
         }
+        
         return json($this->sucjson($info, $list));
     }
     /**
@@ -463,7 +461,7 @@ class Shop extends Base
                     $sellid_list[$v['date']] = $v['id'];
                     $sellinfo = array();
                     foreach(explode('$', $v['sellinfo']) as $_k=>$_v){
-                        preg_match('/(\d+)\@(\d+)/i', $_v, $match);
+                        preg_match('/(\w+)\@(\d+)/i', $_v, $match); 
                         if($match[1]){
                             $sellinfo[$_k]['tableid'] = $match[1];
                             $desknum = 0;
@@ -521,8 +519,8 @@ class Shop extends Base
             return json($this->errjson(-80003));
         }
         foreach(explode('$', $sellinfo) as $key=>$val){
-            if(!preg_match( '/^\d+\@\d+$/i' , $val, $result)){
-                return json($this->errjson(-80004));
+            if(!preg_match( '/^\w+\@\d+$/i' , $val, $result)){
+                return json($this->erres('放号信息格式错误'));
             }
         }
         if(!$this->checkAdminLogin()){
@@ -559,8 +557,8 @@ class Shop extends Base
         $sellinfo = input('sellinfo'); //折扣信息
         if(!empty($sellinfo)){
             foreach(explode('$', $sellinfo) as $key=>$val){
-                if(!preg_match( '/^\d+\@\d+$/i' , $val)){
-                    return json($this->errjson(-80004));
+                if(!preg_match( '/^\w+\@\d+$/i' , $val)){
+                    return json($this->errjson('放号信息格式错误'));
                 }
             }
         }
