@@ -427,6 +427,7 @@ class DineshopModel extends Model
     public function getCuisineList(){
         $list = Db::table('t_food_cuisine')
             ->field('f_cid id, f_cname cuisinename, f_lasttime addtime')
+            ->where('f_status', 0)
             ->select();
         return $list;
     }

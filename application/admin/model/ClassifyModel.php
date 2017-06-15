@@ -14,7 +14,7 @@ class ClassifyModel extends Model
      */
     public function getClassifyList(){
         $field = 'f_cid id, f_cname classname, f_lasttime lastime';
-        $classifylist = Db::table('t_food_classify')->field($field)->select();
+        $classifylist = Db::table('t_food_classify')->field($field)->where('f_status', 0)->select();
         return $classifylist?$classifylist:array();
     }
 
@@ -53,7 +53,10 @@ class ClassifyModel extends Model
      */
     public function delClassify($cid){
         try{
-            $ret = Db::table('t_food_classify')->where('f_cid', $cid)->delete();
+            $data = array(
+                'f_status' => -1
+            );
+            $ret = Db::table('t_food_classify')->where('f_cid', $cid)->update($data);
             return $ret;
         } catch (\Exception $e) {
             return false;
@@ -95,7 +98,10 @@ class ClassifyModel extends Model
      */
     public function delCuisine($cid){
         try{
-            $ret = Db::table('t_food_cuisine')->where('f_cid', $cid)->delete();
+            $data = array(
+                'f_status' => -1
+            );
+            $ret = Db::table('t_food_cuisine')->where('f_cid', $cid)->update($data);
             return $ret;
         } catch (\Exception $e) {
             return false;

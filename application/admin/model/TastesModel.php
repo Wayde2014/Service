@@ -17,7 +17,7 @@ class TastesModel extends Model
         if($tasteslist){
             $tasteslist = Db::table('t_food_tastes')->field($field)->whereIn('f_tid', explode(',',$tasteslist))->select();
         }else{
-            $tasteslist = Db::table('t_food_tastes')->field($field)->select();
+            $tasteslist = Db::table('t_food_tastes')->field($field)->where('f_status', 0)->select();
         }
         return $tasteslist?$tasteslist:array();
     }
@@ -57,7 +57,10 @@ class TastesModel extends Model
      */
     public function delTastes($tid){
         try{
-            $ret = Db::table('t_food_tastes')->where('f_tid', $tid)->delete();
+            $data = array(
+                'f_status' => -1
+            );
+            $ret = Db::table('t_food_tastes')->where('f_tid', $tid)->update($data);
             return $ret;
         } catch (\Exception $e) {
             return false;
