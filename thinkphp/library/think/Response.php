@@ -79,7 +79,6 @@ class Response
             $response = new static($data, $code, $header, $options);
         }
 
-        Log::record($response,"debug");
         return $response;
     }
 

@@ -21,8 +21,7 @@ class Env
      */
     public static function get($name, $default = null)
     {
-        $key = ENV_PREFIX . strtoupper(str_replace('.', '_', $name));
-        $result = isset($_ENV[$key]) ? $_ENV[$key] : getenv($key);
+        $result = getenv(ENV_PREFIX . strtoupper(str_replace('.', '_', $name)));
         if (false !== $result) {
             return $result;
         } else {
