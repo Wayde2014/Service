@@ -77,7 +77,19 @@ class Shop extends Base
                 $DishesModel = new DishesModel();
                 $reslist = $DishesModel->getDishesListBysid($shopid);
                 if($reslist){
+                    $tastes_dict = $this->getFoodTastesDict();
                     foreach($reslist as $key=>$val){
+                        $tastesid_str = $val['tastesid'];
+                        $tastesid_arr = explode(',',$tastesid_str);
+                        $tastes_conf  = array();
+                        if(!empty($tastesid_arr)){
+                            foreach($tastesid_arr as $v){
+                                if(array_key_exists($v,$tastes_dict)){
+                                    $tastes_conf[$v] = $tastes_dict[$v];
+                                }
+                            }
+                        }
+                        $val["tastes_conf"] = $tastes_conf;
                         $shopdishes[$val['classifyname']][] = $val;
                     }
                 }
@@ -235,5 +247,20 @@ class Shop extends Base
         $tastes_list = $DineshopModel->getFoodTastesInfo();
         $tastes_info = array();
         return json($this->sucjson($tastes_info,$tastes_list));
+    }
+
+    /**
+     * 获取菜肴口味字典信息
+     */
+    private function getFoodTastesDict(){
+        $tastes_info = array();
+        $DineshopModel = new DineshopModel();
+        $tastes_list = $DineshopModel->getFoodTastesInfo();
+        if(!empty($tastes_list)){
+            foreach($tastes_list as $row){
+                $tastes_info[$row['tastid']] = $row['tastname'];
+            }
+        }
+        return $tastes_info;
     }
 }
