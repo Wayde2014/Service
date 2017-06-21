@@ -46,13 +46,15 @@ class Dishes extends Base
         if(empty($dishicon)){
             return json($this->erres('菜肴图片不能为空'));
         }
-        $dishiconurl = str_replace("upload","public/static/images", $dishicon);
-        if(is_file(ROOT_PATH.$dishicon)){
+        if(strstr($dishicon,'upload/') && is_file(ROOT_PATH.$dishicon)){
+            $dishiconurl = str_replace("upload","public/static/images", $dishicon);
             try{
                 copy(ROOT_PATH.$dishicon, ROOT_PATH.$dishiconurl); //拷贝到新目录
             }catch (\Exception $e) {
-                return json($this->erres("文件传输错误"));
+                return json($this->errjson("文件传输错误"));
             }
+        }else{
+            $dishiconurl = $dishicon;
         }
         $cuisineid = input('cuisineid');
         $salenum = intval(input('salenum',0));
@@ -65,9 +67,9 @@ class Dishes extends Base
         }
         $DishesModel = new DishesModel();
         if($dishid){
-            $res = $DishesModel->modDishes($dishid, $dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid,$salenum);
+            $res = $DishesModel->modDishes($dishid, $dishname, $dishdesc, $dishiconurl, $price, $discount, $tastesid, $cuisineid, $classid,$salenum);
         }else{
-            $res = $DishesModel->addDishes($dishname, $dishdesc, $dishicon, $price, $discount, $tastesid, $cuisineid, $classid, $shopid, $adduser,$salenum);
+            $res = $DishesModel->addDishes($dishname, $dishdesc, $dishiconurl, $price, $discount, $tastesid, $cuisineid, $classid, $shopid, $adduser,$salenum);
         }
         if($res){
             return json($this->sucjson($info, $list));

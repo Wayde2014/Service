@@ -28,13 +28,15 @@ class Shop extends Base
         if(empty($shopicon)){
             return json($this->errjson(-80008));
         }
-        $shopiconurl = str_replace("upload","public/static/images", $shopicon);
-        if(is_file(ROOT_PATH.$shopicon)){
+        if(strstr($shopicon,'upload/') && is_file(ROOT_PATH.$shopicon)){
+            $shopiconurl = str_replace("upload","public/static/images", $shopicon);
             try{
                 copy(ROOT_PATH.$shopicon, ROOT_PATH.$shopiconurl); //拷贝到新目录
             }catch (\Exception $e) {
                 return json($this->errjson("文件传输错误"));
             }
+        }else{
+            $shopiconurl = $shopicon;
         }
         $cuisineid = input('cuisineid');
         if(empty($cuisineid)){
@@ -64,14 +66,14 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        //店铺重复添加判断
-        //if($adduser != 10001){
-            $shopinfo = $DineshopModel->getDineshopInfoByadduser($adduser);
-            if($shopinfo) return json($this->erres('您已经添加店铺不能重复添加'));
-        //}
         if($shopid){
             $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume, $servicecharge);
         }else{
+            //店铺重复添加判断
+            $shopinfo = $DineshopModel->getDineshopInfoByadduser($adduser);
+            if($shopinfo) {
+                return json($this->erres('您已经添加店铺不能重复添加'));
+            }
             $res = $DineshopModel->addDineshop($shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume, $servicecharge);
         }
         if($res){
