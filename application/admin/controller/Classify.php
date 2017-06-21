@@ -51,10 +51,10 @@ class Classify extends Base
 				$res = $model->addTastes($cname);
 			}
 		}
-        if($res){
-            return json($this->sucjson($info, $list));
-        }else{
+        if($res === false){
             return json($this->errjson(-1));
+        }else{
+            return json($this->sucjson($info, $list));
         }
     }
 
