@@ -89,7 +89,7 @@ class Shop extends Base
                                 }
                             }
                         }
-                        $val["tastes_conf"] = $tastes_conf;
+                        $val["tastesid"] = $tastes_conf;
                         $shopdishes[$val['classifyname']][] = $val;
                     }
                 }
