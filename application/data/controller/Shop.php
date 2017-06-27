@@ -138,6 +138,7 @@ class Shop extends Base
             }
             $DishesModel = new DishesModel();
             $reslist = $DishesModel->getDishesListBysid($shopid);
+            $tastes_dict = $this->getFoodTastesDict();
             foreach($reslist as $key => $val){
                 $classifyname = $val['classifyname'];
                 if(isset($discount[$val['id']])){
@@ -157,6 +158,17 @@ class Shop extends Base
                     $discount_price = $floatTemp * $default_discount;
                     $reslist[$key]['discountprice'] = number_format($discount_price , 2, ".", "");
                 }
+                $tastesid_str = $val['tastesid'];
+                $tastesid_arr = explode(',',$tastesid_str);
+                $tastes_conf  = array();
+                if(!empty($tastesid_arr)){
+                    foreach($tastesid_arr as $v){
+                        if(array_key_exists($v,$tastes_dict)){
+                            $tastes_conf[$v] = $tastes_dict[$v];
+                        }
+                    }
+                }
+                $reslist[$key]["tastesid"] = $tastes_conf;
                 if(!isset($info[$classifyname])) $info[$classifyname] = array();
                 array_push($info[$classifyname], $reslist[$key]);
             }
