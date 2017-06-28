@@ -176,8 +176,9 @@ class Order extends Base
         $userid = input('userid');
         $orderid = input('orderid');
         $checkupstatus = input('checkupstatus',1);    //审核结果 0-不通过，1-通过
-        if(!$this->checkAdminLogin()){
-            return json($this->errjson(-10001));
+        $isrobot = intval(input('robot',-1));
+        if($isrobot < 0){
+            if(!$this->checkAdminLogin()) return json($this->errjson(-10001));
         }
         $OrderModel = new OrderModel();
         $orderinfo =$OrderModel->getOrderinfo($userid, $orderid);

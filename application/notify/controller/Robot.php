@@ -8,6 +8,8 @@ namespace app\notify\controller;
 use app\admin\model\OrderModel as AdminOrderModel;
 use app\data\model\OrderModel as OrderModel;
 use base\Base;
+use think\Log;
+use third\Curl;
 
 
 class Robot extends Base
@@ -88,6 +90,39 @@ class Robot extends Base
                     }
                 }
             }
+        }
+        return json(self::sucjson());
+    }
+
+    /**
+     * 退款自动处理
+     */
+    public function cancel(){
+        //查询退款订单
+        $OrderModel = new OrderModel();
+        $AdminOrderModel = new AdminOrderModel();
+        $order_list = $AdminOrderModel->getCancelOrderList($OrderModel->status_waiting_checkup_refund,$this->limit_num);
+        if(empty($order_list)){
+            return json(self::sucjson());
+        }
+
+        $checkupstatus = 1;
+        $isrobot = 1;
+        $checkup_url = $_SERVER['HTTP_HOST']."/admin/order/checkupCancelOrder";
+        $Curl = new Curl();
+
+        foreach($order_list as $order){
+            $order_id = $order['orderid'];
+            $order_userid = $order['userid'];
+            $request = array(
+                "userid" => $order_userid,
+                "orderid" => $order_id,
+                "checkupstatus" => $checkupstatus,
+                "robot" => $isrobot,
+            );
+            Log::record('checkupCancelOrder-userid='.$order_userid.'-order_id='.$order_id,'debug');
+            $result = $Curl->post($checkup_url,$request);
+            Log::record($result,'debug');
         }
         return json(self::sucjson());
     }

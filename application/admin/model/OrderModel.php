@@ -227,4 +227,26 @@ class OrderModel extends Model
         }
         return false;
     }
+
+    /**
+     * 获取待退款订单列表
+     */
+    public function getCancelOrderList($status,$limit_num=100){
+        $table_name = "orders";
+        $order_list = Db::name($table_name)
+            ->where('f_status','in',$status)
+            ->field('f_oid as orderid')
+            ->field('f_userid as userid')
+            ->field('f_type as ordertype')
+            ->field('f_status as status')
+            ->field('f_shopid as shopid')
+            ->field('f_deskid as deskid')
+            ->field('f_addtime as addtime')
+            ->field('f_startime as startime')
+            ->field('f_endtime as endtime')
+            ->order('f_addtime desc')
+            ->limit($limit_num)
+            ->select();
+        return $order_list;
+    }
 }
