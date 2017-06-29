@@ -138,6 +138,82 @@ class Shop extends Base
         }
     }
     /**
+     * 获取推荐店铺信息列表
+     */
+    public function getRecomDineshopList(){
+        $info = array();
+        $list = array();
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->getRecomDineshopList($page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['dineshoplist']) {
+            $list = $res['dineshoplist'];
+        }
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 获取可推荐店铺信息列表
+     */
+    public function getCanRecomDineshopList(){
+        $info = array();
+        $list = array();
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->getCanRecomDineshopList($page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['dineshoplist']) {
+            $list = $res['dineshoplist'];
+        }
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 添加推荐
+     */
+    public function addRecomDineshop(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->addRecomDineshop($shopid);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
+    /**
+     * 删除推荐
+     */
+    public function delRecomDineshop(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->addRecomDineshop($shopid);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
+    /**
      * 获取店铺信息列表
      */
     public function getDineshopList(){
@@ -756,6 +832,30 @@ class Shop extends Base
         }
         $DishesModel = new DishesModel();
         $res = $DishesModel->getDishesListBysid($shopid, $page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['disheslist']) {
+            $list = $res['disheslist'];
+        }
+        return json($this->sucjson($info, $list));
+    }
+    
+    /**
+     * 根据店铺信息获取可推荐菜肴列表
+     */
+    public function getCanRecomDishesList(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid');
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        if(empty($shopid)){
+            return json($this->errjson(-20001));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DishesModel = new DishesModel();
+        $res = $DishesModel->getRecomDishesListBysid($shopid, $page, $pagesize);
         $info['allnum'] = $res['allnum'];
         if($res['disheslist']) {
             $list = $res['disheslist'];

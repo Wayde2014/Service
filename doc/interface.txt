@@ -1,16 +1,10 @@
 注意事项：
-    1、所有接口皆需要验证签名
-        1)参数名称token
-        2)签名密钥sign：x$sfxF%Qu4
-        3)signstr生成规则：除token外所有参数，按照参数名称升序排列，组装成key1=value1&key2=value2...
-        4)密钥生成规则：md5(signstr+sign)
-
-    2、API接口地址
+    1、API接口地址
         http://119.23.73.39/
-    3、用户相关接口需验证登录 传入uid=1002&ck=
+    1、用户相关接口需验证登录 传入uid=1002&ck=
 首页
     1，获取首页推荐店铺
-    http://119.23.73.39/data/shop/getRecomList?num=4  
+    http://119.23.73.39/data/shop/getRecomList
     入参：num获取推荐店铺个数 默认为4
     2，获取首页外卖列表
     http://119.23.73.39/data/shop/getTakeoutList?page=1&pagesize=10&lon=114.240668&lat=22.703796

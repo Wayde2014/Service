@@ -11,13 +11,18 @@ class Shop extends Base
      * 获取推荐列表
      */
     public function getRecomList(){
-        $num = input('num')?input('num'):4; //取推荐店铺个数
-        $list = Db::query('select f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_sort sort from t_dineshop_recom order by f_sort asc limit 0,:num',['num'=>intval($num)]);
+        $info = array();
+        $list = array();
         $this->res['code'] = 1;
-        if($list && count($list) > 0){
-            $this->res['list'] = $list;
+        $recomshop = Db::query('select f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_shopdesc shopdesc, f_shophone shophone, f_address address from t_dineshop where f_isrecom = 1');
+        $recomdishes = Db::query('select f_id dishid, f_sid shopid, f_name dishname, f_desc dishdesc, f_icon dishicon, f_price dishprice, f_discount defdiscount, f_tastesid tastesid, f_cuisineid cuisineid, f_classid classid, f_salenum salenum from t_food_dishes where f_isrecom = 1');
+        if($recomshop && count($recomshop) > 0){
+            $info['recomshop'] = $recomshop;
         }
-        return json($this->res);
+        if($recomdishes && count($recomdishes) > 0){
+            $info['recomdishes'] = $recomdishes;
+        }
+        return json($this->sucjson($info,$list));
     }
     /**
      * 获取外卖列表

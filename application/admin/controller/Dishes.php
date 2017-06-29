@@ -153,4 +153,64 @@ class Dishes extends Base
         $info = $DishesModel->getDishesInfo($dishid);
         return json($this->sucjson($info, $list));
     }
+    
+    /**
+     * 获取推荐菜肴列表信息
+     */
+    public function getRecomDishesList(){
+        $info = array();
+        $list = array();
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DishesModel = new DishesModel();
+        $res = $DishesModel->getRecomDishesList($page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['disheslist']) {
+            $list = $res['disheslist'];
+        }
+        return json($this->sucjson($info, $list));
+    }
+    
+    /**
+     * 添加推荐
+     */
+    public function addRecomDishes(){
+        $info = array();
+        $list = array();
+        $dishid = input('dishid'); //菜肴ID
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DishesModel = new DishesModel();
+        $res = $DishesModel->addRecomDishes($dishid);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
+    /**
+     * 删除推荐
+     */
+    public function delRecomDishes(){
+        $info = array();
+        $list = array();
+        $dishid = input('dishid'); //菜肴ID
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DishesModel = new DishesModel();
+        $res = $DishesModel->delRecomDishes($dishid);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
 }

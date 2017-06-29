@@ -119,6 +119,50 @@ class DineshopModel extends Model
         }
     }
     /**
+     * 获取推荐店铺信息列表
+     */
+    public function getRecomDineshopList($page = 1, $pagesize = 20){
+        $allnum = Db::table('t_dineshop')->where('f_isrecom', 1)->count();
+        $dineshoplist = Db::table('t_dineshop')
+            ->field('f_sid id, f_isrecom isrecom, f_shopname shopname, f_shopdesc shopdesc, f_shopicon shopicon, f_shophone shophone, f_address address, f_isbooking isbooking, f_opentime opentime, f_isaway isaway, f_deliverytime deliverytime, f_addtime addtime')
+            ->where('f_isrecom', 1)
+            ->order('f_addtime desc')
+            ->page($page, $pagesize)
+            ->select();
+        return array(
+            "allnum" => $allnum,
+            "dineshoplist" => $dineshoplist
+        );
+    }
+    /**
+     * 获取可推荐店铺信息列表
+     */
+    public function getCanRecomDineshopList($page = 1, $pagesize = 20){
+        $allnum = Db::table('t_dineshop')->count();
+        $dineshoplist = Db::table('t_dineshop')
+            ->field('f_sid id, f_isrecom isrecom, f_shopname shopname, f_shopdesc shopdesc, f_shopicon shopicon, f_shophone shophone, f_address address, f_isbooking isbooking, f_opentime opentime, f_isaway isaway, f_deliverytime deliverytime, f_addtime addtime')
+            ->order('f_addtime desc')
+            ->page($page, $pagesize)
+            ->select();
+        return array(
+            "allnum" => $allnum,
+            "dineshoplist" => $dineshoplist
+        );
+    }
+    /**
+     * 添加推荐
+     */
+    public function addRecomDineshop($shopid){
+        return Db::table('t_dineshop')->where('f_sid', $shopid)->update(array('f_isrecom' => 1));
+    }
+    
+    /**
+     * 添加推荐
+     */
+    public function delRecomDineshop($shopid){
+        return Db::table('t_dineshop')->where('f_sid', $shopid)->update(array('f_isrecom' => 0));
+    }
+    /**
      * 获取店铺信息列表
      */
     public function getDineshopList($page = 1, $pagesize = 20){
