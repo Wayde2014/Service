@@ -15,7 +15,7 @@ class Shop extends Base
         $list = array();
         $this->res['code'] = 1;
         $recomshop = Db::query('select f_sid shopid, f_shopicon shopicon, f_shopname shopname, f_shopdesc shopdesc, f_shophone shophone, f_address address from t_dineshop where f_isrecom = 1');
-        $recomdishes = Db::query('select f_id dishid, f_sid shopid, f_name dishname, f_desc dishdesc, f_icon dishicon, f_price dishprice, f_discount defdiscount, f_tastesid tastesid, f_cuisineid cuisineid, f_classid classid, f_salenum salenum from t_food_dishes where f_isrecom = 1');
+        $recomdishes = Db::query('select f_id dishid, f_sid shopid, f_name dishesname, f_desc dishdesc, f_icon dishicon, f_price dishprice, f_discount defdiscount, f_tastesid tastesid, f_cuisineid cuisineid, f_classid classid, f_salenum salenum from t_food_dishes where f_isrecom = 1');
         if($recomshop && count($recomshop) > 0){
             $info['recomshop'] = $recomshop;
         }

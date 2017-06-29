@@ -206,7 +206,7 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
-        $res = $DineshopModel->addRecomDineshop($shopid);
+        $res = $DineshopModel->delRecomDineshop($shopid);
         if($res){
             return json($this->sucjson());
         }else{
