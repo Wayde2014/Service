@@ -427,9 +427,9 @@ class OrderModel extends Model
         );
         $orderlist = Db::table('t_sub_orders')
             ->alias('a')
-            ->field('a.f_oid orderid,a.f_parentid parentid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_addtime addtime')
+            ->field('a.f_oid orderid,a.f_parentid parentid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_paymoney paymoney,a.f_addtime addtime')
             ->where($where)
-            ->find();
+            ->select();
         return $orderlist;
     }
 

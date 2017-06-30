@@ -268,7 +268,6 @@ class Order extends Base
             $info = $res;
             $orderdetail = $res['orderdetail'];
             preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
-            preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
             if($match){
                 $orderlist = array_combine($match[1], $match[0]);
                 $dishid = array_merge($dishid, $match[1]);
@@ -290,9 +289,40 @@ class Order extends Base
                 $orderlist[$k]['num'] = $num;
             }
             $info['orderlist'] = $orderlist;
+
+            //子订单详情
             $suborder_list = array();
             if($res['hassuborder'] != 0){
                 $suborder_list = $OrderModel->getSubOrderList($uid,$orderid);
+                if(!empty($suborder_list)){
+                    $sub_orderlist = array();
+                    $sub_dishid = array();
+                    foreach($suborder_list as $k=>$v){
+                        $sub_orderdetail = $v['orderdetail'];
+                        preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $sub_orderdetail, $sub_match);
+                        if($sub_match){
+                            $sub_orderlist = array_combine($sub_match[1], $sub_match[0]);
+                            $sub_dishid = array_merge($sub_dishid, $sub_match[1]);
+                        }
+                        $sub_dishlist = $DishesModel->getDishesList(implode(',', array_unique($sub_dishid)));
+                        $sub_dishinfo = array();
+                        if($sub_dishlist){
+                            foreach($sub_dishlist as $key => $val){
+                                $sub_dishinfo[$val['id']]['icon'] = $val['icon'];
+                                $sub_dishinfo[$val['id']]['dishesname'] = $val['dishesname'];
+                                $sub_dishinfo[$val['id']]['price'] = $val['price'];
+                            }
+                        }
+                        foreach($sub_orderlist as $k => $v){
+                            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $s_match);
+                            $num = $s_match[3];
+                            $old_num = isset($sub_orderlist[$k]['num']) ? $sub_dishinfo[$k]['num'] : 0;
+                            $sub_orderlist[$k] = isset($sub_dishinfo[$k])?$sub_dishinfo[$k]:array();
+                            $sub_orderlist[$k]['num'] = $old_num + $num;
+                        }
+                    }
+                    $suborder_list['orderlist'] = $sub_orderlist;
+                }
             }
             $info['suborderlist'] = $suborder_list;
         }
