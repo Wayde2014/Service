@@ -263,30 +263,46 @@ class Order extends Base
         $OrderModel = new OrderModel();
         $res = $OrderModel->getOrderinfo($uid, $orderid);
         $dishid = array();
+        $tastesid = array();
         $orderlist = array();
         if($res){
             $info = $res;
             $orderdetail = $res['orderdetail'];
             preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
             if($match){
-                $orderlist = array_combine($match[1], $match[0]);
+                for($i=0; $i<count($match[1]); $i++){
+                    array_push($orderlist, $match[0][$i]);
+                }
                 $dishid = array_merge($dishid, $match[1]);
+                $tastesid = array_merge($tastesid, $match[2]);
             }
             $DishesModel = new DishesModel();
             $dishlist = $DishesModel->getDishesList(implode(',', array_unique($dishid)));
+            $tasteslist = $DishesModel->getTastesList(implode(',', array_unique($tastesid)));
             $dishinfo = array();
             if($dishlist){
                 foreach($dishlist as $key => $val){
+                    $dishinfo[$val['id']]['dishid'] = $val['id'];
                     $dishinfo[$val['id']]['icon'] = $val['icon'];
                     $dishinfo[$val['id']]['dishesname'] = $val['dishesname'];
                     $dishinfo[$val['id']]['price'] = $val['price'];
                 }
             }
-            foreach($orderlist as $k => $v){
-                preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $match);
+            $tastesinfo = array();
+            if($tasteslist){
+                foreach($tasteslist as $key => $val){
+                    $tastesinfo[$val['tid']] = $val['tastesname'];
+                }
+            }
+            for($i=0; $i<count($orderlist); $i++){
+                preg_match('/(\d+)\|(\d+)\@(\d+)/i', $orderlist[$i], $match);
+                $dishid = $match[1];
+                $tastesid = $match[2];
                 $num = $match[3];
-                $orderlist[$k] = isset($dishinfo[$k])?$dishinfo[$k]:array();
-                $orderlist[$k]['num'] = $num;
+                $orderlist[$i] = isset($dishinfo[$dishid])?$dishinfo[$dishid]:array();
+                $orderlist[$i]['num'] = $num;
+                $orderlist[$i]['tastesid'] = $tastesid;
+                $orderlist[$i]['tastesname'] = isset($tastesinfo[$tastesid])?$tastesinfo[$tastesid]:'';
             }
             $info['orderlist'] = $orderlist;
 
@@ -295,10 +311,10 @@ class Order extends Base
             if($res['hassuborder'] != 0){
                 $suborder_list = $OrderModel->getSubOrderList($uid,$orderid);
                 if(!empty($suborder_list)){
-                    $sub_orderlist = array();
-                    $sub_dishid = array();
-                    foreach($suborder_list as $k=>$v){
-                        $sub_orderdetail = $v['orderdetail'];
+                    foreach($suborder_list as $k1=>$v1){
+                        $sub_orderlist = array();
+                        $sub_dishid = array();
+                        $sub_orderdetail = $v1['orderdetail'];
                         preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $sub_orderdetail, $sub_match);
                         if($sub_match){
                             $sub_orderlist = array_combine($sub_match[1], $sub_match[0]);
@@ -313,15 +329,15 @@ class Order extends Base
                                 $sub_dishinfo[$val['id']]['price'] = $val['price'];
                             }
                         }
-                        foreach($sub_orderlist as $k => $v){
-                            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $s_match);
+                        foreach($sub_orderlist as $k2 => $v2){
+                            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v2, $s_match);
                             $num = $s_match[3];
-                            $old_num = isset($sub_orderlist[$k]['num']) ? $sub_dishinfo[$k]['num'] : 0;
-                            $sub_orderlist[$k] = isset($sub_dishinfo[$k])?$sub_dishinfo[$k]:array();
-                            $sub_orderlist[$k]['num'] = $old_num + $num;
+                            $old_num = isset($sub_orderlist[$k2]['num']) ? $sub_dishinfo[$k2]['num'] : 0;
+                            $sub_orderlist[$k2] = isset($sub_dishinfo[$k2])?$sub_dishinfo[$k2]:array();
+                            $sub_orderlist[$k2]['num'] = $old_num + $num;
                         }
+                        $suborder_list[$k1]['orderlist'] = $sub_orderlist;
                     }
-                    $suborder_list['orderlist'] = $sub_orderlist;
                 }
             }
             $info['suborderlist'] = $suborder_list;
