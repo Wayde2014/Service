@@ -86,6 +86,20 @@ class DishesModel extends Model
             ->select();
         return $disheslist?$disheslist:false;
     }
+<<<<<<< HEAD
+=======
+    
+    /**
+     * 获取菜品口味信息
+     */
+    public function getTastesList($tastes){
+        $tasteslist = Db::table('t_food_tastes')
+            ->field('f_tid tid, f_tname tastesname')
+            ->whereIn('f_tid', explode(',',$tastes))
+            ->select();
+        return $tasteslist?$tasteslist:false;
+    }
+>>>>>>> upstream/master
 
     /**
      * 根据店铺ID获取菜品列表信息
@@ -97,6 +111,10 @@ class DishesModel extends Model
             ->join('t_food_classify b','a.f_classid = b.f_cid','left')
             ->join('t_food_cuisine c','a.f_cuisineid = c.f_cid','left')
             ->where('a.f_sid', $shopid)
+<<<<<<< HEAD
+=======
+            ->where('a.f_state', '>=', 0)
+>>>>>>> upstream/master
             ->select();
         return $disheslist;
     }

@@ -8,9 +8,15 @@ CREATE TABLE `t_user_info` (
   `f_sex` tinyint DEFAULT 0 COMMENT '性别(0-未知,1-男,2-女)',
   `f_idcard` varchar(50) DEFAULT NULL COMMENT '身份证号码',
   `f_auth_status` smallint default 100 COMMENT '实名认证状态(0-未认证,100-已认证,-100-认证失败)',
+<<<<<<< HEAD
   `f_usermoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '用户余额',
   `f_freezemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '冻结金额',
   `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '押金金额',
+=======
+  `f_usermoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '用户余额',
+  `f_freezemoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '冻结金额',
+  `f_depositmoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '押金金额',
+>>>>>>> upstream/master
   `f_user_status` smallint default 200 COMMENT '用户状态(0-默认,100-已实名认证,200-已充值押金,-100-黑名单,-200-已清户(余额为0,押金退回))',
   `f_regtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '注册时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -44,7 +50,11 @@ CREATE TABLE `t_user_paylog` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
   `f_inout` tinyint not null comment '出入账类型(1-入账,2-出账)',
+<<<<<<< HEAD
   `f_trademoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' comment '交易金额',
+=======
+  `f_trademoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' comment '交易金额',
+>>>>>>> upstream/master
   `f_tradetype` smallint NOT NULL COMMENT '交易类型(1001-余额充值,1002-押金充值,1003-订单充值,1004-撤单返款,1101-押金退款解冻,1102-订单支付解冻,1103-订单退款解冻,2001-押金退款冻结,2002-订单支付冻结,2003-订单退款冻结,2101-押金退款(解冻扣款),2102-订单支付(解冻扣款),2103-订单退款(解冻扣款))',
   `f_orderid` varchar(200) default null COMMENT '订单号',
   `f_suborderid` varchar(200) default null COMMENT '子订单号',
@@ -59,7 +69,11 @@ DROP TABLE IF EXISTS `t_user_recharge_order`;
 CREATE TABLE `t_user_recharge_order` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
+<<<<<<< HEAD
   `f_paymoney` decimal(19,4) unsigned NOT NULL COMMENT '充值金额',
+=======
+  `f_paymoney` decimal(19,2) unsigned NOT NULL COMMENT '充值金额',
+>>>>>>> upstream/master
   `f_paytype` smallint NOT NULL COMMENT '充值类型(1001-充值余额,1002-充值押金,1003-订单充值)',
   `f_channel` smallint not NULL COMMENT '充值渠道(1001-支付宝充值,1002-微信充值)',
   `f_suborder` int default 0 comment '子订单号(订单充值时,不能为空)',
@@ -67,7 +81,11 @@ CREATE TABLE `t_user_recharge_order` (
   `f_account` varchar(200) default NULL COMMENT '充值账号',
   `f_bankorderid` varchar(100) default null comment '第三方订单号',
   `f_suctime` timestamp default '0000-00-00 00:00:00' comment '成功时间',
+<<<<<<< HEAD
   `f_bankmoney` decimal(19,4) unsigned default '0.0000'null comment '第三方订单金额',
+=======
+  `f_bankmoney` decimal(19,2) unsigned default '0.00'null comment '第三方订单金额',
+>>>>>>> upstream/master
   `f_status` smallint default 0 COMMENT '订单状态(0-默认,100-充值成功,-100-充值失败)',
   `f_paynote` varchar(1000) default null comment '充值备注',
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
@@ -81,14 +99,22 @@ DROP TABLE IF EXISTS `t_user_draw_order`;
 CREATE TABLE `t_user_draw_order` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
+<<<<<<< HEAD
   `f_drawmoney` decimal(19,4) unsigned NOT NULL COMMENT '提款金额',
+=======
+  `f_drawmoney` decimal(19,2) unsigned NOT NULL COMMENT '提款金额',
+>>>>>>> upstream/master
   `f_drawtype` smallint NOT NULL default 200 COMMENT '充值类型(100-余额提款,200-押金退款,300-订单退款)',
   `f_channel` smallint default 0 COMMENT '提款渠道(1001-支付宝提款,1002-微信提款)',
   `f_suborder` int default 0 comment '子订单号(订单退款时,不能为空)',
   `f_account` varchar(200) not NULL COMMENT '提款账号',
   `f_bankorderid` varchar(100) default null comment '第三方订单号',
   `f_suctime` timestamp default '0000-00-00 00:00:00' comment '成功时间',
+<<<<<<< HEAD
   `f_bankmoney` decimal(19,4) unsigned default '0.0000'null comment '第三方订单金额',
+=======
+  `f_bankmoney` decimal(19,2) unsigned default '0.00'null comment '第三方订单金额',
+>>>>>>> upstream/master
   `f_status` smallint default 0 COMMENT '订单状态(0-默认,100-提款成功,-100-提款失败)',
   `f_drawnote` varchar(1000) default null comment '提款备注',
   `f_payorderid` int default null comment '退款对应网站充值订单号',
@@ -121,9 +147,15 @@ DROP TABLE IF EXISTS `t_dineshop_account`;
 CREATE TABLE `t_dineshop_account` (
   `f_id` smallint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_sid` int NOT NULL COMMENT '门店id',
+<<<<<<< HEAD
   `f_depositmoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '押金金额',
   `f_storemoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '账户余额',
   `f_proceeds` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '收益金余额',
+=======
+  `f_depositmoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '押金金额',
+  `f_storemoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '账户余额',
+  `f_proceeds` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '收益金余额',
+>>>>>>> upstream/master
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
@@ -248,7 +280,11 @@ DROP TABLE IF EXISTS `t_food_dishes`;
 CREATE TABLE `t_food_dishes` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '菜肴ID(自增)',
   `f_name` varchar(200) NOT NULL COMMENT '菜品名称',
+<<<<<<< HEAD
   `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+=======
+  `f_price` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '菜品价格',
+>>>>>>> upstream/master
   `f_state` smallint NOT NULL COMMENT '菜品状态（-1已停售， 0初始， 1预售，100已售完）',
   `f_tastesid` int NOT NULL COMMENT '口味ID',
   `f_cuisineid` int NOT NULL COMMENT '菜系ID',
@@ -265,7 +301,11 @@ CREATE TABLE `t_food_menu` (
   `f_foodid` int NOT NULL COMMENT '菜单ID',
   `f_foodname` varchar(200) DEFAULT NULL COMMENT '菜名',
   `f_foodicon` varchar(200) DEFAULT NULL COMMENT '菜品图片',
+<<<<<<< HEAD
   `f_foodprice` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+=======
+  `f_foodprice` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '菜品价格',
+>>>>>>> upstream/master
   `f_foodnum` varchar(200) DEFAULT NULL COMMENT '菜品数量',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
@@ -291,7 +331,11 @@ CREATE TABLE `t_user_freezelog` (
   `f_id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `f_uid` int NOT NULL COMMENT '用户uid',
   `f_inout` tinyint not null comment '冻结解冻类型(1-解冻,2-冻结)',
+<<<<<<< HEAD
   `f_trademoney` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' comment '交易金额',
+=======
+  `f_trademoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' comment '交易金额',
+>>>>>>> upstream/master
   `f_tradetype` smallint NOT NULL COMMENT '交易类型(1101-押金退款解冻,1102-订单支付解冻,2001-押金退款冻结,2002-订单支付冻结)',
   `f_tradenote` varchar(1000) default null comment '交易备注',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -345,7 +389,11 @@ CREATE TABLE `t_admin_food_dishes` (
   `f_icon` varchar(200) DEFAULT NULL COMMENT '菜品图片',
   `f_name` varchar(200) NOT NULL COMMENT '菜品名称',
   `f_desc` text COMMENT '描述',
+<<<<<<< HEAD
   `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+=======
+  `f_price` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '菜品价格',
+>>>>>>> upstream/master
   `f_discount` double(11,2) DEFAULT '1.00' COMMENT '默认折扣（1表示不打折）',
   `f_state` smallint(6) NOT NULL DEFAULT '0' COMMENT '菜品状态（-1已停售， 0初始， 1预售，100已售完）',
   `f_salenum` int(11) default '0' COMMENT '月销量',
@@ -393,6 +441,10 @@ CREATE TABLE `t_dineshop` (
 DROP TABLE IF EXISTS `t_dineshop_deskinfo`;
 CREATE TABLE `t_dineshop_deskinfo` (
   `f_id` smallint(6) NOT NULL AUTO_INCREMENT COMMENT '自增id',
+<<<<<<< HEAD
+=======
+  `f_deskid` varchar(50) not null comment '桌型ID',
+>>>>>>> upstream/master
   `f_sid` int(11) NOT NULL COMMENT '门店id',
   `f_seatnum` tinyint(4) NOT NULL DEFAULT '1' COMMENT '可坐人数',
   `f_amount` tinyint(4) NOT NULL DEFAULT '1' COMMENT '桌子数量',
@@ -401,7 +453,11 @@ CREATE TABLE `t_dineshop_deskinfo` (
   `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`),
+<<<<<<< HEAD
   UNIQUE KEY `t_sid_seatnum` (`f_sid`,`f_seatnum`)
+=======
+  UNIQUE KEY `t_sid_seatnum` (`f_sid`,`f_deskid`)
+>>>>>>> upstream/master
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='门店管理-门店信息表';
 
 
@@ -508,7 +564,11 @@ CREATE TABLE `t_food_dishes` (
   `f_icon` varchar(200) DEFAULT NULL COMMENT '菜品图片',
   `f_name` varchar(200) NOT NULL COMMENT '菜品名称',
   `f_desc` text COMMENT '描述',
+<<<<<<< HEAD
   `f_price` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+=======
+  `f_price` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '菜品价格',
+>>>>>>> upstream/master
   `f_discount` double(11,2) DEFAULT '1.00' COMMENT '默认折扣（1表示不打折）',
   `f_state` smallint(6) NOT NULL DEFAULT '0' COMMENT '菜品状态（-1已停售， 0初始， 1预售，100已售完）',
   `f_salenum` int(11) default '0' COMMENT '月销量',
@@ -543,7 +603,11 @@ CREATE TABLE `t_food_menu` (
   `f_foodid` int(11) NOT NULL COMMENT '菜单ID',
   `f_foodname` varchar(200) DEFAULT NULL COMMENT '菜名',
   `f_foodicon` varchar(200) DEFAULT NULL COMMENT '菜品图片',
+<<<<<<< HEAD
   `f_foodprice` decimal(19,4) unsigned NOT NULL DEFAULT '0.0000' COMMENT '菜品价格',
+=======
+  `f_foodprice` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '菜品价格',
+>>>>>>> upstream/master
   `f_foodnum` varchar(200) DEFAULT NULL COMMENT '菜品数量',
   `f_lasttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`f_id`)
@@ -569,6 +633,7 @@ CREATE TABLE `t_orders` (
   `f_type` int(2) NOT NULL DEFAULT '1' COMMENT '订单类型（1,外卖订单  2,食堂订单）',
   `f_status` int(2) NOT NULL DEFAULT '1' COMMENT '订单状态（0,初始 1,未付款 2,已付款 3,配送中 4,配送完成 5,用餐中 6,申请打包 90,已打包 100,已完成 -100逾期 -110退款待审核 -120退款审核通过 -130退款审核不通过 -200退款中 -300退款完成， -400已取消）',
   `f_orderdetail` varchar(255) NOT NULL COMMENT '订单详情',
+<<<<<<< HEAD
   `f_ordermoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '订单金额',
   `f_deliverymoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '配送费',
   `f_allmoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '订单总金额',
@@ -577,14 +642,29 @@ CREATE TABLE `t_orders` (
   `f_mealsnum` int(10) DEFAULT '0' COMMENT '就餐人数（仅食堂订单有）',
   `f_deskid` int default null comment '预订桌型ID（仅食堂订单有）',
   `f_servicemoney` double(200,0) DEFAULT 0 COMMENT '服务费（仅食堂订单有）',
+=======
+  `f_ordermoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单金额',
+  `f_deliverymoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '配送费',
+  `f_allmoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单总金额',
+  `f_paymoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '已支付金额',
+  `f_paytype` varchar(200) DEFAULT '0' COMMENT '支付方式（0余额，1微信，2支付宝）',
+  `f_mealsnum` int(10) DEFAULT '0' COMMENT '就餐人数（仅食堂订单有）',
+  `f_deskid` varchar(50) default null comment '预订桌型ID（仅食堂订单有）',
+  `f_servicemoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '服务费（仅食堂订单有）',
+>>>>>>> upstream/master
   `f_startime` varchar(200) DEFAULT '' COMMENT '用餐开始时间（仅食堂订单有）',
   `f_endtime` varchar(200) DEFAULT '' COMMENT '用餐结束时间（仅食堂订单有）',
   `f_deliveryid` int(10) DEFAULT '0' COMMENT '配送员ID（仅外卖订单有）',
   `f_deliverytime` varchar(20) DEFAULT '' COMMENT '配送时间',
   `f_addressid` int(10) DEFAULT NULL COMMENT '配送地址ID（仅外卖订单有）',
   `f_hassuborder` tinyint unsigned default 0 comment '是否有子订单(0-无，1-有)',
+<<<<<<< HEAD
   `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
+=======
+  `f_addtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '订单时间',
+  `f_modtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',
+>>>>>>> upstream/master
   PRIMARY KEY (`f_oid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='外卖及预订订单表';
 
@@ -596,8 +676,13 @@ CREATE TABLE `t_sub_orders` (
   `f_userid` int(10) NOT NULL COMMENT '用户ID',
   `f_status` int(2) NOT NULL DEFAULT '1' COMMENT '订单状态（0,初始 1,未付款 2,已付款）',
   `f_orderdetail` varchar(255) NOT NULL COMMENT '订单详情',
+<<<<<<< HEAD
   `f_ordermoney` double(200,0) NOT NULL DEFAULT '0' COMMENT '订单金额',
   `f_paymoney` double(200,0) DEFAULT '0' COMMENT '已支付金额',
+=======
+  `f_ordermoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单金额',
+  `f_paymoney` decimal(19,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '已支付金额',
+>>>>>>> upstream/master
   `f_paytype` varchar(200) DEFAULT '0' COMMENT '支付方式（0余额，1微信，2支付宝）',
   `f_addtime` varchar(200) DEFAULT '' COMMENT '订单时间',
   `f_modtime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '订单更新时间',

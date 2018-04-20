@@ -28,13 +28,23 @@ class Shop extends Base
         if(empty($shopicon)){
             return json($this->errjson(-80008));
         }
+<<<<<<< HEAD
         $shopiconurl = str_replace("upload","public/static/images", $shopicon);
         if(is_file(ROOT_PATH.$shopicon)){
+=======
+        if(strstr($shopicon,'upload/') && is_file(ROOT_PATH.$shopicon)){
+            $shopiconurl = str_replace("upload","public/static/images", $shopicon);
+>>>>>>> upstream/master
             try{
                 copy(ROOT_PATH.$shopicon, ROOT_PATH.$shopiconurl); //拷贝到新目录
             }catch (\Exception $e) {
                 return json($this->errjson("文件传输错误"));
             }
+<<<<<<< HEAD
+=======
+        }else{
+            $shopiconurl = $shopicon;
+>>>>>>> upstream/master
         }
         $cuisineid = input('cuisineid');
         if(empty($cuisineid)){
@@ -67,6 +77,14 @@ class Shop extends Base
         if($shopid){
             $res = $DineshopModel->modDineshop($shopid, $shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $minconsume, $servicecharge);
         }else{
+<<<<<<< HEAD
+=======
+            //店铺重复添加判断
+            $shopinfo = $DineshopModel->getDineshopInfoByadduser($adduser);
+            if($shopinfo) {
+                return json($this->erres('您已经添加店铺不能重复添加'));
+            }
+>>>>>>> upstream/master
             $res = $DineshopModel->addDineshop($shopname, $shopdesc, $shopiconurl, $cuisineid, $maplon, $maplat, $sales, $deliveryfee, $minprice, $preconsume, $isbooking, $isaway, $opentime, $shophone, $address, $adduser, $minconsume, $servicecharge);
         }
         if($res){
@@ -89,6 +107,7 @@ class Shop extends Base
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
+<<<<<<< HEAD
         $status = '';
         if($key == '审核'){
             $status = 1;
@@ -102,6 +121,41 @@ class Shop extends Base
         $res = false;
         $DineshopModel = new DineshopModel();
         if($status != ''){
+=======
+        //查询店铺信息
+        $DineshopModel = new DineshopModel();
+        $shopinfo = $DineshopModel->getDineshopInfo($shopid);
+        $shopstatus = $shopinfo['status'];
+        $status = '';
+        if($key == '审核'){
+            if($shopstatus != 0){
+                return json($this->erres('店铺状态错误'));
+            }
+            $status = 1;
+        }else if($key == '通过审核'){
+            if($shopstatus != 1){
+                return json($this->erres('店铺状态错误'));
+            }
+            $status = 100;
+        }else if($key == '审核不通过'){
+            if($shopstatus != 1){
+                return json($this->erres('店铺状态错误'));
+            }
+            $status = -100;
+        }else if($key == '下架'){
+            if($shopstatus != 100 && $shopstatus != -100){
+                return json($this->erres('店铺状态错误'));
+            }
+            $status = -300;
+        }else if($key == '重新提交审核'){
+            if($shopstatus != -300){
+                return json($this->erres('店铺状态错误'));
+            }
+            $status = 0;
+        }
+        $res = false;
+        if($status !== ''){
+>>>>>>> upstream/master
             $res = $DineshopModel->modDineshopStatus($shopid, $status);
         }
         if($res){
@@ -111,6 +165,85 @@ class Shop extends Base
         }
     }
     /**
+<<<<<<< HEAD
+=======
+     * 获取推荐店铺信息列表
+     */
+    public function getRecomDineshopList(){
+        $info = array();
+        $list = array();
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->getRecomDineshopList($page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['dineshoplist']) {
+            $list = $res['dineshoplist'];
+        }
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 获取可推荐店铺信息列表
+     */
+    public function getCanRecomDineshopList(){
+        $info = array();
+        $list = array();
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->getCanRecomDineshopList($page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['dineshoplist']) {
+            $list = $res['dineshoplist'];
+        }
+        return json($this->sucjson($info, $list));
+    }
+    /**
+     * 添加推荐
+     */
+    public function addRecomDineshop(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->addRecomDineshop($shopid);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
+    /**
+     * 删除推荐
+     */
+    public function delRecomDineshop(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid'); //店铺ID
+        //判断登录
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DineshopModel = new DineshopModel();
+        $res = $DineshopModel->delRecomDineshop($shopid);
+        if($res){
+            return json($this->sucjson());
+        }else{
+            return json($this->errjson(-1));
+        }
+    }
+    /**
+>>>>>>> upstream/master
      * 获取店铺信息列表
      */
     public function getDineshopList(){
@@ -154,10 +287,19 @@ class Shop extends Base
 				$shopid = $info['id'];
 			}
 		}
+<<<<<<< HEAD
         $DishesModel = new DishesModel();
         $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
         if($dishlist){
             $disheslist = $dishlist;
+=======
+        if(isset($info['fontshopid']) && $info['fontshopid']){
+            $DishesModel = new DishesModel();
+            $dishlist = $DishesModel->getDishesListBysidNoPage($info['fontshopid']);
+            if($dishlist){
+                $disheslist = $dishlist;
+            }
+>>>>>>> upstream/master
         }
         $info['disheslist'] = $disheslist;
         return json($this->sucjson($info, $list));
@@ -244,13 +386,21 @@ class Shop extends Base
             $info['shopname'] = $shopinfo['shopname'];
             $info['shopicon'] = $shopinfo['shopicon'];
             $info['shopaddress'] = $shopinfo['address'];
+<<<<<<< HEAD
             $DishesModel = new DishesModel();
             $dishlist = $DishesModel->getDishesListBysidNoPage($shopid);
+=======
+            $fontshopid = $shopinfo['fontshopid'];
+            $DishesModel = new DishesModel();
+            $dishlist = $DishesModel->getDishesListBysidNoPage($fontshopid);
+            
+>>>>>>> upstream/master
             if($dishlist){
                 foreach($dishlist as $key => $val){
                     $dishinfo[$val['id']] = $val['dishesname'];
                 }
             }
+<<<<<<< HEAD
         }
         $discountlist = $DineshopModel->getDineshopDiscount($shopid, $startdate, $endate);
         $discountimeslot = $DineshopModel->getDiscountTimeslot();
@@ -288,6 +438,46 @@ class Shop extends Base
             $list[$key]['timeslot'] = $timeslot;
             $list[$key]['discountdata'] = $discountdata;
         }
+=======
+            $discountlist = $DineshopModel->getDineshopDiscount($fontshopid, $startdate, $endate);
+            $discountimeslot = $DineshopModel->getDiscountTimeslot();
+            foreach($discountimeslot as $key=>$val){
+                $slotid = $val['id'];
+                $timeslot = $val['timeslot'];
+                $discid_list = array();
+                $discount_list = array();
+                foreach($discountlist as $k=>$v){
+                    if($v['timeslot'] == $timeslot){
+                        $discid_list[$v['date']] = $v['id'];
+                        $discount = array();
+                        foreach(explode('$', $v['discount']) as $_k=>$_v){
+                            preg_match('/(\d+)\|(\d+)\@(([1-9]\d*|0)(\.\d{1,2})?)/i', $_v, $match);
+                            if($match[1]){
+                                $discount[$_k]['dishid'] = $match[1];
+                                $discount[$_k]['dishname'] = isset($dishinfo[$match[1]])?$dishinfo[$match[1]]:'';
+                                $discount[$_k]['type'] = $match[2];
+                                $discount[$_k]['num'] = $match[3]*10;
+                            }
+                        }
+                        $discount_list[$v['date']] = $discount;
+                    }
+                }
+                $discountdata = array();
+                for($i=0;$i<7;$i++){
+                    $date = Date('Y-m-d', strtotime('+'.$i.' days'));
+                    $discountdata[] = array(
+                        'date' => $date,
+                        'discid' => isset($discid_list[$date])?$discid_list[$date]:'',
+                        'discount' => isset($discount_list[$date])?$discount_list[$date]:array()
+                    );
+                }
+                $list[$key]['slotid'] = $slotid;
+                $list[$key]['timeslot'] = $timeslot;
+                $list[$key]['discountdata'] = $discountdata;
+            }
+        }
+        
+>>>>>>> upstream/master
         return json($this->sucjson($info, $list));
     }
     /**
@@ -417,7 +607,11 @@ class Shop extends Base
         $deskinfo = array();
         $desklist = $DineshopModel->getDesklist($shopid);
         foreach($desklist as $key=>$val){
+<<<<<<< HEAD
             $deskinfo[$val['id']] = $val;
+=======
+            $deskinfo[$val['deskid']] = $val;
+>>>>>>> upstream/master
         }
         $sellist = $DineshopModel->getDineshopSell($shopid, $startdate, $endate);
         $timeslotlist = $DineshopModel->getDiscountTimeslot();
@@ -431,7 +625,11 @@ class Shop extends Base
                     $sellid_list[$v['date']] = $v['id'];
                     $sellinfo = array();
                     foreach(explode('$', $v['sellinfo']) as $_k=>$_v){
+<<<<<<< HEAD
                         preg_match('/(\d+)\@(\d+)/i', $_v, $match);
+=======
+                        preg_match('/(\w+)\@(\d+)/i', $_v, $match); 
+>>>>>>> upstream/master
                         if($match[1]){
                             $sellinfo[$_k]['tableid'] = $match[1];
                             $desknum = 0;
@@ -489,8 +687,13 @@ class Shop extends Base
             return json($this->errjson(-80003));
         }
         foreach(explode('$', $sellinfo) as $key=>$val){
+<<<<<<< HEAD
             if(!preg_match( '/^\d+\@\d+$/i' , $val, $result)){
                 return json($this->errjson(-80004)); exit;
+=======
+            if(!preg_match( '/^\w+\@\d+$/i' , $val, $result)){
+                return json($this->erres('放号信息格式错误'));
+>>>>>>> upstream/master
             }
         }
         if(!$this->checkAdminLogin()){
@@ -527,8 +730,13 @@ class Shop extends Base
         $sellinfo = input('sellinfo'); //折扣信息
         if(!empty($sellinfo)){
             foreach(explode('$', $sellinfo) as $key=>$val){
+<<<<<<< HEAD
                 if(!preg_match( '/^\d+\@\d+$/i' , $val)){
                     return json($this->errjson(-80004)); exit;
+=======
+                if(!preg_match( '/^\w+\@\d+$/i' , $val)){
+                    return json($this->errjson('放号信息格式错误'));
+>>>>>>> upstream/master
                 }
             }
         }
@@ -573,9 +781,17 @@ class Shop extends Base
         $info = array();
         $list = array();
         $shopid = input('shopid'); //店铺ID
+<<<<<<< HEAD
         if(empty($shopid)) return json($this->errjson(-20003));
         $seatnum = input('seatnum'); //就餐人数
         $desknum = input('desknum'); //数量
+=======
+        $deskid = input('deskid'); //桌型ID
+        $seatnum = input('seatnum'); //就餐人数
+        $desknum = input('desknum'); //数量
+        if(empty($shopid)) return json($this->errjson(-20003));
+        if(empty($deskid)) return json(self::erres("桌型编号不能为空"));
+>>>>>>> upstream/master
         if(empty($seatnum) || empty($desknum)) {
             return json($this->errjson(-20001));
         }
@@ -583,8 +799,20 @@ class Shop extends Base
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
+<<<<<<< HEAD
         $deskid = $DineshopModel->addDesk($shopid, $seatnum, $desknum);
         if($deskid){
+=======
+        //检查桌型编号是否已经存在
+        $deskinfo = $DineshopModel->getDeskinfo($shopid,$deskid);
+        if(!empty($deskinfo)){
+            return json(self::erres("桌型编号已存在"));
+        }
+        if($seatnum == $deskinfo['seatnum']){
+            return json(self::erres("已有该座位数的桌型信息"));
+        }
+        if($DineshopModel->addDesk($shopid, $deskid, $seatnum, $desknum)){
+>>>>>>> upstream/master
             return json($this->sucjson(array('deskid' => $deskid)));
         }else{
             return json($this->erres('添加桌型信息失败！')); 
@@ -594,18 +822,27 @@ class Shop extends Base
      * 修改店铺桌型
      */
     public function modDesk(){
+<<<<<<< HEAD
         $info = array();
         $list = array();
         $deskid = input('deskid'); //桌型ID
         $seatnum = input('seatnum'); //就餐人数
         $desknum = input('desknum'); //数量
         if(empty($deskid) || empty($seatnum) || empty($desknum)) {
+=======
+        $shopid = input('shopid');
+        $deskid = input('deskid'); //桌型ID
+        $desknum = intval(input('desknum',-1)); //数量
+        $status = intval(input('status',1)); //桌型状态
+        if(empty($shopid) || empty($deskid)) {
+>>>>>>> upstream/master
             return json($this->errjson(-20001));
         }     
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
+<<<<<<< HEAD
         $info = $DineshopModel->modDesk($deskid,$seatnum,$desknum);
         if($info){
            return json($this->sucjson()); 
@@ -634,6 +871,21 @@ class Shop extends Base
            return json($this->errjson()); 
         }
     }
+=======
+        $deskinfo = $DineshopModel->getDeskinfo($shopid,$deskid);
+        if(empty($deskinfo)){
+            return json(self::erres("桌型信息不存在"));
+        }
+        $desknum = $desknum > 0 ? $desknum : $deskinfo['desknum'];
+        $info = $DineshopModel->modDesk($shopid, $deskid, $desknum, $status);
+        if($info){
+           return json($this->sucjson()); 
+        }else{
+           return json($this->errjson($this->erres('修改桌型信息失败！'))); 
+        }
+    }
+
+>>>>>>> upstream/master
     /**
      * 获取店铺桌型
      */
@@ -671,15 +923,25 @@ class Shop extends Base
     public function getDeskinfo(){
         $info = array();
         $list = array();
+<<<<<<< HEAD
         $deskid = input('deskid'); //店铺ID
         if(empty($deskid)){
+=======
+        $shopid = input('shopid'); //店铺ID
+        $deskid = input('deskid'); //桌型编号
+        if(empty($deskid) || empty($shopid)){
+>>>>>>> upstream/master
             return json($this->errjson(-20001));
         }        
         if(!$this->checkAdminLogin()){
             return json($this->errjson(-10001));
         }
         $DineshopModel = new DineshopModel();
+<<<<<<< HEAD
         $info = $DineshopModel->getDeskinfo($deskid);
+=======
+        $info = $DineshopModel->getDeskinfo($shopid,$deskid);
+>>>>>>> upstream/master
         return json($this->sucjson($info, $list));
     }
     /**
@@ -736,6 +998,33 @@ class Shop extends Base
         }
         return json($this->sucjson($info, $list));
     }
+<<<<<<< HEAD
+=======
+    
+    /**
+     * 根据店铺信息获取可推荐菜肴列表
+     */
+    public function getCanRecomDishesList(){
+        $info = array();
+        $list = array();
+        $shopid = input('shopid');
+        $page = input('page',1); //页码
+        $pagesize = input('pagesize',20); //每页显示数
+        if(empty($shopid)){
+            return json($this->errjson(-20001));
+        }
+        if(!$this->checkAdminLogin()){
+            return json($this->errjson(-10001));
+        }
+        $DishesModel = new DishesModel();
+        $res = $DishesModel->getRecomDishesListBysid($shopid, $page, $pagesize);
+        $info['allnum'] = $res['allnum'];
+        if($res['disheslist']) {
+            $list = $res['disheslist'];
+        }
+        return json($this->sucjson($info, $list));
+    }
+>>>>>>> upstream/master
 
     /**
      * 获取指定用户的店铺信息

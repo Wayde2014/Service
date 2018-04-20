@@ -169,6 +169,9 @@ return [
         'path'  => LOG_PATH,
         // 日志记录级别
         'level' => [],
+        'apart_level' => ['error','debug'],
+        'time_format' => ' d ',
+        'file_size'   => 104857600,
     ],
 
     // +----------------------------------------------------------------------
@@ -279,4 +282,11 @@ return [
     "suborder" => array(
         "endtime" => 1800,
     ),
+<<<<<<< HEAD
+=======
+    "order" => array(
+        "overtime_closed" => 900, //超时未付款自动关闭
+        "overtime_repast" => 1800, //逾期未就餐
+    ),
+>>>>>>> upstream/master
 ];

@@ -7,12 +7,17 @@
  */
 namespace app\data\model;
 
+<<<<<<< HEAD
+=======
+use think\Log;
+>>>>>>> upstream/master
 use think\Model;
 use think\Db;
 
 class OrderModel extends Model
 {
     public $status_waiting_pay = 1;
+<<<<<<< HEAD
     public $status_waiting_refund = -200;
     public $status_pay_suc = 2;
     public $status_refund_suc = -300;
@@ -34,6 +39,33 @@ class OrderModel extends Model
      * @params $deliverytime 配送时间
      * @params $addressid 配送地址ID
      * @return \think\response\Json
+=======
+    public $status_pay_suc = 2;
+    public $status_in_delivery = 3;
+    public $status_start_eat = 5;
+    public $status_apply_packing = 6;
+    public $status_waiting_checkup_refund = -110;
+    public $status_checkup_suc_refund = -120;
+    public $status_checkup_fail_refund = -130;
+    public $status_waiting_refund = -200;
+    public $status_refund_suc = -300;
+    public $status_overtime_repast = -400;
+    public $status_overtime_closed = -900;
+    public $status_final_closed = -1000;
+
+    /**
+     * 新增外卖订单
+     * @param $userid 用户ID
+     * @param $shopid 店铺ID
+     * @param $orderdetail 订单详情
+     * @param $ordermoney 订单金额
+     * @param $deliverymoney 配送费
+     * @param $allmoney 订单总金额
+     * @param $paytype 支付方式
+     * @param $deliverytime 配送时间
+     * @param $addressid 配送地址ID
+     * @return bool|int
+>>>>>>> upstream/master
      */
     public function addTakeoutOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $deliverytime, $addressid)
     {
@@ -57,6 +89,7 @@ class OrderModel extends Model
         }
         return $orderid;
     }
+<<<<<<< HEAD
     /**
      * 新增食堂订单
      * @params $userid 用户ID
@@ -70,6 +103,24 @@ class OrderModel extends Model
      * @params $startime 就餐开始时间
      * @params $endtime 就餐结束时间
      * @return \think\response\Json
+=======
+
+    /**
+     * 新增食堂订单
+     * @param $userid 用户ID
+     * @param $shopid 店铺ID
+     * @param $orderdetail 订单详情
+     * @param $ordermoney 订单金额
+     * @param $deliverymoney 配送费
+     * @param $allmoney 订单总金额
+     * @param $paytype 支付方式
+     * @param $mealsnum 就餐人数
+     * @param $startime 就餐开始时间
+     * @param $endtime 就餐结束时间
+     * @param $servicemoney
+     * @param $deskid
+     * @return bool|int
+>>>>>>> upstream/master
      */
     public function addEatinOrders($userid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid)
     {
@@ -97,8 +148,16 @@ class OrderModel extends Model
             if ($orderid > 0) {
                 Db::name($table_deskinfo)
                     ->where('f_sid',$shopid)
+<<<<<<< HEAD
                     ->where('f_id',$deskid)
                     ->setInc('f_orderamount');
+=======
+                    ->where('f_deskid',$deskid)
+                    ->setInc('f_orderamount');
+                Log::record('wayde-orderid='.$orderid,'error');
+                Log::record('wayde-f_sid='.$shopid,'error');
+                Log::record('wayde-f_deskid='.$deskid,'error');
+>>>>>>> upstream/master
                 Db::commit();
                 return $orderid;
             }
@@ -147,7 +206,11 @@ class OrderModel extends Model
             ->where('f_userid', $userid)
             ->where('f_orderdetail', $orderdetail)
             ->where('f_type', $ordertype)
+<<<<<<< HEAD
             ->where('f_addtime', '> time', time()-10)
+=======
+            ->where('f_addtime', '>', (date("Y-m-d H:i:s",time()-10)))
+>>>>>>> upstream/master
             ->find();
         return $check?$check['orderid']:false;
     }
@@ -416,9 +479,35 @@ class OrderModel extends Model
         );
         $orderlist = Db::table('t_sub_orders')
             ->alias('a')
+<<<<<<< HEAD
             ->field('a.f_oid orderid,a.f_parentid parentid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_addtime addtime')
             ->where($where)
             ->find();
         return $orderlist;
     }
+=======
+            ->field('a.f_oid orderid,a.f_parentid parentid,a.f_userid userid,a.f_status status,a.f_orderdetail orderdetail,a.f_ordermoney ordermoney,a.f_paymoney paymoney,a.f_addtime addtime')
+            ->where($where)
+            ->select();
+        return $orderlist;
+    }
+
+    /**
+     * 获取用户扫码用餐订单信息
+     */
+    public function getScanOrderInfo($userid,$shopid,$deskid){
+        $table_name = "orders";
+        $orderinfo = Db::name($table_name)
+            ->where('f_userid',$userid)
+            ->where('f_shopid',$shopid)
+            ->where('f_deskid',$deskid)
+            ->where('f_type',2)
+            ->where('f_status',$this->status_pay_suc)
+            ->field('f_oid as orderid')
+            ->order('f_startime','desc')
+            ->limit(1)
+            ->find();
+        return $orderinfo;
+    }
+>>>>>>> upstream/master
 }

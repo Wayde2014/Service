@@ -12,6 +12,7 @@ use think\Db;
 
 class OrderModel extends Model
 {
+<<<<<<< HEAD
 
     public $status_waiting_pay = 1;
     public $status_waiting_refund = -200;
@@ -20,6 +21,21 @@ class OrderModel extends Model
     public $status_waiting_checkup_refund = -110;
     public $status_checkup_suc_refund = -120;
     public $status_checkup_fail_refund = -130;
+=======
+    public $status_waiting_pay = 1;
+    public $status_pay_suc = 2;
+    public $status_in_delivery = 3;
+    public $status_start_eat = 5;
+    public $status_apply_packing = 6;
+    public $status_waiting_checkup_refund = -110;
+    public $status_checkup_suc_refund = -120;
+    public $status_checkup_fail_refund = -130;
+    public $status_waiting_refund = -200;
+    public $status_refund_suc = -300;
+    public $status_overtime_repast = -400;
+    public $status_overtime_closed = -900;
+    public $status_final_closed = -1000;
+>>>>>>> upstream/master
 
     /**
      * 获取外卖订单列表
@@ -27,8 +43,12 @@ class OrderModel extends Model
     public function getTakeoutlist($startime, $endtime, $shopid = '', $orderid = '', $page = 1, $pagesize = 20)
     {
         $where = array(
+<<<<<<< HEAD
             'a.f_type' => 1,
             'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
+=======
+            'a.f_type' => 1
+>>>>>>> upstream/master
         );
 		if (is_numeric($shopid)){
 			$where['a.f_shopid'] = $shopid;
@@ -37,6 +57,11 @@ class OrderModel extends Model
         }
         if(!empty($orderid)) {
             $where['a.f_oid'] = $orderid;
+<<<<<<< HEAD
+=======
+        }else{
+            $where['a.f_addtime'] = array('between time', [$startime.' 00:00:00', $endtime.' 23:59:59']);
+>>>>>>> upstream/master
         }
         $allnum = Db::table('t_orders')->alias('a')->join('t_dineshop b','a.f_shopid = b.f_sid','left')->where($where)->count();
         $orderlist = Db::table('t_orders')
@@ -61,7 +86,11 @@ class OrderModel extends Model
     {
         $where = array(
             'a.f_type' => 2,
+<<<<<<< HEAD
             'a.f_addtime' => array('between', [$startime.' 00:00:00', $endtime.' 59:59:59'])
+=======
+            'a.f_addtime' => array('between time', [$startime, $endtime])
+>>>>>>> upstream/master
         );
         if (is_numeric($shopid)){
 			$where['a.f_shopid'] = $shopid;
@@ -181,4 +210,69 @@ class OrderModel extends Model
             ->where('f_id',$deskid)
             ->setDec('f_orderamount');
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * 获取待处理订单列表
+     */
+    public function getPendingOrderList($pending_list,$limit_num=100){
+        $table_name = "orders";
+        $order_list = Db::name($table_name)
+            ->where('f_status','in',$pending_list)
+            ->field('f_oid as orderid')
+            ->field('f_userid as userid')
+            ->field('f_type as ordertype')
+            ->field('f_status as status')
+            ->field('f_shopid as shopid')
+            ->field('f_deskid as deskid')
+            ->field('f_addtime as addtime')
+            ->field('f_startime as startime')
+            ->field('f_endtime as endtime')
+            ->order('f_addtime desc')
+            ->limit($limit_num)
+            ->select();
+        return $order_list;
+    }
+
+    /**
+     * 释放桌型
+     * @param $shopid
+     * @param $deskid
+     * @return bool
+     */
+    public function releaseDesk($shopid, $deskid){
+        $table_deskinfo = 'dineshop_deskinfo';
+        $retup = Db::name($table_deskinfo)
+            ->where('f_sid',$shopid)
+            ->where('f_deskid',$deskid)
+            ->setInc('f_orderamount');
+        if($retup !== false){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 获取待退款订单列表
+     */
+    public function getCancelOrderList($status,$limit_num=100){
+        $table_name = "orders";
+        $order_list = Db::name($table_name)
+            ->where('f_status','in',$status)
+            ->field('f_oid as orderid')
+            ->field('f_userid as userid')
+            ->field('f_type as ordertype')
+            ->field('f_status as status')
+            ->field('f_shopid as shopid')
+            ->field('f_deskid as deskid')
+            ->field('f_addtime as addtime')
+            ->field('f_startime as startime')
+            ->field('f_endtime as endtime')
+            ->order('f_addtime desc')
+            ->limit($limit_num)
+            ->select();
+        return $order_list;
+    }
+>>>>>>> upstream/master
 }

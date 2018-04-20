@@ -72,9 +72,15 @@ $.fn.splitter = function(args){
          // Constrain new splitbar position to fit pane size limits
          newPos = Math.max(A._min, splitter._DA - B._max,
                Math.min(newPos, A._max, splitter._DA - bar._DA - B._min));
+<<<<<<< HEAD
          // Resize/position the two panes
          bar._DA = bar[0][opts.pxSplit];      // bar size may change during dock
 
+=======
+         // Resize/position the two panes
+         bar._DA = bar[0][opts.pxSplit];      // bar size may change during dock
+
+>>>>>>> upstream/master
          var posOffset = bar.is(':visible') ? bar._DA - 1 : 0;
 
          bar.css(opts.origin, newPos - posOffset).css(opts.fixed, splitter._DF);
@@ -150,7 +156,11 @@ $.fn.splitter = function(args){
       if ( /^(auto|default|)$/.test(bar.css("cursor")) )
          bar.css("cursor", opts.cursor);
 
+<<<<<<< HEAD
       // Cache several dimensions for speed, rather than re-querying constantly
+=======
+      // Cache several dimensions for speed, rather than re-querying constantly
+>>>>>>> upstream/master
       bar._DA = bar[0][opts.pxSplit];
       splitter._PBF = $.boxModel? dimSum(splitter, "border"+opts.side3+"Width", "border"+opts.side4+"Width") : 0;
       splitter._PBA = $.boxModel? dimSum(splitter, "border"+opts.side1+"Width", "border"+opts.side2+"Width") : 0;

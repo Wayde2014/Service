@@ -325,6 +325,10 @@ class UserModel extends Model
         $address = Db::name($table_name)
             ->where('f_uid', $userid)
             ->field('f_id id,f_province province,f_city city,f_address address,f_name name,f_sex as male,f_mobile mobile,f_isactive isactive')
+<<<<<<< HEAD
+=======
+            ->order('f_isactive', 'desc')
+>>>>>>> upstream/master
             ->order('f_addtime', 'desc')
             ->select();
         return $address;

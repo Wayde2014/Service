@@ -102,6 +102,7 @@ class Order extends Base
             }
         }
         $_ordermoney = 0;
+<<<<<<< HEAD
         Log::record($orderdetail);
         Log::record($priceinfo);
         foreach(explode(',', $orderdetail) as $key=>$val){
@@ -112,6 +113,24 @@ class Order extends Base
         }
         Log::record($_ordermoney.'**'.$ordermoney);
         if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
+=======
+        foreach(explode(',', $orderdetail) as $key=>$val){
+            if(preg_match('/^(\d+)\|(\d+)\@(\d+)$/i', $val)){
+                preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
+                $_dishid = $match[1];
+                $_dishnum = $match[3];
+                if(!isset($priceinfo[$_dishid])){
+                    return json($this->erres('['.$_dishid.']菜肴信息不存在'));
+                }
+                $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
+            }else{
+                return json($this->erres('订单格式不正确'));
+            }
+        }
+        /*if($_ordermoney != $ordermoney){
+            return json($this->errjson(-30017));
+        }*/
+>>>>>>> upstream/master
         //验证外卖配送地址
         if($ordertype == 1){
             $addressinfo = $UserModel->getAddressInfo($addressid);
@@ -130,11 +149,22 @@ class Order extends Base
                 $orderid = $OrderModel->addEatinOrders($uid, $shopid, $orderdetail, $ordermoney, $deliverymoney, $allmoney, $paytype, $mealsnum, $startime, $endtime, $servicemoney, $deskid);
             }
             if($orderid){
+<<<<<<< HEAD
                 if($this->checkMoneyEnough($uid,$allmoney)){
                     return json($this->sucjson(array('orderid' => $orderid)));
                 }else{
                     return json($this->errjson(-10002, array('orderid' => $orderid)));
                 }
+=======
+                if($_ordermoney != $ordermoney){
+                    Log::record('wayde-orderid='.$orderid,'error');
+                    Log::record('wayde-orderid='.$orderdetail,'error');
+                    Log::record($priceinfo,'error');
+                    Log::record('wayde-'.$_ordermoney.'---'.$ordermoney,'error');
+                    Log::record('error-30017,订单金额不正确','error');
+                }
+                return json($this->sucjson(array('orderid' => $orderid)));
+>>>>>>> upstream/master
             }else{
                 return json($this->errjson(-30019));
             }
@@ -206,6 +236,7 @@ class Order extends Base
         $info["totalpage"] = ceil($res["allnum"]/$pagesize);
         if($res["orderlist"]) {
             $list = $res["orderlist"];
+<<<<<<< HEAD
             $orderlist = array();
             $dishid = array();
             foreach($list as $key=>$val){
@@ -214,17 +245,36 @@ class Order extends Base
                 if($match){
                     $orderlist = array_combine($match[1], $match[0]);
                     $dishid = array_merge($dishid, $match[1]);
+=======
+            $dishid = array();
+            $tastesid = array();
+            foreach($list as $key=>$val){
+                $orderlist = array();
+                $orderdetail = $val['orderdetail'];
+                preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
+                if($match){
+                    for($i=0; $i<count($match[1]); $i++){
+                        array_push($orderlist, $match[0][$i]);
+                    }
+                    $dishid = array_merge($dishid, $match[1]);
+                    $tastesid = array_merge($tastesid, $match[2]);
+>>>>>>> upstream/master
                 }
                 $list[$key]['orderlist'] = $orderlist;
             }
             $DishesModel = new DishesModel();
             $dishlist = $DishesModel->getDishesList(implode(',', array_unique($dishid)));
+<<<<<<< HEAD
+=======
+            $tasteslist = $DishesModel->getTastesList(implode(',', array_unique($tastesid)));
+>>>>>>> upstream/master
             $dishinfo = array();
             if($dishlist){
                 foreach($dishlist as $key => $val){
                     $dishinfo[$val['id']] = $val;
                 }
             }
+<<<<<<< HEAD
             foreach($list as $key => $val){
                 $orderlist = array();
                 foreach($val['orderlist'] as $k => $v){
@@ -233,6 +283,26 @@ class Order extends Base
                     $num = $match[3];
                     $orderinfo = isset($dishinfo[$k])?$dishinfo[$k]:array();
                     $orderinfo['num'] = $num;
+=======
+            $tastesinfo = array();
+            if($tasteslist){
+                foreach($tasteslist as $key => $val){
+                    $tastesinfo[$val['tid']] = $val['tastesname'];
+                }
+            }
+            foreach($list as $key => $val){
+                $orderlist = array();
+                for($i=0; $i<count($val['orderlist']); $i++){
+                    $v = $val['orderlist'][$i];
+                    preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $match);
+                    $dishid = $match[1];
+                    $tastesid = $match[2];
+                    $num = $match[3];
+                    $orderinfo = isset($dishinfo[$dishid])?$dishinfo[$dishid]:array();
+                    $orderinfo['num'] = $num;
+                    $orderinfo['tastesid'] = $tastesid;
+                    $orderinfo['tastesname'] = isset($tastesinfo[$tastesid])?$tastesinfo[$tastesid]:'';
+>>>>>>> upstream/master
                     array_push($orderlist, $orderinfo);
                 }
                 $list[$key]['orderlist'] = $orderlist;
@@ -254,26 +324,44 @@ class Order extends Base
         $OrderModel = new OrderModel();
         $res = $OrderModel->getOrderinfo($uid, $orderid);
         $dishid = array();
+<<<<<<< HEAD
+=======
+        $tastesid = array();
+>>>>>>> upstream/master
         $orderlist = array();
         if($res){
             $info = $res;
             $orderdetail = $res['orderdetail'];
             preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
+<<<<<<< HEAD
             preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $orderdetail, $match);
             if($match){
                 $orderlist = array_combine($match[1], $match[0]);
                 $dishid = array_merge($dishid, $match[1]);
+=======
+            if($match){
+                for($i=0; $i<count($match[1]); $i++){
+                    array_push($orderlist, $match[0][$i]);
+                }
+                $dishid = array_merge($dishid, $match[1]);
+                $tastesid = array_merge($tastesid, $match[2]);
+>>>>>>> upstream/master
             }
             $DishesModel = new DishesModel();
             $dishlist = $DishesModel->getDishesList(implode(',', array_unique($dishid)));
             $dishinfo = array();
             if($dishlist){
                 foreach($dishlist as $key => $val){
+<<<<<<< HEAD
+=======
+                    $dishinfo[$val['id']]['dishid'] = $val['id'];
+>>>>>>> upstream/master
                     $dishinfo[$val['id']]['icon'] = $val['icon'];
                     $dishinfo[$val['id']]['dishesname'] = $val['dishesname'];
                     $dishinfo[$val['id']]['price'] = $val['price'];
                 }
             }
+<<<<<<< HEAD
             foreach($orderlist as $k => $v){
                 preg_match('/(\d+)\|(\d+)\@(\d+)/i', $v, $match);
                 $num = $match[3];
@@ -284,6 +372,76 @@ class Order extends Base
             $suborder_list = array();
             if($res['hassuborder'] != 0){
                 $suborder_list = $OrderModel->getSubOrderList($uid,$orderid);
+=======
+            $tasteslist = $DishesModel->getTastesList(implode(',', array_unique($tastesid)));
+            $tastesinfo = array();
+            if($tasteslist){
+                foreach($tasteslist as $key => $val){
+                    $tastesinfo[$val['tid']] = $val['tastesname'];
+                }
+            }
+            for($i=0; $i<count($orderlist); $i++){
+                preg_match('/(\d+)\|(\d+)\@(\d+)/i', $orderlist[$i], $match);
+                $dishid = $match[1];
+                $tastesid = $match[2];
+                $num = $match[3];
+                $orderlist[$i] = isset($dishinfo[$dishid])?$dishinfo[$dishid]:array();
+                $orderlist[$i]['num'] = $num;
+                $orderlist[$i]['tastesid'] = $tastesid;
+                $orderlist[$i]['tastesname'] = isset($tastesinfo[$tastesid])?$tastesinfo[$tastesid]:'';
+            }
+            $info['orderlist'] = $orderlist;
+
+            //子订单详情
+            $suborder_list = array();
+            if($res['hassuborder'] != 0){
+                $suborder_list = $OrderModel->getSubOrderList($uid,$orderid);
+                if(!empty($suborder_list)){
+                    foreach($suborder_list as $k1=>$v1){
+                        $sub_orderlist = array();
+                        $sub_dishid = array();
+                        $sub_tastesid = array();
+                        $sub_orderdetail = $v1['orderdetail'];
+                        preg_match_all('/(\d+)\|(\d+)\@(\d+)/i', $sub_orderdetail, $sub_match);
+                        if($sub_match){
+                            for($i=0; $i<count($sub_match[1]); $i++){
+                                array_push($sub_orderlist, $sub_match[0][$i]);
+                            }
+                            $sub_dishid = array_merge($sub_dishid, $sub_match[1]);
+                            $sub_tastesid = array_merge($sub_tastesid, $sub_match[2]);
+                        }
+                        $sub_dishlist = $DishesModel->getDishesList(implode(',', array_unique($sub_dishid)));
+                        $sub_dishinfo = array();
+                        if($sub_dishlist){
+                            foreach($sub_dishlist as $key => $val){
+                                $sub_dishinfo[$val['id']]['dishid'] = $val['id'];
+                                $sub_dishinfo[$val['id']]['icon'] = $val['icon'];
+                                $sub_dishinfo[$val['id']]['dishesname'] = $val['dishesname'];
+                                $sub_dishinfo[$val['id']]['price'] = $val['price'];
+                            }
+                        }
+                        $sub_tasteslist = $DishesModel->getTastesList(implode(',', array_unique($sub_tastesid)));
+                        $sub_tastesinfo = array();
+                        if($sub_tasteslist){
+                            foreach($sub_tasteslist as $key => $val){
+                                $sub_tastesinfo[$val['tid']] = $val['tastesname'];
+                            }
+                        }
+                        for($i=0; $i<count($sub_orderlist); $i++){
+                            preg_match('/(\d+)\|(\d+)\@(\d+)/i', $sub_orderlist[$i], $match);
+                            $dishid = $match[1];
+                            $tastesid = $match[2];
+                            $num = $match[3];
+                            $sub_orderlist[$i] = isset($sub_dishinfo[$dishid])?$sub_dishinfo[$dishid]:array();
+                            $sub_orderlist[$i]['num'] = $num;
+                            $sub_orderlist[$i]['tastesid'] = $tastesid;
+                            $sub_orderlist[$i]['tastesname'] = isset($sub_tastesinfo[$tastesid])?$sub_tastesinfo[$tastesid]:'';
+                        }
+                        
+                        $suborder_list[$k1]['orderlist'] = $sub_orderlist;
+                    }
+                }
+>>>>>>> upstream/master
             }
             $info['suborderlist'] = $suborder_list;
         }
@@ -443,16 +601,25 @@ class Order extends Base
             }
         }
         $_ordermoney = 0;
+<<<<<<< HEAD
         Log::record($orderdetail);
         Log::record($priceinfo);
+=======
+>>>>>>> upstream/master
         foreach(explode(',', $orderdetail) as $key=>$val){
             preg_match('/(\d+)\|(\d+)\@(\d+)/i', $val, $match);
             $_dishid = $match[1];
             $_dishnum = $match[3];
             $_ordermoney += $priceinfo[$_dishid] * $_dishnum;
         }
+<<<<<<< HEAD
         Log::record($_ordermoney.'**'.$ordermoney);
         if($_ordermoney != $ordermoney) return json($this->errjson(-30017));
+=======
+        /*if($_ordermoney != $ordermoney){
+            return json($this->errjson(-30017));
+        }*/
+>>>>>>> upstream/master
 
         //创建订单
         $OrderModel = new OrderModel();
@@ -462,6 +629,17 @@ class Order extends Base
                 'parentid' => $parentidid,
                 'orderid' => $orderid,
             );
+<<<<<<< HEAD
+=======
+            if($_ordermoney != $ordermoney){
+                Log::record('wayde-parentid='.$parentidid,'error');
+                Log::record('wayde-orderid='.$orderid,'error');
+                Log::record('wayde-orderdetail='.$orderdetail,'error');
+                Log::record($priceinfo,'error');
+                Log::record('wayde-'.$_ordermoney.'---'.$ordermoney,'error');
+                Log::record('error-30017,suborder订单金额不正确','error');
+            }
+>>>>>>> upstream/master
             return json($this->sucjson($orderinfo));
         }else{
             return json($this->errjson(-30019));
@@ -579,4 +757,35 @@ class Order extends Base
 
         return json(self::errjson());
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * 扫码获取用户某店铺某桌型最近一笔未完成堂食订单ID
+     */
+    public function scan(){
+        //获取参数
+        $ck = input('ck');
+        $uid = input('uid');
+        $shopid = intval(input('shopid',-1));
+        $deskid = intval(input('deskid',-1));
+
+        if($shopid < 0 || $deskid < 0){
+            return json(self::errjson(-20001));
+        }
+
+        //检查用户是否登录
+        if(!self::checkLogin($uid,$ck)){
+            return json($this->errjson(-10001));
+        }
+
+        //获取订单信息
+        $OrderModel = new OrderModel();
+        $orderinfo = $OrderModel->getScanOrderInfo($uid,$shopid,$deskid);
+        if(!empty($orderinfo)){
+            return json(self::sucjson(array("orderid"=>$orderinfo['orderid'])));
+        }
+        return json(self::sucjson());
+    }
+>>>>>>> upstream/master
 }

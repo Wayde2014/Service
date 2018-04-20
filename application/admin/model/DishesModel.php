@@ -120,6 +120,66 @@ class DishesModel extends Model
             "disheslist" => $disheslist
         );
     }
+<<<<<<< HEAD
+=======
+    
+    /**
+     * 根据店铺ID获取可推荐菜品列表信息
+     */
+    public function getRecomDishesListBysid($shopid, $page, $pagesize){
+        $allnum = Db::table('t_food_dishes')->where('f_sid', $shopid)->count();
+        $disheslist = Db::table('t_food_dishes')
+            ->alias('a')
+            ->field('a.f_id id, a.f_state status, a.f_isrecom isrecom, a.f_sid shopid, e.f_shopname shopname, a.f_name dishname, a.f_desc dishdesc, a.f_icon dishicon, a.f_price dishprice, a.f_discount defdiscount, a.f_tastesid tastesid, a.f_cuisineid cuisineid, d.f_cname cuisinename, a.f_classid classid, c.f_cname classname, a.f_lasttime addtime, a.f_salenum salenum')
+            ->join('t_food_classify c','a.f_classid = c.f_cid','left')
+            ->join('t_food_cuisine d','a.f_cuisineid = d.f_cid','left')
+            ->join('t_admin_dineshop e','a.f_sid = e.f_sid','left')
+            ->where('a.f_sid', $shopid)
+            ->order('a.f_lasttime desc')
+            ->page($page, $pagesize)
+            ->select();
+        return array(
+            "allnum" => $allnum,
+            "disheslist" => $disheslist
+        );
+    }
+    
+    /**
+     * 获取推荐菜品列表信息
+     */
+    public function getRecomDishesList($page, $pagesize){
+        $allnum = Db::table('t_food_dishes')->where('f_isrecom', 1)->count();
+        $disheslist = Db::table('t_food_dishes')
+            ->alias('a')
+            ->field('a.f_id id, a.f_state status, a.f_sid shopid, e.f_shopname shopname, a.f_name dishname, a.f_desc dishdesc, a.f_icon dishicon, a.f_price dishprice, a.f_discount defdiscount, a.f_tastesid tastesid, a.f_cuisineid cuisineid, d.f_cname cuisinename, a.f_classid classid, c.f_cname classname, a.f_lasttime addtime, a.f_salenum salenum')
+            ->join('t_food_classify c','a.f_classid = c.f_cid','left')
+            ->join('t_food_cuisine d','a.f_cuisineid = d.f_cid','left')
+            ->join('t_admin_dineshop e','a.f_sid = e.f_sid','left')
+            ->where('a.f_isrecom', 1)
+            ->order('a.f_lasttime desc')
+            ->page($page, $pagesize)
+            ->select();
+        return array(
+            "allnum" => $allnum,
+            "disheslist" => $disheslist
+        );
+    }
+    
+    /**
+     * 添加推荐
+     */
+    public function addRecomDishes($dishid){
+        return Db::table('t_food_dishes')->where('f_id', $dishid)->update(array('f_isrecom' => 1));
+    }
+    
+    /**
+     * 添加推荐
+     */
+    public function delRecomDishes($dishid){
+        return Db::table('t_food_dishes')->where('f_id', $dishid)->update(array('f_isrecom' => 0));
+    }
+    
+>>>>>>> upstream/master
     /**
      * 获取菜品信息
      */

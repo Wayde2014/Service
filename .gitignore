@@ -3,5 +3,13 @@ Thumbs.db
 Desktop.ini
 
 # My configurations:
+<<<<<<< HEAD
 /Application/Runtime/
 /.idea/
+=======
+/application/database.php
+/runtime/
+/upload/
+/public/
+
+>>>>>>> upstream/master

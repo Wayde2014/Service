@@ -173,6 +173,7 @@ class DineshopModel extends Model
     /**
      * 获取桌型信息
      * @param $shopid
+<<<<<<< HEAD
      * @param $deskid_list
      * @return $this
      */
@@ -183,6 +184,16 @@ class DineshopModel extends Model
             ->where('f_id','in',$deskid_list)
             ->where('f_status',1)
             ->field('f_id as deskid')
+=======
+     * @return false|\PDOStatement|string|\think\Collection
+     */
+    public function getDeskInfo($shopid){
+        $table_name = "dineshop_deskinfo";
+        $deskinfo = Db::name($table_name)
+            ->where('f_sid',$shopid)
+            ->where('f_status',1)
+            ->field('f_deskid as deskid')
+>>>>>>> upstream/master
             ->field('f_sid as shopid')
             ->field('f_seatnum as seatnum')
             ->field('f_amount as amount')
@@ -191,4 +202,19 @@ class DineshopModel extends Model
 
         return $deskinfo;
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * 获取菜肴口味字典表
+     */
+    public function getFoodTastesInfo(){
+        $table_name = "food_tastes";
+        $result = Db::name($table_name)
+            ->field('f_tid as tastid')
+            ->field('f_tname as tastname')
+            ->select();
+        return $result;
+    }
+>>>>>>> upstream/master
 }

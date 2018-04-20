@@ -38,7 +38,11 @@ class DineshopModel extends Model
             $shopid = intval(Db::table('t_admin_dineshop')->insertGetId($data));
             return $shopid;
         }catch (\Exception $e) {
+<<<<<<< HEAD
             $shopinfo = Db::table('t_admin_dineshop')->field('f_sid shopid')->where('f_shopname', $shopname)->where('f_adduser', $adduser)->find();
+=======
+            $shopinfo = Db::table('t_admin_dineshop')->field('f_sid shopid, f_fontshopid fontshopid')->where('f_adduser', $adduser)->find();
+>>>>>>> upstream/master
             if($shopinfo && isset($shopinfo['shopid'])){
                 return $shopinfo['shopid'];
             }else{
@@ -119,13 +123,64 @@ class DineshopModel extends Model
         }
     }
     /**
+<<<<<<< HEAD
+=======
+     * 获取推荐店铺信息列表
+     */
+    public function getRecomDineshopList($page = 1, $pagesize = 20){
+        $allnum = Db::table('t_dineshop')->where('f_isrecom', 1)->count();
+        $dineshoplist = Db::table('t_dineshop')
+            ->field('f_sid id, f_isrecom isrecom, f_shopname shopname, f_shopdesc shopdesc, f_shopicon shopicon, f_shophone shophone, f_address address, f_isbooking isbooking, f_opentime opentime, f_isaway isaway, f_deliverytime deliverytime, f_addtime addtime')
+            ->where('f_isrecom', 1)
+            ->order('f_addtime desc')
+            ->page($page, $pagesize)
+            ->select();
+        return array(
+            "allnum" => $allnum,
+            "dineshoplist" => $dineshoplist
+        );
+    }
+    /**
+     * 获取可推荐店铺信息列表
+     */
+    public function getCanRecomDineshopList($page = 1, $pagesize = 20){
+        $allnum = Db::table('t_dineshop')->count();
+        $dineshoplist = Db::table('t_dineshop')
+            ->field('f_sid id, f_isrecom isrecom, f_shopname shopname, f_shopdesc shopdesc, f_shopicon shopicon, f_shophone shophone, f_address address, f_isbooking isbooking, f_opentime opentime, f_isaway isaway, f_deliverytime deliverytime, f_addtime addtime')
+            ->order('f_addtime desc')
+            ->page($page, $pagesize)
+            ->select();
+        return array(
+            "allnum" => $allnum,
+            "dineshoplist" => $dineshoplist
+        );
+    }
+    /**
+     * 添加推荐
+     */
+    public function addRecomDineshop($shopid){
+        return Db::table('t_dineshop')->where('f_sid', $shopid)->update(array('f_isrecom' => 1));
+    }
+    
+    /**
+     * 添加推荐
+     */
+    public function delRecomDineshop($shopid){
+        return Db::table('t_dineshop')->where('f_sid', $shopid)->update(array('f_isrecom' => 0));
+    }
+    /**
+>>>>>>> upstream/master
      * 获取店铺信息列表
      */
     public function getDineshopList($page = 1, $pagesize = 20){
         $allnum = Db::table('t_admin_dineshop')->count();
         $dineshoplist = Db::table('t_admin_dineshop')
             ->alias('a')
+<<<<<<< HEAD
             ->field('a.f_sid id, a.f_adduser userid, b.f_username adduser, a.f_status status, a.f_shopname shopname, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
+=======
+            ->field('a.f_sid id, a.f_adduser userid, b.f_username adduser, a.f_status status, a.f_shopname shopname, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime, a.f_fontshopid fontshopid')
+>>>>>>> upstream/master
             ->join('t_admin_userinfo b','a.f_adduser = b.f_uid','left')
             ->order('a.f_addtime desc')
             ->page($page, $pagesize)
@@ -141,20 +196,38 @@ class DineshopModel extends Model
     public function getDineshopInfo($shopid){
         $dineshopinfo = Db::table('t_admin_dineshop')
             ->alias('a')
+<<<<<<< HEAD
             ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice,a.f_minconsume minconsume, a.f_preconsume preconsume,a.f_servicecharge servicecharge, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
+=======
+            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice,a.f_minconsume minconsume, a.f_preconsume preconsume,a.f_servicecharge servicecharge, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime, a.f_fontshopid fontshopid')
+>>>>>>> upstream/master
             ->join('t_food_cuisine b','a.f_cuisineid = b.f_cid','left')
             ->where('a.f_sid', $shopid)
             ->find();
         return $dineshopinfo;
     }
+<<<<<<< HEAD
 
+=======
+    /**
+     * 获取店铺信息
+     */
+    public function getDineshopInfoByadduser($adduser){
+        $dineshopinfo = Db::table('t_admin_dineshop')->where('f_adduser', $adduser)->find();
+        return $dineshopinfo;
+    }
+>>>>>>> upstream/master
 	/**
      * 获取店铺信息(按店铺名模糊搜索)
      */
     public function getDineshopInfoByName($shopname){
         $dineshopinfo = Db::table('t_admin_dineshop')
             ->alias('a')
+<<<<<<< HEAD
             ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice, a.f_minconsume minconsume, a.f_preconsume preconsume, a.f_servicecharge servicecharge, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime')
+=======
+            ->field('a.f_sid id, a.f_adduser userid, a.f_shopname shopname, a.f_status status, a.f_shopdesc shopdesc, a.f_shopicon shopicon, a.f_shophone shophone, a.f_address address, a.f_cuisineid cuisineid, b.f_cname cuisinename, a.f_menulist menulist, a.f_maplon maplon, a.f_maplat maplat, a.f_sales sales, a.f_deliveryfee deliveryfee, a.f_minprice minprice, a.f_minconsume minconsume, a.f_preconsume preconsume, a.f_servicecharge servicecharge, a.f_isbooking isbooking, a.f_opentime opentime, a.f_isaway isaway, a.f_deliverytime deliverytime, a.f_addtime addtime, a.f_fontshopid fontshopid')
+>>>>>>> upstream/master
             ->join('t_food_cuisine b','a.f_cuisineid = b.f_cid','left')
             ->where(array('a.f_shopname'=>array('like','%'.$shopname.'%')))
             ->find();
@@ -353,16 +426,31 @@ class DineshopModel extends Model
     /**
      * 添加店铺桌型
      */
+<<<<<<< HEAD
     public function addDesk($shopid, $seatnum, $desknum){
         try{
             $data = array(
                 'f_sid' => $shopid,
+=======
+    public function addDesk($shopid, $deskid, $seatnum, $desknum){
+        try{
+            $data = array(
+                'f_sid' => $shopid,
+                'f_deskid' => $deskid,
+>>>>>>> upstream/master
                 'f_seatnum' => $seatnum,
                 'f_amount' => $desknum,
                 'f_addtime' => date('Y-m-d H:i:s')
             );
+<<<<<<< HEAD
             $deskid = intval(Db::table('t_dineshop_deskinfo')->insertGetId($data));
             return $deskid;
+=======
+            if(Db::table('t_dineshop_deskinfo')->insertGetId($data) > 0){
+                return true;
+            }
+            return false;
+>>>>>>> upstream/master
         } catch (\Exception $e) {
             return false;
         }
@@ -370,6 +458,7 @@ class DineshopModel extends Model
     /**
      * 修改店铺桌型
      */
+<<<<<<< HEAD
     public function modDesk($deskid, $seatnum, $desknum){
         $data = array("f_seatnum" => $seatnum, "f_amount" => $desknum);
         $ret = Db::table('t_dineshop_deskinfo')->where('f_id', $deskid)->update($data);
@@ -386,21 +475,47 @@ class DineshopModel extends Model
         $ret = Db::table('t_dineshop_deskinfo')->where('f_id', $deskid)->delete();
         return $ret<0?false:true;
     }
+=======
+    public function modDesk($shopid, $deskid, $desknum, $status)
+    {
+        $data = array(
+            "f_amount" => $desknum,
+            "f_status" => $status
+        );
+        $ret = Db::table('t_dineshop_deskinfo')
+            ->where('f_sid', $shopid)
+            ->where('f_deskid', $deskid)
+            ->update($data);
+        if ($ret !== false) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+>>>>>>> upstream/master
     /**
      * 获取店铺桌型列表
      */
     public function getDesklist($shopid){
         $desklist = Db::table('t_dineshop_deskinfo')
+<<<<<<< HEAD
             ->field('f_id id, f_sid shopid, f_seatnum seatnum, f_amount desknum, f_orderamount ordernum, f_addtime addtime')
             ->where('f_sid', $shopid)
             ->where('f_status', 1)
             ->order('f_seatnum asc')
+=======
+            ->field('f_deskid deskid, f_sid shopid, f_seatnum seatnum, f_amount desknum, f_orderamount ordernum,f_status status, f_addtime addtime')
+            ->where('f_sid', $shopid)
+            ->order('f_deskid asc')
+>>>>>>> upstream/master
             ->select();
         return $desklist;
     }
     /**
      * 获取店铺桌型信息
      */
+<<<<<<< HEAD
     public function getDeskinfo($deskid){
         $deskinfo = Db::table('t_dineshop_deskinfo')
             ->alias('a')
@@ -408,6 +523,16 @@ class DineshopModel extends Model
             ->join('t_dineshop b','a.f_sid = b.f_sid','left')
             ->where('a.f_id', $deskid)
             ->where('a.f_status', 1)
+=======
+    public function getDeskinfo($shopid, $deskid)
+    {
+        $deskinfo = Db::table('t_dineshop_deskinfo')
+            ->alias('a')
+            ->field('a.f_id id, a.f_sid shopid, b.f_shopname shopname, b.f_shopdesc shopdesc, b.f_shopicon shopicon, b.f_shophone shophone, b.f_address address, a.f_seatnum seatnum, a.f_amount desknum, a.f_status status, a.f_addtime addtime')
+            ->join('t_dineshop b', 'a.f_sid = b.f_sid', 'left')
+            ->where('a.f_sid', $shopid)
+            ->where('a.f_deskid', $deskid)
+>>>>>>> upstream/master
             ->find();
         return $deskinfo;
     }
@@ -417,6 +542,10 @@ class DineshopModel extends Model
     public function getCuisineList(){
         $list = Db::table('t_food_cuisine')
             ->field('f_cid id, f_cname cuisinename, f_lasttime addtime')
+<<<<<<< HEAD
+=======
+            ->where('f_status', 0)
+>>>>>>> upstream/master
             ->select();
         return $list;
     }
